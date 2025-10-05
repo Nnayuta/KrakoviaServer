@@ -78,55 +78,90 @@ public class MariaDBAccountDatabase : IAccountDatabase
     public async Task<Account?> GetAccountByUsernameAsync(string username)
     {
         Account? account = null;
+        // Usamos um dicionário para montar os personagens, evitando duplicatas.
+        var characters = new Dictionary<string, Character>();
+
         using (var connection = new MySqlConnection(_connectionString))
         {
             await connection.OpenAsync();
-            var query = @"
-                SELECT
-                    a.id as account_id, a.username, a.password_hash,
-                    c.id as character_id, c.name, c.class_id, c.level, c.appearance_json
-                FROM accounts a
-                LEFT JOIN characters c ON a.id = c.account_id
-                WHERE a.username = @username;";
 
-            using (var command = new MySqlCommand(query, connection))
+            // Query principal para buscar a conta e os personagens
+            var accountQuery = @"
+                SELECT id as account_id, username, password_hash
+                FROM accounts
+                WHERE username = @username;";
+
+            using (var command = new MySqlCommand(accountQuery, connection))
             {
                 command.Parameters.AddWithValue("@username", username);
                 using (var reader = await command.ExecuteReaderAsync())
                 {
+                    if (!await reader.ReadAsync())
+                    {
+                        return null; // A conta não existe
+                    }
+
+                    account = new Account
+                    {
+                        Id = Convert.ToInt32(reader["account_id"]),
+                        Username = Convert.ToString(reader["username"]),
+                        HashedPassword = Convert.ToString(reader["password_hash"]),
+                        Characters = new List<Character>()
+                    };
+                }
+            }
+
+            // Se a conta existe, buscamos os personagens e seus equipamentos
+            var charactersQuery = @"
+                SELECT
+                    c.id as character_id, c.name, c.class_id, c.level, c.appearance_json,
+                    ce.slot_name, ce.item_id
+                FROM characters c
+                LEFT JOIN character_equipment ce ON c.id = ce.character_id
+                WHERE c.account_id = @account_id;";
+
+            using (var command = new MySqlCommand(charactersQuery, connection))
+            {
+                command.Parameters.AddWithValue("@account_id", account.Id);
+                using (var reader = await command.ExecuteReaderAsync())
+                {
                     while (await reader.ReadAsync())
                     {
-                        if (account == null)
-                        {
-                            // <<< CORREÇÃO PRINCIPAL AQUI >>>
-                            // Usamos o indexador de objeto (reader["nome_coluna"]) e o Convert
-                            // para evitar os erros de tipo.
-                            account = new Account
-                            {
-                                Id = Convert.ToInt32(reader["account_id"]),
-                                Username = Convert.ToString(reader["username"]),
-                                HashedPassword = Convert.ToString(reader["password_hash"]),
-                                Characters = new List<Character>()
-                            };
-                        }
+                        string charId = Convert.ToString(reader["character_id"]);
 
-                        // Verificamos se o personagem existe usando DBNull.Value
-                        if (reader["character_id"] != DBNull.Value)
+                        // Se é a primeira vez que vemos este personagem, criamos o objeto.
+                        if (!characters.ContainsKey(charId))
                         {
-                            var character = new Character
+                            characters[charId] = new Character
                             {
-                                Id = Convert.ToString(reader["character_id"]),
+                                Id = charId,
                                 Name = Convert.ToString(reader["name"]),
                                 ClassID = Convert.ToString(reader["class_id"]),
                                 Level = Convert.ToInt32(reader["level"]),
                                 Appearance = JsonConvert.DeserializeObject<CharacterAppearance>(Convert.ToString(reader["appearance_json"]))
                             };
-                            account.Characters.Add(character);
+                        }
+
+                        // Adiciona o item equipado, se houver um.
+                        if (reader["item_id"] != DBNull.Value)
+                        {
+                            string slotName = Convert.ToString(reader["slot_name"]);
+                            if (Enum.TryParse<EquipmentSlot>(slotName, out var slot))
+                            {
+                                characters[charId].EquippedItems[slot] = Convert.ToString(reader["item_id"]);
+                            }
                         }
                     }
                 }
             }
         }
+
+        // Adiciona a lista de personagens montada à conta
+        if (account != null)
+        {
+            account.Characters = characters.Values.ToList();
+        }
+
         return account;
     }
 

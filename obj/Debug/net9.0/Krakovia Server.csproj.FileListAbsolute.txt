@@ -67,3 +67,4 @@ D:\GameDev\Krakovia Server\Krakovia Server\bin\Debug\net9.0\runtimes\win-x64\nat
 D:\GameDev\Krakovia Server\Krakovia Server\bin\Debug\net9.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.Messages.dll
 D:\GameDev\Krakovia Server\Krakovia Server\bin\Debug\net9.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.dll
 D:\GameDev\Krakovia Server\Krakovia Server\bin\Debug\net9.0\runtimes\win\lib\net8.0\System.Windows.Extensions.dll
+D:\GameDev\Krakovia Server\Krakovia Server\obj\Debug\net9.0\Krakovia Server.sourcelink.json
