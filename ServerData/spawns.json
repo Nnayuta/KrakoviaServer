@@ -1,0 +1,34 @@
+{
+  "SpawnPoints": [
+    {
+      "NpcTypeId": "090d7357",
+      "Quantity": 10,
+      "SpawnRadius": 88.8,
+      "Position": {
+        "X": 103.5,
+        "Y": 2.8,
+        "Z": 237.0
+      }
+    },
+    {
+      "NpcTypeId": "090d7357",
+      "Quantity": 10,
+      "SpawnRadius": 77.4,
+      "Position": {
+        "X": -51.2,
+        "Y": 2.8,
+        "Z": 359.0
+      }
+    },
+    {
+      "NpcTypeId": "090d7357",
+      "Quantity": 10,
+      "SpawnRadius": 77.4,
+      "Position": {
+        "X": 339.0,
+        "Y": 2.8,
+        "Z": 319.9
+      }
+    }
+  ]
+}

@@ -1,0 +1,414 @@
+[
+  {
+    "$type": "ServerWeaponData, Assembly-CSharp",
+    "WeaponDamage": 0.0,
+    "WeaponSpeed": 0.0,
+    "combatStyle": "Unarmed",
+    "handType": "TwoHanded",
+    "weaponType": "Bow",
+    "equipmentSlot": "MainHand",
+    "itemID": "bow_wood_01",
+    "itemName": "Arco de Madeira",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 1,
+    "sellPrice": 0,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Agility",
+        "Value": 2
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Leather",
+    "equipmentSlot": "Feet",
+    "itemID": "cloth_boots_01",
+    "itemName": "Botas de Linho",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 1,
+    "sellPrice": 0,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Stamina",
+        "Value": 1
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Leather",
+    "equipmentSlot": "Chest",
+    "itemID": "cloth_chest_01",
+    "itemName": "Túnica de Linho",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 1,
+    "sellPrice": 0,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Intellect",
+        "Value": 1
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Leather",
+    "equipmentSlot": "Head",
+    "itemID": "cloth_head_01",
+    "itemName": "Capuz de de Linho",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 1,
+    "sellPrice": 0,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Intellect",
+        "Value": 1
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Leather",
+    "equipmentSlot": "Legs",
+    "itemID": "cloth_legs_01",
+    "itemName": "Calças de Linho",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 1,
+    "sellPrice": 0,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Intellect",
+        "Value": 1
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "common_bear_skin",
+    "itemName": "Pele de Urso",
+    "quality": "Common",
+    "maxStackSize": 100,
+    "requiredLevel": 1,
+    "sellPrice": 0,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "flower_blue_01",
+    "itemName": "Erva Azul",
+    "quality": "Common",
+    "maxStackSize": 100,
+    "requiredLevel": 1,
+    "sellPrice": 0,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerWeaponData, Assembly-CSharp",
+    "WeaponDamage": 0.0,
+    "WeaponSpeed": 0.0,
+    "combatStyle": "Unarmed",
+    "handType": "OneHanded",
+    "weaponType": "Sword1H",
+    "equipmentSlot": "MainHand",
+    "itemID": "gm_sword_01",
+    "itemName": "Espada do GameMaster",
+    "quality": "Legendary",
+    "maxStackSize": 1,
+    "requiredLevel": 1,
+    "sellPrice": 0,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Strength",
+        "Value": 1000
+      },
+      {
+        "Stat": "Agility",
+        "Value": 1000
+      },
+      {
+        "Stat": "Intellect",
+        "Value": 1000
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 1000
+      },
+      {
+        "Stat": "Armor",
+        "Value": 1000
+      },
+      {
+        "Stat": "Leech",
+        "Value": 1000
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Leather",
+    "equipmentSlot": "Feet",
+    "itemID": "laether_boots_01",
+    "itemName": "Botas de Couro",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 1,
+    "sellPrice": 0,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Agility",
+        "Value": 1
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Leather",
+    "equipmentSlot": "Chest",
+    "itemID": "laether_chest_01",
+    "itemName": "Peitoral de Couro",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 1,
+    "sellPrice": 0,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Agility",
+        "Value": 1
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Leather",
+    "equipmentSlot": "Head",
+    "itemID": "laether_head_01",
+    "itemName": "Capacete de Couro",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 1,
+    "sellPrice": 0,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Agility",
+        "Value": 1
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Leather",
+    "equipmentSlot": "Legs",
+    "itemID": "laether_legs_01",
+    "itemName": "Perneiras de Couro",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 1,
+    "sellPrice": 0,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Agility",
+        "Value": 1
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Plate",
+    "equipmentSlot": "Feet",
+    "itemID": "plate_boots_01",
+    "itemName": "Botas de Couro",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 1,
+    "sellPrice": 0,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 1
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Plate",
+    "equipmentSlot": "Chest",
+    "itemID": "plate_chest_01",
+    "itemName": "Armadura de Ferro Gasto",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 1,
+    "sellPrice": 0,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 1
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Plate",
+    "equipmentSlot": "Head",
+    "itemID": "plate_head_01",
+    "itemName": "Capacete de Couro",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 1,
+    "sellPrice": 0,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 1
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Plate",
+    "equipmentSlot": "Legs",
+    "itemID": "plate_legs_01",
+    "itemName": "Perneiras de Couro",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 1,
+    "sellPrice": 0,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 2
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "$type": "ServerWeaponData, Assembly-CSharp",
+    "WeaponDamage": 0.0,
+    "WeaponSpeed": 0.0,
+    "combatStyle": "Unarmed",
+    "handType": "TwoHanded",
+    "weaponType": "Staff",
+    "equipmentSlot": "MainHand",
+    "itemID": "staff_wood_01",
+    "itemName": "Cajado de Madeira",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 1,
+    "sellPrice": 0,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Intellect",
+        "Value": 4
+      }
+    ]
+  },
+  {
+    "$type": "ServerWeaponData, Assembly-CSharp",
+    "WeaponDamage": 0.0,
+    "WeaponSpeed": 0.0,
+    "combatStyle": "Unarmed",
+    "handType": "OneHanded",
+    "weaponType": "Sword1H",
+    "equipmentSlot": "MainHand",
+    "itemID": "sword_wood_01",
+    "itemName": "Espada de Madeira",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 1,
+    "sellPrice": 0,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Strength",
+        "Value": 2
+      }
+    ]
+  }
+]

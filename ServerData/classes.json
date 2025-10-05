@@ -1,0 +1,145 @@
+{
+  "Classes": [
+    {
+      "ClassID": "hunter",
+      "PrimaryStat": "Agility",
+      "BaseHealth": 100,
+      "BaseResource": 200,
+      "BaseStrength": 4,
+      "BaseAgility": 15,
+      "BaseIntelligence": 0,
+      "BaseStamina": 0,
+      "HealthPerLevel": 0.0,
+      "ResourcePerLevel": 10.0,
+      "StrengthPerLevel": 3.0,
+      "AgilityPerLevel": 6.0,
+      "IntelligencePerLevel": 0.0,
+      "StaminaPerLevel": 5.0,
+      "BaseAbilityUnlocks": {
+        "1": [
+          "bow_shot"
+        ]
+      },
+      "StartingEquipmentIDs": [
+        "bow_wood_01",
+        "laether_boots_01",
+        "laether_chest_01",
+        "laether_head_01",
+        "laether_legs_01"
+      ],
+      "StartingInventoryIDs": [],
+      "Specializations": [],
+      "WeaponProficiencies": [
+        "Bow"
+      ]
+    },
+    {
+      "ClassID": "mage",
+      "PrimaryStat": "Intellect",
+      "BaseHealth": 100,
+      "BaseResource": 300,
+      "BaseStrength": 0,
+      "BaseAgility": 0,
+      "BaseIntelligence": 30,
+      "BaseStamina": 10,
+      "HealthPerLevel": 0.0,
+      "ResourcePerLevel": 15.0,
+      "StrengthPerLevel": 0.0,
+      "AgilityPerLevel": 0.0,
+      "IntelligencePerLevel": 10.0,
+      "StaminaPerLevel": 5.0,
+      "BaseAbilityUnlocks": {
+        "1": [
+          "mage_54d36845",
+          "mage_644c55de",
+          "mage_e5dfac90"
+        ]
+      },
+      "StartingEquipmentIDs": [
+        "cloth_boots_01",
+        "cloth_chest_01",
+        "cloth_head_01",
+        "cloth_legs_01",
+        "staff_wood_01"
+      ],
+      "StartingInventoryIDs": [],
+      "Specializations": [],
+      "WeaponProficiencies": [
+        "Staff"
+      ]
+    },
+    {
+      "ClassID": "priest",
+      "PrimaryStat": "Intellect",
+      "BaseHealth": 120,
+      "BaseResource": 400,
+      "BaseStrength": 0,
+      "BaseAgility": 0,
+      "BaseIntelligence": 20,
+      "BaseStamina": 0,
+      "HealthPerLevel": 0.0,
+      "ResourcePerLevel": 20.0,
+      "StrengthPerLevel": 0.0,
+      "AgilityPerLevel": 0.0,
+      "IntelligencePerLevel": 10.0,
+      "StaminaPerLevel": 12.0,
+      "BaseAbilityUnlocks": {
+        "1": [
+          "damage_priest_01",
+          "healer_priest_01",
+          "healer_priest_02"
+        ]
+      },
+      "StartingEquipmentIDs": [
+        "cloth_boots_01",
+        "cloth_chest_01",
+        "cloth_head_01",
+        "cloth_legs_01",
+        "staff_wood_01"
+      ],
+      "StartingInventoryIDs": [],
+      "Specializations": [],
+      "WeaponProficiencies": [
+        "Staff"
+      ]
+    },
+    {
+      "ClassID": "warrior",
+      "PrimaryStat": "Strength",
+      "BaseHealth": 200,
+      "BaseResource": 100,
+      "BaseStrength": 25,
+      "BaseAgility": 0,
+      "BaseIntelligence": 0,
+      "BaseStamina": 20,
+      "HealthPerLevel": 0.0,
+      "ResourcePerLevel": 0.0,
+      "StrengthPerLevel": 10.0,
+      "AgilityPerLevel": 0.0,
+      "IntelligencePerLevel": 0.0,
+      "StaminaPerLevel": 10.0,
+      "BaseAbilityUnlocks": {
+        "1": [
+          "sword_warrior_autoattack",
+          "sword_light_attack",
+          "sword_heavy_attack"
+        ]
+      },
+      "StartingEquipmentIDs": [
+        "sword_wood_01",
+        "plate_boots_01",
+        "plate_chest_01",
+        "plate_head_01",
+        "plate_legs_01"
+      ],
+      "StartingInventoryIDs": [],
+      "Specializations": [],
+      "WeaponProficiencies": [
+        "Sword1H",
+        "Axe1H",
+        "Mace1H",
+        "Sword2H"
+      ]
+    }
+  ]
+}
