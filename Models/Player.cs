@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Numerics;
+using Newtonsoft.Json;
 
 // A classe PlayerState permanece a mesma.
 public class PlayerState
@@ -25,9 +26,20 @@ public class Player : ICombatEntity, IWorldEntity
 
     public string GetSpawnMessage()
     {
-        // Agora usamos a propriedade Appearance.IsFemale que veio do CharacterData
-        string genderBit = this.Appearance.IsFemale ? "1" : "0";
-        return $"SPAWN_PLAYER|{this.Id}|{this.State.Position}|{GetEquipmentPayload()}|{genderBit}";
+        // Formato: SPAWN_PLAYER | ID | Nome | Posição | RotaçãoY | PayloadEquipamento | JSONAparência | Nível | VidaAtual | VidaMáxima
+
+        string position = this.State.Position;
+        string rotationY = this.State.RotationY;
+        string equipmentPayload = GetEquipmentPayload();
+
+        // Serializamos todo o objeto de aparência para JSON.
+        // O cliente pode então usar isso para reconstruir a aparência visual completa.
+        string appearanceJson = JsonConvert.SerializeObject(this.Appearance);
+
+        Console.WriteLine($"[GetSpawnMessage] Gerando mensagem de spawn para {this.CharacterName}. PermissionLevel ATUAL: {this.PermissionLevel}");
+
+        // Juntamos tudo em uma única mensagem poderosa.
+        return $"SPAWN_PLAYER|{this.Id}|{this.CharacterName}|{position}|{rotationY}|{equipmentPayload}|{appearanceJson}|{this.Level}|{this.CurrentHealth:F0}|{this.MaxHealth:F0}|{this.PermissionLevel}";
     }
 
     public string SessionId { get; }
@@ -38,7 +50,9 @@ public class Player : ICombatEntity, IWorldEntity
 
     #region Identity & Character Data (Sem mudanças)
     public string Username { get; }
+    public string CharacterName { get; }
     public string CharacterId { get; }
+    public int PermissionLevel { get; private set; } // <<< ADICIONE ESTA LINHA
     public long TotalBronze { get; set; }
     public string ClassID { get; private set; }
     public int Level { get; set; }
@@ -106,8 +120,12 @@ public class Player : ICombatEntity, IWorldEntity
         LastCombatTime = server.CurrentTimeUtc;
         NextRegenTime = server.CurrentTimeUtc;
         QuestLog = new PlayerQuestLog(this);
+        PermissionLevel = authInfo.PermissionLevel;
+
+        Console.WriteLine($"[Player CONSTRUTOR] Objeto Player criado para {authInfo.CharacterName}. PermissionLevel atribuído: {this.PermissionLevel}");
 
         Username = authInfo.Username;
+        CharacterName = authInfo.CharacterName;
         CharacterId = authInfo.CharacterId;
 
         // Atribuição de dados a partir do CharacterData carregado
@@ -220,25 +238,6 @@ public class Player : ICombatEntity, IWorldEntity
         }
     }
 
-    // Os métodos GiveStartingItems, CalculateKnownAbilities e RecalculateProficiencies
-    // permanecem funcionalmente os mesmos.
-    // private void GiveStartingItems()
-    // {
-    //     if (!DataManager.Classes.TryGetValue(this.ClassID, out var classData)) return;
-    //     foreach (string itemID in classData.StartingEquipmentIDs)
-    //     {
-    //         if (DataManager.Items.TryGetValue(itemID, out var itemData) && itemData is ServerEquipmentData eqData)
-    //         {
-    //             //Console.WriteLine($"[PlayerInit] Equipando '{itemID}' no slot '{eqData.equipmentSlot}'.");
-    //             PlayerEquipment.SetItemInSlot(eqData.equipmentSlot, new ItemStack(itemID, 1));
-    //         }
-    //     }
-    //     foreach (string itemID in classData.StartingInventoryIDs)
-    //     {
-    //         PlayerInventory.AddItem(itemID);
-    //     }
-    // }
-
     public void SendFullStateToClient()
     {
         // Se _server for nulo (como no caso do tempPlayer), este método não faz nada.
@@ -251,6 +250,9 @@ public class Player : ICombatEntity, IWorldEntity
         // Envia atualização de equipamento
         string eqPayload = string.Join("|", this.PlayerEquipment.equippedItems.Select(kvp => $"{kvp.Key},{(kvp.Value == null ? "null" : $"{kvp.Value.InstanceID},{kvp.Value.ItemID},{kvp.Value.Quantity}")}"));
         _server.NetworkManager.SendMessageToClient($"EQUIPMENT_UPDATE|{eqPayload}", this.EndPoint);
+
+        _server.NetworkManager.SendVitalsUpdate(this);
+        _server.NetworkManager.SendStatsUpdate(this);
     }
 
     public List<string> CalculateKnownAbilities()

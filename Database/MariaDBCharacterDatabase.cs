@@ -173,9 +173,6 @@ public class MariaDBCharacterDatabase : ICharacterDatabase
                     connection, transaction);
 
                 insertCmd.Parameters.AddWithValue("@id", authInfo.CharacterId);
-                // NOTA: O nome do personagem deveria vir do `authInfo`. Precisamos garantir que ele seja passado.
-                // Assumindo que CharacterId contém o nome por enquanto ou que buscamos no TCP server.
-                // Para o exemplo, usaremos o nome do usuário como placeholder se o nome do char não estiver disponível.
                 insertCmd.Parameters.AddWithValue("@name", authInfo.CharacterName); // Supondo que você adicionou CharacterName ao AuthenticatedPlayerInfo
                 insertCmd.Parameters.AddWithValue("@class_id", authInfo.ClassID);
                 insertCmd.Parameters.AddWithValue("@level", authInfo.Level);

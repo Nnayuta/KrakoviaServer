@@ -5,9 +5,19 @@
       "Quantity": 10,
       "SpawnRadius": 88.8,
       "Position": {
-        "X": 103.5,
+        "X": 125.0,
         "Y": 2.8,
-        "Z": 237.0
+        "Z": 226.4
+      }
+    },
+    {
+      "NpcTypeId": "090d7357",
+      "Quantity": 10,
+      "SpawnRadius": 77.4,
+      "Position": {
+        "X": 339.0,
+        "Y": 2.8,
+        "Z": 319.9
       }
     },
     {
@@ -25,9 +35,9 @@
       "Quantity": 10,
       "SpawnRadius": 77.4,
       "Position": {
-        "X": 339.0,
+        "X": 213.0,
         "Y": 2.8,
-        "Z": 319.9
+        "Z": -59.0
       }
     }
   ]

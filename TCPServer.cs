@@ -60,9 +60,7 @@ public class TCPServer
         }
     }
 
-    // =========================================================
-    // ALTERAÇÃO 2: O handler de cliente também aceita o token
-    // =========================================================
+
     private async Task HandleClientAsync(TcpClient client, CancellationToken cancellationToken)
     {
         Console.WriteLine($"[TCP] Nova conexão de {client.Client.RemoteEndPoint}.");
@@ -72,13 +70,10 @@ public class TCPServer
 
         try
         {
-            // O loop agora também verifica se o cancelamento geral do servidor foi solicitado.
             while (client.Connected && !cancellationToken.IsCancellationRequested)
             {
-                // 6. Usamos o overload de ReadLineAsync que aceita o token.
-                // Se o servidor desligar enquanto esperamos por uma mensagem, esta tarefa será cancelada.
                 var jsonString = await reader.ReadLineAsync(cancellationToken);
-                if (string.IsNullOrEmpty(jsonString)) break; // Cliente desconectou
+                if (string.IsNullOrEmpty(jsonString)) break;
 
                 var baseRequest = JsonConvert.DeserializeObject<BaseRequest>(jsonString);
                 if (baseRequest == null) continue;
@@ -94,17 +89,9 @@ public class TCPServer
                         if (loggedInAccount == null) client.Close();
                         break;
                     case "create_character":
-                        if (loggedInAccount != null)
-                        {
-                            loggedInAccount = await _accountDb.GetAccountByUsernameAsync(loggedInAccount.Username);
-                        }
                         await HandleCreateCharacterRequest(stream, jsonString, loggedInAccount);
                         break;
                     case "select_character":
-                        if (loggedInAccount != null)
-                        {
-                            loggedInAccount = await _accountDb.GetAccountByUsernameAsync(loggedInAccount.Username);
-                        }
                         await HandleSelectCharacterRequest(stream, jsonString, loggedInAccount);
                         client.Close();
                         break;
@@ -113,7 +100,6 @@ public class TCPServer
         }
         catch (OperationCanceledException)
         {
-            // 7. Exceção esperada se o servidor desligar enquanto este handler estiver ativo.
             Console.WriteLine($"[TCP] Handler para {client.Client.RemoteEndPoint} cancelado para shutdown.");
         }
         catch (IOException) { /* Cliente desconectou (normal) */ }
@@ -125,6 +111,7 @@ public class TCPServer
         }
     }
 
+
     #region Handlers de Requisição (Sem alterações necessárias aqui)
 
     private async Task HandleRegisterRequest(NetworkStream stream, string jsonString)
@@ -132,15 +119,8 @@ public class TCPServer
         var regReq = JsonConvert.DeserializeObject<RegisterRequest>(jsonString);
         if (regReq == null) return;
 
-        // <<< MUDANÇA 4: Usando a nova chamada assíncrona da interface.
         bool success = await _accountDb.RegisterAsync(regReq.Username, regReq.Password);
-
-        var response = new BaseResponse
-        {
-            Command = "register_response",
-            Success = success,
-            Message = success ? "Cadastro bem-sucedido. Por favor, faça o login." : "Nome de usuário já existe."
-        };
+        var response = new BaseResponse { Command = "register_response", Success = success, Message = success ? "Cadastro bem-sucedido." : "Nome de usuário já existe." };
         await SendResponseAsync(stream, response);
     }
 
@@ -151,14 +131,12 @@ public class TCPServer
 
         if (loginReq.ClientVersion != ServerConfig.GAME_VERSION)
         {
-            var versionResponse = new BaseResponse { Command = "login_response", Success = false, Message = $"Versão do jogo incompatível \n Por favor, atualize o jogo." };
+            var versionResponse = new BaseResponse { Command = "login_response", Success = false, Message = "Versão do jogo incompatível." };
             await SendResponseAsync(stream, versionResponse);
             return null;
         }
 
-        // <<< MUDANÇA 5: Usando a nova chamada assíncrona de autenticação.
         Account? account = await _accountDb.AuthenticateAsync(loginReq.Username, loginReq.Password);
-
         if (account != null)
         {
             var characters = account.Characters?.Select(c => c.ToSummary()).ToList() ?? new List<CharacterSummary>();
@@ -174,6 +152,7 @@ public class TCPServer
         }
     }
 
+
     private async Task HandleCreateCharacterRequest(NetworkStream stream, string jsonString, Account? loggedInAccount)
     {
         if (loggedInAccount == null)
@@ -183,32 +162,23 @@ public class TCPServer
         }
 
         var createReq = JsonConvert.DeserializeObject<CreateCharacterRequest>(jsonString);
-        if (createReq == null) return;
-
-        if (string.IsNullOrWhiteSpace(createReq.Name) || createReq.Name.Length < 3 || createReq.Name.Length > 16)
+        if (createReq == null || string.IsNullOrWhiteSpace(createReq.Name) || createReq.Name.Length < 3 || createReq.Name.Length > 16)
         {
             await SendResponseAsync(stream, new BaseResponse { Command = "create_character_response", Success = false, Message = "Nome inválido (3-16 caracteres)." });
             return;
         }
 
-        var newCharacter = new Character
-        {
-            Name = createReq.Name,
-            ClassID = createReq.ClassID ?? "WARRIOR",
-            Appearance = createReq.Appearance ?? new CharacterAppearance()
-        };
-
+        var newCharacter = new Character { Name = createReq.Name, ClassID = createReq.ClassID ?? "WARRIOR", Appearance = createReq.Appearance ?? new CharacterAppearance() };
         bool success = await _accountDb.AddCharacterToAccountAsync(loggedInAccount.Username, newCharacter);
 
-        // <<< MUDANÇA 7: Após a tentativa de criação, busca a lista atualizada de personagens da conta.
         var updatedAccount = await _accountDb.GetAccountByUsernameAsync(loggedInAccount.Username);
-        var characters = updatedAccount?.Characters?.Select(c => c.ToSummary()).ToList() ?? new List<CharacterSummary>();
+        loggedInAccount.Characters = updatedAccount?.Characters ?? loggedInAccount.Characters; // Atualiza a lista
+        var characters = loggedInAccount.Characters?.Select(c => c.ToSummary()).ToList() ?? new List<CharacterSummary>();
 
         var message = success ? "Personagem criado!" : "Nome de personagem já existe ou limite atingido.";
         var response = new CharacterListResponse { Command = "create_character_response", Success = success, Message = message, Characters = characters };
         await SendResponseAsync(stream, response);
     }
-
     private async Task HandleSelectCharacterRequest(NetworkStream stream, string jsonString, Account? loggedInAccount)
     {
         if (loggedInAccount == null)
@@ -240,13 +210,12 @@ public class TCPServer
             CharacterName = selectedCharacter.Name,
             ClassID = selectedCharacter.ClassID,
             Level = selectedCharacter.Level,
-            Appearance = selectedCharacter.Appearance
+            Appearance = selectedCharacter.Appearance,
+            PermissionLevel = loggedInAccount.PermissionLevel
         };
 
         CharacterData characterData = await _characterDb.LoadOrCreateAsync(authInfo);
 
-
-        // A partir daqui, o resto do método continua igual, usando o 'characterData' que foi carregado.
         var (_, _, _, knownAbilities) = CharacterStateGenerator.GenerateInitialState(selectedCharacter.ClassID, selectedCharacter.Level);
         string accessToken = AuthTokenManager.GenerateToken(loggedInAccount, selectedCharacter);
 
@@ -261,15 +230,8 @@ public class TCPServer
             ClassID = selectedCharacter.ClassID,
             Level = selectedCharacter.Level,
             KnownAbilityIDs = knownAbilities,
-            Inventory = characterData.PlayerInventory.slots
-                .Select(s => s == null ? null : new ItemStackSummary { InstanceID = s.InstanceID, ItemID = s.ItemID, Quantity = s.Quantity })
-                .ToList(),
-            Equipment = characterData.PlayerEquipment.equippedItems
-                .Where(kvp => kvp.Value != null)
-                .ToDictionary(
-                    kvp => kvp.Key,
-                    kvp => new ItemStackSummary { InstanceID = kvp.Value!.InstanceID, ItemID = kvp.Value.ItemID, Quantity = kvp.Value.Quantity }
-                ),
+            Inventory = characterData.PlayerInventory.slots.Select(s => s == null ? null : new ItemStackSummary { InstanceID = s.InstanceID, ItemID = s.ItemID, Quantity = s.Quantity }).ToList(),
+            Equipment = characterData.PlayerEquipment.equippedItems.Where(kvp => kvp.Value != null).ToDictionary(kvp => kvp.Key, kvp => new ItemStackSummary { InstanceID = kvp.Value!.InstanceID, ItemID = kvp.Value.ItemID, Quantity = kvp.Value.Quantity }),
             ActionBar = characterData.PlayerActionBar
         };
 

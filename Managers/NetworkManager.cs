@@ -292,11 +292,9 @@ public class NetworkManager
                 _server.DisconnectPlayer(existingPlayer.EndPoint.ToString());
             }
 
-            Console.WriteLine($"[AUTH-UDP] Token válido para: {playerInfo.Username} (Personagem: {playerInfo.CharacterId})");
+            Console.WriteLine($"[Conexão] Autenticado: {playerInfo.Username} | Perm: {playerInfo.PermissionLevel}, Personagem: {playerInfo.CharacterName} (Classe: {playerInfo.ClassID}, Nível: {playerInfo.Level})");
 
             CharacterData characterData = await _characterDb.LoadOrCreateAsync(playerInfo);
-
-            // 2. Passamos os dados carregados para o novo construtor do Player.
             var newPlayer = new Player(clientEndPoint, playerInfo, _server, characterData);
 
             if (_server.ConnectedPlayers.TryAdd(clientKey, newPlayer))
@@ -304,11 +302,14 @@ public class NetworkManager
                 Console.WriteLine($"Novo jogador ({newPlayer.SessionId}) conectado de {clientEndPoint}. Total: {_server.ConnectedPlayers.Count}");
                 OnlineStatusManager.SetOnline(newPlayer.Id);
 
-                // O resto da lógica de boas-vindas é a mesma.
-                string welcomeMessage = $"ASSIGN_ID|{newPlayer.Id}\nSPAWN_PLAYER|{newPlayer.Id}|{newPlayer.State.Position}";
-                SendMessageToClient(welcomeMessage, clientEndPoint);
-                SendMessageToClient($"ENTITY_HEALTH_UPDATE|{newPlayer.Id}|{newPlayer.CurrentHealth}|{newPlayer.MaxHealth}", newPlayer.EndPoint);
-                this.SendVitalsUpdate(newPlayer); // Usando 'this' para clareza
+                // 1. Mensagem de atribuição de ID (necessária para o cliente saber "quem ele é").
+                string assignIdMessage = $"ASSIGN_ID|{newPlayer.Id}";
+                SendMessageToClient(assignIdMessage, clientEndPoint);
+
+                // 2. A mensagem de spawn completa, para o jogador renderizar a si mesmo.
+                string spawnMessage = newPlayer.GetSpawnMessage();
+                SendMessageToClient(spawnMessage, clientEndPoint);
+
                 _server.InterestManager.OnPlayerConnected(newPlayer);
             }
         }

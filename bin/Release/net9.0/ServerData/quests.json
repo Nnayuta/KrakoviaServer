@@ -1,0 +1,60 @@
+{
+  "Quests": [
+    {
+      "QuestID": "ervas_medicas_01",
+      "RequiredLevel": 1,
+      "PrerequisiteQuestIDs": [],
+      "Objectives": [
+        {
+          "Type": "Collect",
+          "TargetID": "erva_verde_01",
+          "RequiredAmount": 5
+        }
+      ],
+      "GuaranteedRewards": [
+        {
+          "Type": "Experience",
+          "ItemID": "",
+          "Amount": 15,
+          "AbilityID": ""
+        },
+        {
+          "Type": "Currency",
+          "ItemID": "",
+          "Amount": 5,
+          "AbilityID": ""
+        }
+      ],
+      "ChooseOneRewards": []
+    },
+    {
+      "QuestID": "slay_bear_01",
+      "RequiredLevel": 1,
+      "PrerequisiteQuestIDs": [],
+      "QuestGiverID": "21119d19",
+      "QuestCompleterID": "21119d19",
+      "Objectives": [
+        {
+          "Type": "Slay",
+          "TargetID": "090d7357",
+          "RequiredAmount": 6
+        }
+      ],
+      "GuaranteedRewards": [
+        {
+          "Type": "Currency",
+          "ItemID": "",
+          "Amount": 10,
+          "AbilityID": ""
+        },
+        {
+          "Type": "Experience",
+          "ItemID": "",
+          "Amount": 25,
+          "AbilityID": ""
+        }
+      ],
+      "ChooseOneRewards": []
+    }
+  ]
+}

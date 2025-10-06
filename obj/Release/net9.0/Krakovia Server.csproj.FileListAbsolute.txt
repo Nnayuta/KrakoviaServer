@@ -20,3 +20,50 @@ C:\Users\naayu\source\repos\Krakovia Server\Krakovia Server\bin\Release\net9.0\S
 C:\Users\naayu\source\repos\Krakovia Server\Krakovia Server\bin\Release\net9.0\Newtonsoft.Json.dll
 C:\Users\naayu\source\repos\Krakovia Server\Krakovia Server\obj\Release\net9.0\Krakovia Server.csproj.AssemblyReference.cache
 C:\Users\naayu\source\repos\Krakovia Server\Krakovia Server\obj\Release\net9.0\Krakovia.B7EC60F7.Up2Date
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\Krakovia Server.exe
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\ServerData\abilities.json
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\ServerData\classes.json
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\ServerData\items.json
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\ServerData\loottables.json
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\ServerData\npcs.json
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\ServerData\quests.json
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\ServerData\spawns.json
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\ServerData\vendors.json
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\Krakovia Server.deps.json
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\Krakovia Server.runtimeconfig.json
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\Krakovia Server.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\Krakovia Server.pdb
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\BCrypt.Net-Next.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\BouncyCastle.Cryptography.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\Google.Protobuf.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\K4os.Compression.LZ4.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\K4os.Compression.LZ4.Streams.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\K4os.Hash.xxHash.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\MySql.Data.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\Newtonsoft.Json.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\System.Configuration.ConfigurationManager.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\System.Diagnostics.EventLog.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\System.Security.Cryptography.ProtectedData.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\System.Security.Permissions.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\System.Windows.Extensions.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\ZstdSharp.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\runtimes\win-x64\native\comerr64.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\runtimes\win-x64\native\gssapi64.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\runtimes\win-x64\native\k5sprt64.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\runtimes\win-x64\native\krb5_64.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\runtimes\win-x64\native\krbcc64.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.Messages.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.dll
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\runtimes\win\lib\net8.0\System.Windows.Extensions.dll
+D:\GameDev\Krakovia Server\Krakovia Server\obj\Release\net9.0\Krakovia Server.csproj.AssemblyReference.cache
+D:\GameDev\Krakovia Server\Krakovia Server\obj\Release\net9.0\Krakovia Server.GeneratedMSBuildEditorConfig.editorconfig
+D:\GameDev\Krakovia Server\Krakovia Server\obj\Release\net9.0\Krakovia Server.AssemblyInfoInputs.cache
+D:\GameDev\Krakovia Server\Krakovia Server\obj\Release\net9.0\Krakovia Server.AssemblyInfo.cs
+D:\GameDev\Krakovia Server\Krakovia Server\obj\Release\net9.0\Krakovia Server.csproj.CoreCompileInputs.cache
+D:\GameDev\Krakovia Server\Krakovia Server\obj\Release\net9.0\Krakovia Server.sourcelink.json
+D:\GameDev\Krakovia Server\Krakovia Server\obj\Release\net9.0\Krakovia.B7EC60F7.Up2Date
+D:\GameDev\Krakovia Server\Krakovia Server\obj\Release\net9.0\Krakovia Server.dll
+D:\GameDev\Krakovia Server\Krakovia Server\obj\Release\net9.0\refint\Krakovia Server.dll
+D:\GameDev\Krakovia Server\Krakovia Server\obj\Release\net9.0\Krakovia Server.pdb
+D:\GameDev\Krakovia Server\Krakovia Server\obj\Release\net9.0\Krakovia Server.genruntimeconfig.cache
+D:\GameDev\Krakovia Server\Krakovia Server\obj\Release\net9.0\ref\Krakovia Server.dll

@@ -44,52 +44,38 @@ public class MariaDBAccountDatabase : IAccountDatabase
 
     public async Task<Account?> AuthenticateAsync(string username, string password)
     {
-        Account? account = null;
-        using (var connection = new MySqlConnection(_connectionString))
-        {
-            await connection.OpenAsync();
-            var query = "SELECT id, password_hash FROM accounts WHERE username = @username LIMIT 1;";
-            using (var command = new MySqlCommand(query, connection))
-            {
-                command.Parameters.AddWithValue("@username", username);
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    if (await reader.ReadAsync())
-                    {
-                        string storedHash = Convert.ToString(reader["password_hash"]);
+        // 1. Busca a conta COMPLETA primeiro
+        Account? account = await GetAccountByUsernameAsync(username);
 
-                        if (!string.IsNullOrEmpty(storedHash) && BCrypt.Net.BCrypt.Verify(password, storedHash))
-                        {
-                            account = new Account();
-                        }
-                    }
-                }
+        // 2. Se a conta existe, verifica a senha
+        if (account != null)
+        {
+            // Usa o HashedPassword que já foi carregado pelo GetAccountByUsernameAsync
+            if (BCrypt.Net.BCrypt.Verify(password, account.HashedPassword))
+            {
+                // Senha correta! Retorna a conta completa que já carregamos.
+                return account;
             }
         }
 
-        if (account != null)
-        {
-            return await GetAccountByUsernameAsync(username);
-        }
-
+        // Se a conta não existe ou a senha está incorreta, retorna null.
         return null;
     }
 
     public async Task<Account?> GetAccountByUsernameAsync(string username)
     {
         Account? account = null;
-        // Usamos um dicionário para montar os personagens, evitando duplicatas.
         var characters = new Dictionary<string, Character>();
 
         using (var connection = new MySqlConnection(_connectionString))
         {
             await connection.OpenAsync();
 
-            // Query principal para buscar a conta e os personagens
+            // <<< A CORREÇÃO ESTÁ AQUI >>>
             var accountQuery = @"
-                SELECT id as account_id, username, password_hash
-                FROM accounts
-                WHERE username = @username;";
+            SELECT id as account_id, username, password_hash, permission_level
+            FROM accounts
+            WHERE username = @username;";
 
             using (var command = new MySqlCommand(accountQuery, connection))
             {
@@ -106,19 +92,22 @@ public class MariaDBAccountDatabase : IAccountDatabase
                         Id = Convert.ToInt32(reader["account_id"]),
                         Username = Convert.ToString(reader["username"]),
                         HashedPassword = Convert.ToString(reader["password_hash"]),
+                        PermissionLevel = Convert.ToInt32(reader["permission_level"]),
                         Characters = new List<Character>()
                     };
                 }
             }
 
-            // Se a conta existe, buscamos os personagens e seus equipamentos
+            // O resto do método permanece o mesmo
+            if (account == null) return null; // Adiciona uma verificação de segurança
+
             var charactersQuery = @"
-                SELECT
-                    c.id as character_id, c.name, c.class_id, c.level, c.appearance_json,
-                    ce.slot_name, ce.item_id
-                FROM characters c
-                LEFT JOIN character_equipment ce ON c.id = ce.character_id
-                WHERE c.account_id = @account_id;";
+            SELECT
+                c.id as character_id, c.name, c.class_id, c.level, c.appearance_json,
+                ce.slot_name, ce.item_id
+            FROM characters c
+            LEFT JOIN character_equipment ce ON c.id = ce.character_id
+            WHERE c.account_id = @account_id;";
 
             using (var command = new MySqlCommand(charactersQuery, connection))
             {
@@ -129,7 +118,6 @@ public class MariaDBAccountDatabase : IAccountDatabase
                     {
                         string charId = Convert.ToString(reader["character_id"]);
 
-                        // Se é a primeira vez que vemos este personagem, criamos o objeto.
                         if (!characters.ContainsKey(charId))
                         {
                             characters[charId] = new Character
@@ -142,7 +130,6 @@ public class MariaDBAccountDatabase : IAccountDatabase
                             };
                         }
 
-                        // Adiciona o item equipado, se houver um.
                         if (reader["item_id"] != DBNull.Value)
                         {
                             string slotName = Convert.ToString(reader["slot_name"]);
@@ -156,7 +143,6 @@ public class MariaDBAccountDatabase : IAccountDatabase
             }
         }
 
-        // Adiciona a lista de personagens montada à conta
         if (account != null)
         {
             account.Characters = characters.Values.ToList();

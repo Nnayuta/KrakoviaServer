@@ -1,0 +1,110 @@
+{
+  "Npcs": [
+    {
+      "TypeId": "7d47429f",
+      "Faction": "Neutral",
+      "AiType": "Wandering_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 100
+        }
+      ],
+      "Level": 1,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 10,
+      "SwingTimer": 4.0,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "ExperienceReward": 0,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "090d7357",
+      "Faction": "Enemy",
+      "AiType": "Wandering_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Strength",
+          "Value": 2
+        },
+        {
+          "Stat": "Stamina",
+          "Value": 4
+        }
+      ],
+      "Level": 1,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 4.0,
+      "AutoAttackAbilityID": "bear_attack_01",
+      "AbilityIDs": [
+        "bear_attack_02",
+        "bear_attack_03",
+        "bear_buff_01"
+      ],
+      "ExperienceReward": 50,
+      "LootTableID": "bear_common_drops"
+    },
+    {
+      "TypeId": "21119d19",
+      "Faction": "Friendly",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 20
+        },
+        {
+          "Stat": "Strength",
+          "Value": 20
+        },
+        {
+          "Stat": "Armor",
+          "Value": 20
+        }
+      ],
+      "Level": 20,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 4.0,
+      "AutoAttackAbilityID": "sword_light_attack",
+      "AbilityIDs": [
+        "sword_heavy_attack"
+      ],
+      "ExperienceReward": 10,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "75448138",
+      "Faction": "Neutral",
+      "AiType": "Ambient_Fleeing",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 10
+        },
+        {
+          "Stat": "Strength",
+          "Value": 1
+        }
+      ],
+      "Level": 1,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 4.0,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "ExperienceReward": 10,
+      "LootTableID": ""
+    }
+  ]
+}
