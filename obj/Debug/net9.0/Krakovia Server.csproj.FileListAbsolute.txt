@@ -22,7 +22,6 @@ C:\Users\naayu\source\repos\Krakovia Server\Krakovia Server\bin\Debug\net9.0\Ser
 C:\Users\naayu\source\repos\Krakovia Server\Krakovia Server\bin\Debug\net9.0\ServerData\items.json
 C:\Users\naayu\source\repos\Krakovia Server\Krakovia Server\bin\Debug\net9.0\ServerData\vendors.json
 D:\GameDev\Krakovia Server\Krakovia Server\bin\Debug\net9.0\Krakovia Server.exe
-D:\GameDev\Krakovia Server\Krakovia Server\bin\Debug\net9.0\ServerData\abilities.json
 D:\GameDev\Krakovia Server\Krakovia Server\bin\Debug\net9.0\ServerData\classes.json
 D:\GameDev\Krakovia Server\Krakovia Server\bin\Debug\net9.0\ServerData\items.json
 D:\GameDev\Krakovia Server\Krakovia Server\bin\Debug\net9.0\ServerData\npcs.json
@@ -68,3 +67,5 @@ D:\GameDev\Krakovia Server\Krakovia Server\bin\Debug\net9.0\runtimes\win\lib\net
 D:\GameDev\Krakovia Server\Krakovia Server\bin\Debug\net9.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.dll
 D:\GameDev\Krakovia Server\Krakovia Server\bin\Debug\net9.0\runtimes\win\lib\net8.0\System.Windows.Extensions.dll
 D:\GameDev\Krakovia Server\Krakovia Server\obj\Debug\net9.0\Krakovia Server.sourcelink.json
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Debug\net9.0\ServerData\status_effects.json
+D:\GameDev\Krakovia Server\Krakovia Server\bin\Debug\net9.0\ServerData\abilities.json

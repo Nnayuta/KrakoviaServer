@@ -2,283 +2,406 @@
   "Abilities": [
     {
       "ID": "bear_attack_01",
-      "Type": "Active",
+      "Name": "Patada de Urso",
       "Intent": "Harmful",
-      "TargetType": "SingleTarget",
-      "EffectType": "Damage",
-      "ResourceCost": 0.0,
+      "Effects": [
+        {
+          "$type": "ServerDamageEffectData",
+          "BaseValue": 20.0,
+          "AttackPowerScaling": 1.2,
+          "SpellPowerScaling": 0.0,
+          "EffectType": "ServerDamageEffectData",
+          "Intent": "Harmful"
+        }
+      ],
       "Cooldown": 0.0,
       "Range": 3.0,
+      "ResourceCost": 0.0,
       "RequiresTarget": true,
       "WeaponRequirement": "None",
-      "BaseValue": 10.0,
-      "AttackPowerScaling": 1.0,
-      "SpellPowerScaling": 0.0,
+      "Priority": 0,
+      "Type": "Active",
       "CastTime": 0.0,
       "CanMoveWhileCasting": false,
       "ProjectileSpeed": 0.0,
-      "Priority": 0,
-      "GrantsWeaponProficiency": "Sword1H"
+      "TargetType": "SingleTarget",
+      "AoeRadius": 0.0,
+      "ConeAngle": 0.0
     },
     {
       "ID": "bear_attack_02",
-      "Type": "Active",
+      "Name": "Mordida de Urso",
       "Intent": "Harmful",
-      "TargetType": "SingleTarget",
-      "EffectType": "Damage",
-      "ResourceCost": 0.0,
+      "Effects": [
+        {
+          "$type": "ServerDamageEffectData",
+          "BaseValue": 20.0,
+          "AttackPowerScaling": 1.2,
+          "SpellPowerScaling": 0.0,
+          "EffectType": "ServerDamageEffectData",
+          "Intent": "Harmful"
+        }
+      ],
       "Cooldown": 10.0,
       "Range": 3.0,
+      "ResourceCost": 0.0,
       "RequiresTarget": true,
       "WeaponRequirement": "None",
-      "BaseValue": 10.0,
-      "AttackPowerScaling": 1.0,
-      "SpellPowerScaling": 0.0,
+      "Priority": 0,
+      "Type": "Active",
       "CastTime": 0.0,
       "CanMoveWhileCasting": false,
       "ProjectileSpeed": 0.0,
-      "Priority": 0,
-      "GrantsWeaponProficiency": "Sword1H"
+      "TargetType": "SingleTarget",
+      "AoeRadius": 0.0,
+      "ConeAngle": 0.0
     },
     {
       "ID": "bear_attack_03",
-      "Type": "Active",
+      "Name": "Batidão de Urso",
       "Intent": "Harmful",
-      "TargetType": "AreaOfEffect",
-      "EffectType": "Damage",
-      "ResourceCost": 5.0,
+      "Effects": [
+        {
+          "$type": "ServerDamageEffectData",
+          "BaseValue": 20.0,
+          "AttackPowerScaling": 1.2,
+          "SpellPowerScaling": 0.0,
+          "EffectType": "ServerDamageEffectData",
+          "Intent": "Harmful"
+        }
+      ],
       "Cooldown": 15.0,
       "Range": 3.0,
+      "ResourceCost": 5.0,
       "RequiresTarget": true,
       "WeaponRequirement": "None",
-      "BaseValue": 15.0,
-      "AttackPowerScaling": 1.0,
-      "SpellPowerScaling": 0.0,
+      "Priority": 0,
+      "Type": "Active",
       "CastTime": 0.0,
       "CanMoveWhileCasting": false,
       "ProjectileSpeed": 0.0,
-      "Priority": 0,
-      "GrantsWeaponProficiency": "Sword1H"
+      "TargetType": "AreaOfEffect",
+      "AoeRadius": 0.0,
+      "ConeAngle": 0.0
     },
     {
       "ID": "bear_buff_01",
-      "Type": "Active",
+      "Name": "Rurgido de Urso",
       "Intent": "Helpful",
-      "TargetType": "Self",
-      "EffectType": "ApplyBuff",
-      "ResourceCost": 10.0,
+      "Effects": [
+        {
+          "$type": "ServerHealEffectData",
+          "BaseValue": 40.0,
+          "SpellPowerScaling": 1.2,
+          "EffectType": "ServerHealEffectData",
+          "Intent": "Helpful"
+        }
+      ],
       "Cooldown": 10.0,
       "Range": 3.0,
+      "ResourceCost": 10.0,
       "RequiresTarget": false,
       "WeaponRequirement": "None",
-      "BaseValue": 10.0,
-      "AttackPowerScaling": 1.0,
-      "SpellPowerScaling": 0.0,
+      "Priority": 0,
+      "Type": "Active",
       "CastTime": 0.0,
       "CanMoveWhileCasting": false,
       "ProjectileSpeed": 0.0,
-      "Priority": 0,
-      "GrantsWeaponProficiency": "Sword1H"
+      "TargetType": "Self",
+      "AoeRadius": 0.0,
+      "ConeAngle": 0.0
     },
     {
       "ID": "bow_shot",
-      "Type": "Active",
+      "Name": "Tiro Preciso",
       "Intent": "Harmful",
-      "TargetType": "SingleTarget",
-      "EffectType": "Damage",
-      "ResourceCost": 0.0,
+      "Effects": [
+        {
+          "$type": "ServerDamageEffectData",
+          "BaseValue": 20.0,
+          "AttackPowerScaling": 1.2,
+          "SpellPowerScaling": 0.0,
+          "EffectType": "ServerDamageEffectData",
+          "Intent": "Harmful"
+        }
+      ],
       "Cooldown": 3.0,
       "Range": 10.0,
+      "ResourceCost": 0.0,
       "RequiresTarget": true,
       "WeaponRequirement": "RangedWeapon",
-      "BaseValue": 10.0,
-      "AttackPowerScaling": 1.0,
-      "SpellPowerScaling": 0.0,
+      "Priority": 0,
+      "Type": "Active",
       "CastTime": 0.0,
       "CanMoveWhileCasting": false,
       "ProjectileSpeed": 0.0,
-      "Priority": 0,
-      "GrantsWeaponProficiency": "Sword1H"
+      "TargetType": "SingleTarget",
+      "AoeRadius": 0.0,
+      "ConeAngle": 0.0
     },
     {
       "ID": "mage_54d36845",
-      "Type": "Active",
+      "Name": "Nova Congelante",
       "Intent": "Harmful",
-      "TargetType": "AreaOfEffect",
-      "EffectType": "Damage",
-      "ResourceCost": 10.0,
+      "Effects": [
+        {
+          "$type": "ServerDamageEffectData",
+          "BaseValue": 30.0,
+          "AttackPowerScaling": 1.2,
+          "SpellPowerScaling": 0.0,
+          "EffectType": "ServerDamageEffectData",
+          "Intent": "Harmful"
+        }
+      ],
       "Cooldown": 4.0,
       "Range": 30.0,
+      "ResourceCost": 10.0,
       "RequiresTarget": false,
       "WeaponRequirement": "None",
-      "BaseValue": 25.0,
-      "AttackPowerScaling": 0.0,
-      "SpellPowerScaling": 1.4,
+      "Priority": 0,
+      "Type": "Active",
       "CastTime": 3.0,
       "CanMoveWhileCasting": true,
       "ProjectileSpeed": 0.0,
-      "Priority": 0,
-      "GrantsWeaponProficiency": "Sword1H"
+      "TargetType": "AreaOfEffect",
+      "AoeRadius": 0.0,
+      "ConeAngle": 0.0
     },
     {
       "ID": "mage_644c55de",
-      "Type": "Active",
+      "Name": "Lança Glacial",
       "Intent": "Harmful",
-      "TargetType": "Cone",
-      "EffectType": "Damage",
-      "ResourceCost": 10.0,
+      "Effects": [
+        {
+          "$type": "ServerDamageEffectData",
+          "BaseValue": 30.0,
+          "AttackPowerScaling": 1.2,
+          "SpellPowerScaling": 0.0,
+          "EffectType": "ServerDamageEffectData",
+          "Intent": "Harmful"
+        }
+      ],
       "Cooldown": 3.0,
       "Range": 15.0,
+      "ResourceCost": 10.0,
       "RequiresTarget": false,
       "WeaponRequirement": "None",
-      "BaseValue": 15.0,
-      "AttackPowerScaling": 0.0,
-      "SpellPowerScaling": 1.3,
+      "Priority": 0,
+      "Type": "Active",
       "CastTime": 2.0,
       "CanMoveWhileCasting": true,
       "ProjectileSpeed": 0.0,
-      "Priority": 0,
-      "GrantsWeaponProficiency": "Sword1H"
+      "TargetType": "Cone",
+      "AoeRadius": 0.0,
+      "ConeAngle": 0.0
     },
     {
       "ID": "mage_e5dfac90",
-      "Type": "Active",
+      "Name": "Estilhaço de Gelo",
       "Intent": "Harmful",
-      "TargetType": "SingleTarget",
-      "EffectType": "Damage",
-      "ResourceCost": 10.0,
+      "Effects": [
+        {
+          "$type": "ServerDamageEffectData",
+          "BaseValue": 30.0,
+          "AttackPowerScaling": 1.2,
+          "SpellPowerScaling": 0.0,
+          "EffectType": "ServerDamageEffectData",
+          "Intent": "Harmful"
+        }
+      ],
       "Cooldown": 2.0,
       "Range": 30.0,
+      "ResourceCost": 10.0,
       "RequiresTarget": true,
       "WeaponRequirement": "None",
-      "BaseValue": 15.0,
-      "AttackPowerScaling": 0.0,
-      "SpellPowerScaling": 1.3,
+      "Priority": 0,
+      "Type": "Active",
       "CastTime": 2.0,
       "CanMoveWhileCasting": true,
       "ProjectileSpeed": 0.0,
-      "Priority": 0,
-      "GrantsWeaponProficiency": "Sword1H"
+      "TargetType": "SingleTarget",
+      "AoeRadius": 0.0,
+      "ConeAngle": 0.0
     },
     {
       "ID": "damage_priest_01",
-      "Type": "Active",
+      "Name": "Sombra Penitente",
       "Intent": "Harmful",
-      "TargetType": "SingleTarget",
-      "EffectType": "Damage",
-      "ResourceCost": 12.0,
+      "Effects": [
+        {
+          "$type": "ServerDamageEffectData",
+          "BaseValue": 30.0,
+          "AttackPowerScaling": 1.2,
+          "SpellPowerScaling": 0.0,
+          "EffectType": "ServerDamageEffectData",
+          "Intent": "Harmful"
+        },
+        {
+          "$type": "ServerHealEffectData",
+          "BaseValue": 40.0,
+          "SpellPowerScaling": 1.2,
+          "EffectType": "ServerHealEffectData",
+          "Intent": "Helpful"
+        }
+      ],
       "Cooldown": 2.0,
       "Range": 30.0,
+      "ResourceCost": 12.0,
       "RequiresTarget": true,
       "WeaponRequirement": "None",
-      "BaseValue": 10.0,
-      "AttackPowerScaling": 0.0,
-      "SpellPowerScaling": 1.2,
+      "Priority": 0,
+      "Type": "Active",
       "CastTime": 2.5,
       "CanMoveWhileCasting": true,
       "ProjectileSpeed": 0.0,
-      "Priority": 0,
-      "GrantsWeaponProficiency": "Sword1H"
+      "TargetType": "SingleTarget",
+      "AoeRadius": 0.0,
+      "ConeAngle": 0.0
     },
     {
       "ID": "healer_priest_01",
-      "Type": "Active",
+      "Name": "Luz Restauradora",
       "Intent": "Helpful",
-      "TargetType": "SingleTarget",
-      "EffectType": "Heal",
-      "ResourceCost": 12.0,
+      "Effects": [
+        {
+          "$type": "ServerHealEffectData",
+          "BaseValue": 40.0,
+          "SpellPowerScaling": 1.2,
+          "EffectType": "ServerHealEffectData",
+          "Intent": "Helpful"
+        }
+      ],
       "Cooldown": 4.0,
       "Range": 30.0,
+      "ResourceCost": 12.0,
       "RequiresTarget": true,
       "WeaponRequirement": "None",
-      "BaseValue": 150.0,
-      "AttackPowerScaling": 0.0,
-      "SpellPowerScaling": 1.2,
+      "Priority": 0,
+      "Type": "Active",
       "CastTime": 1.5,
       "CanMoveWhileCasting": false,
       "ProjectileSpeed": 0.0,
-      "Priority": 0,
-      "GrantsWeaponProficiency": "Sword1H"
+      "TargetType": "SingleTarget",
+      "AoeRadius": 0.0,
+      "ConeAngle": 0.0
     },
     {
       "ID": "healer_priest_02",
-      "Type": "Active",
+      "Name": "Oração da Esperança",
       "Intent": "Helpful",
-      "TargetType": "AreaOfEffect",
-      "EffectType": "Heal",
-      "ResourceCost": 24.0,
+      "Effects": [
+        {
+          "$type": "ServerHealEffectData",
+          "BaseValue": 25.0,
+          "SpellPowerScaling": 1.25,
+          "EffectType": "ServerHealEffectData",
+          "Intent": "Helpful"
+        }
+      ],
       "Cooldown": 6.0,
       "Range": 30.0,
+      "ResourceCost": 24.0,
       "RequiresTarget": true,
       "WeaponRequirement": "None",
-      "BaseValue": 200.0,
-      "AttackPowerScaling": 0.0,
-      "SpellPowerScaling": 1.3,
+      "Priority": 0,
+      "Type": "Active",
       "CastTime": 3.5,
       "CanMoveWhileCasting": false,
       "ProjectileSpeed": 0.0,
-      "Priority": 0,
-      "GrantsWeaponProficiency": "Sword1H"
+      "TargetType": "AreaOfEffect",
+      "AoeRadius": 0.0,
+      "ConeAngle": 0.0
     },
     {
       "ID": "sword_heavy_attack",
-      "Type": "Active",
+      "Name": "Golpe Pesado",
       "Intent": "Harmful",
-      "TargetType": "Cone",
-      "EffectType": "Damage",
-      "ResourceCost": 5.0,
+      "Effects": [
+        {
+          "$type": "ServerDamageEffectData",
+          "BaseValue": 20.0,
+          "AttackPowerScaling": 1.2,
+          "SpellPowerScaling": 0.0,
+          "EffectType": "ServerDamageEffectData",
+          "Intent": "Harmful"
+        },
+        {
+          "$type": "ServerHealEffectData",
+          "BaseValue": 40.0,
+          "SpellPowerScaling": 1.2,
+          "EffectType": "ServerHealEffectData",
+          "Intent": "Helpful"
+        }
+      ],
       "Cooldown": 8.0,
       "Range": 5.0,
+      "ResourceCost": 5.0,
       "RequiresTarget": false,
       "WeaponRequirement": "MeleeWeapon",
-      "BaseValue": 10.0,
-      "AttackPowerScaling": 1.2,
-      "SpellPowerScaling": 0.0,
+      "Priority": 0,
+      "Type": "Active",
       "CastTime": 0.0,
       "CanMoveWhileCasting": false,
       "ProjectileSpeed": 0.0,
-      "Priority": 0,
-      "GrantsWeaponProficiency": "Sword1H"
+      "TargetType": "Cone",
+      "AoeRadius": 0.0,
+      "ConeAngle": 0.0
     },
     {
       "ID": "sword_light_attack",
-      "Type": "Active",
+      "Name": "Corte Rápido",
       "Intent": "Harmful",
-      "TargetType": "SingleTarget",
-      "EffectType": "Damage",
-      "ResourceCost": 0.0,
+      "Effects": [
+        {
+          "$type": "ServerDamageEffectData",
+          "BaseValue": 20.0,
+          "AttackPowerScaling": 1.2,
+          "SpellPowerScaling": 0.0,
+          "EffectType": "ServerDamageEffectData",
+          "Intent": "Harmful"
+        }
+      ],
       "Cooldown": 4.0,
       "Range": 4.0,
+      "ResourceCost": 0.0,
       "RequiresTarget": true,
       "WeaponRequirement": "MeleeWeapon",
-      "BaseValue": 6.0,
-      "AttackPowerScaling": 1.0,
-      "SpellPowerScaling": 0.0,
+      "Priority": 0,
+      "Type": "Active",
       "CastTime": 0.0,
       "CanMoveWhileCasting": false,
       "ProjectileSpeed": 0.0,
-      "Priority": 0,
-      "GrantsWeaponProficiency": "Sword1H"
+      "TargetType": "SingleTarget",
+      "AoeRadius": 0.0,
+      "ConeAngle": 0.0
     },
     {
       "ID": "sword_warrior_autoattack",
-      "Type": "Active",
+      "Name": "Ataque Basico",
       "Intent": "Harmful",
-      "TargetType": "SingleTarget",
-      "EffectType": "Damage",
-      "ResourceCost": 0.0,
+      "Effects": [
+        {
+          "$type": "ServerDamageEffectData",
+          "BaseValue": 20.0,
+          "AttackPowerScaling": 1.2,
+          "SpellPowerScaling": 0.0,
+          "EffectType": "ServerDamageEffectData",
+          "Intent": "Harmful"
+        }
+      ],
       "Cooldown": 2.0,
       "Range": 4.0,
+      "ResourceCost": 0.0,
       "RequiresTarget": true,
       "WeaponRequirement": "MeleeWeapon",
-      "BaseValue": 3.0,
-      "AttackPowerScaling": 1.0,
-      "SpellPowerScaling": 0.0,
+      "Priority": 0,
+      "Type": "Active",
       "CastTime": 0.0,
       "CanMoveWhileCasting": false,
       "ProjectileSpeed": 0.0,
-      "Priority": 0,
-      "GrantsWeaponProficiency": "Sword1H"
+      "TargetType": "SingleTarget",
+      "AoeRadius": 0.0,
+      "ConeAngle": 0.0
     }
   ]
 }

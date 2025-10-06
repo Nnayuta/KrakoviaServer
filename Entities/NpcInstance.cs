@@ -196,19 +196,35 @@ public class NpcInstance : ICombatEntity, IWorldEntity
             this.LastDamageTime = server.CurrentTimeUtc;
             if (this.CurrentHealth <= 0)
             {
-                this.CurrentHealth = 1;
+                this.CurrentHealth = 1; // Training dummy nunca morre.
             }
         }
-        else
+        else // Para todos os outros NPCs
         {
             if (this.CurrentHealth <= 0)
             {
                 this.CurrentHealth = 0;
+                ProcessDeath(source, server);
             }
         }
+
+        server.NetworkManager.BroadcastMessageToAll($"ENTITY_HEALTH_UPDATE|{this.Id}|{this.CurrentHealth}|{this.MaxHealth}");
     }
 
-    public void ReceiveHealing(float amount)
+    public void ProcessDeath(ICombatEntity killer, UDPServer server)
+    {
+        // Prevenção contra chamadas duplas: só executa se não estiver morto.
+        if (IsDead) return;
+
+        // A IA é quem gerencia o estado de morte (IsDead é derivado de CurrentState).
+        this.ChangeNpcState(NpcAiState.Dead, server.CurrentTimeUtc);
+
+        Console.WriteLine($"[MORTE] NPC {this.BaseData.TypeId} ({this.Id}) foi derrotado por {killer.Id}.");
+
+        server.WorldManager.ProcessNpcDeath(this, killer);
+    }
+
+    public void ReceiveHealing(float amount, UDPServer server) // << Adicionado o parâmetro 'server'
     {
         if (IsDead) return;
         this.CurrentHealth += amount;
@@ -216,6 +232,8 @@ public class NpcInstance : ICombatEntity, IWorldEntity
         {
             this.CurrentHealth = this.MaxHealth;
         }
+
+        server.NetworkManager.BroadcastMessageToAll($"ENTITY_HEALTH_UPDATE|{this.Id}|{this.CurrentHealth}|{this.MaxHealth}");
     }
 
     public void ChangeNpcState(NpcAiState newState, DateTime currentTime)

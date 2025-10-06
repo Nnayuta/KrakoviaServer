@@ -7,7 +7,6 @@ public enum ItemType { Weapon, Shield, Armor, Consumable }
 public enum EquipmentSlot { MainHand, OffHand, Head, Chest, Legs, Feet }
 public enum WeaponHandType { OneHanded, TwoHanded }
 public enum ArmorType { Cloth, Leather, Mail, Plate }
-public enum AbilityType { Active, Passive }
 public enum WeaponType
 {
     Sword1H, Axe1H, Mace1H, Dagger, Fist,
@@ -15,20 +14,10 @@ public enum WeaponType
     Bow, Crossbow, Gun
 }
 
-public enum WeaponRequirement
-{
-    None,           // Pode ser usada com qualquer coisa (ex: um grito de buff)
-    WeaponRequired, // Requer QUALQUER arma equipada (não pode ser desarmado)
-    MeleeWeapon,    // Requer uma espada, machado, maça, etc.
-    RangedWeapon,   // Requer um arco, besta, arma de fogo
-    Unarmed         // Requer que o jogador esteja desarmado
-}
-
 public class ServerJunkItemData : ServerItemData
 {
     // Intencionalmente vazio.
 }
-
 
 // Seu enum CombatStyle continua existindo, mas agora é apenas para ANIMAÇÃO
 public enum CombatStyle { Unarmed, Melee, Ranged, Magic }

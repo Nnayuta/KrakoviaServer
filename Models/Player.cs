@@ -318,15 +318,15 @@ public class Player : ICombatEntity, IWorldEntity
         var proficiencies = new List<WeaponType>(classData.WeaponProficiencies);
 
         // Adiciona proficiências concedidas por habilidades passivas que o jogador conhece
-        foreach (string abilityID in this.KnownAbilityIDs)
-        {
-            if (DataManager.Abilities.TryGetValue(abilityID, out var ability) && ability.Type == AbilityType.Passive && ability.GrantsWeaponProficiency != WeaponType.Sword1H) // Exemplo, ajuste conforme seus enums
-            {
-                // Adiciona a proficiência se a habilidade passiva conceder uma.
-                // TODO: Seu `AbilityData` precisa de um campo como `public WeaponType GrantsWeaponProficiency`.
-                // proficiencies.Add(ability.GrantsWeaponProficiency);
-            }
-        }
+        //foreach (string abilityID in this.KnownAbilityIDs)
+        //{
+        //    if (DataManager.Abilities.TryGetValue(abilityID, out var ability) && ability.Type == AbilityType.Passive && ability.GrantsWeaponProficiency != WeaponType.Sword1H) // Exemplo, ajuste conforme seus enums
+        //    {
+        //        // Adiciona a proficiência se a habilidade passiva conceder uma.
+        //        // TODO: Seu `AbilityData` precisa de um campo como `public WeaponType GrantsWeaponProficiency`.
+        //        // proficiencies.Add(ability.GrantsWeaponProficiency);
+        //    }
+        //}
         this.CurrentWeaponProficiencies = proficiencies.Distinct().ToList();
     }
 
@@ -372,7 +372,7 @@ public class Player : ICombatEntity, IWorldEntity
     {
         if (IsDead) return;
 
-        EnterCombat(_server);
+        EnterCombat(server);
         // Pega o valor da armadura do sistema de stats.
         float armorValue = this.Stats.GetStatValue(StatType.Armor);
 
@@ -392,10 +392,11 @@ public class Player : ICombatEntity, IWorldEntity
         if (this.CurrentHealth <= 0)
         {
             this.CurrentHealth = 0;
-            this.IsDead = true;
+            ProcessDeath(source, server);
         }
 
-        _server?.NetworkManager.SendVitalsUpdate(this);
+        server.NetworkManager.SendVitalsUpdate(this);
+        server.NetworkManager.BroadcastMessageToAll($"ENTITY_HEALTH_UPDATE|{this.Id}|{this.CurrentHealth}|{this.MaxHealth}");
     }
 
     public void Respawn(Vector3 position)
@@ -408,7 +409,7 @@ public class Player : ICombatEntity, IWorldEntity
         this.CurrentResource = this.MaxResource * 0.5f;
     }
 
-    public void ReceiveHealing(float amount)
+    public void ReceiveHealing(float amount, UDPServer server) // << Adicionado o parâmetro 'server'
     {
         if (IsDead) return;
         this.CurrentHealth += amount;
@@ -417,7 +418,9 @@ public class Player : ICombatEntity, IWorldEntity
             this.CurrentHealth = this.MaxHealth;
         }
 
-        _server?.NetworkManager.SendVitalsUpdate(this);
+
+        server?.NetworkManager.SendVitalsUpdate(this);
+        server?.NetworkManager.BroadcastMessageToAll($"ENTITY_HEALTH_UPDATE|{this.Id}|{this.CurrentHealth}|{this.MaxHealth}");
     }
 
     public void ReceiveResource(float amount)
@@ -428,6 +431,22 @@ public class Player : ICombatEntity, IWorldEntity
         {
             this.CurrentResource = this.MaxResource;
         }
+    }
+
+    public void ProcessDeath(ICombatEntity killer, UDPServer server)
+    {
+        // Prevenção contra chamadas duplas: só executa se não estiver morto.
+        if (IsDead) return;
+
+        this.IsDead = true; // Define o estado de morte PRIMEIRO.
+
+        Console.WriteLine($"[MORTE] Jogador {this.CharacterName} ({this.Id}) foi derrotado por {killer.Id}.");
+
+        // Notifica o cliente específico que ele morreu.
+        server.NetworkManager.SendMessageToClient("YOU_DIED", this.EndPoint);
+
+        // Notifica todos os outros jogadores que esta entidade morreu.
+        server.NetworkManager.BroadcastMessageToOthers(this, $"ENTITY_DIED|{this.Id}|{false}"); // 'false' porque jogadores não têm
     }
 
     #endregion

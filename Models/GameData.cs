@@ -1,5 +1,5 @@
 ﻿// --- SERVIDOR ---
-public enum TargetType { Self, SingleTarget, AreaOfEffect, Cone, Projectile }
+
 
 // Modelo para Efeitos (Buffs, Debuffs, Dano, etc.)
 public class AbilityEffect

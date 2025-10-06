@@ -28,5 +28,6 @@ public interface ICombatEntity
 
     // Métodos de Interação
     void TakeDamage(float amount, ICombatEntity source, UDPServer server);
-    void ReceiveHealing(float amount);
+    void ReceiveHealing(float amount, UDPServer server);
+    void ProcessDeath(ICombatEntity killer, UDPServer server);
 }

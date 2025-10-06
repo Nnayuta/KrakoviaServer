@@ -19,6 +19,7 @@ public static class DataManager
     public static Dictionary<string, VendorData> Vendors { get; private set; } = new();
     public static Dictionary<string, LootTable> LootTables { get; private set; } = new();
     public static Dictionary<string, ServerQuestData> Quests { get; private set; } = new();
+    public static Dictionary<string, ServerStatusEffectData> StatusEffects { get; private set; } = new();
 
     private class LootTableWrapper { public List<LootTable> LootTables { get; set; } }
     private class QuestListWrapper { public List<ServerQuestData> Quests { get; set; } }
@@ -27,26 +28,53 @@ public static class DataManager
     {
         Console.WriteLine("[DataManager] Iniciando carregamento de dados do jogo...");
 
-        var jsonSettings = new JsonSerializerSettings
-        {
-            Formatting = Formatting.Indented,
-            TypeNameHandling = TypeNameHandling.Auto
-        };
 
         // Ordem de carregamento
-        LoadAbilities(jsonSettings);
-        LoadItems(jsonSettings);
-        LoadNpcs(jsonSettings);
-        LoadClasses(jsonSettings);
-        LoadSpawnPoints(jsonSettings);
-        LoadLootTables(jsonSettings);
-        LoadVendors(jsonSettings);
-        LoadQuests(jsonSettings);
+        LoadAbilities();
+        LoadItems();
+        LoadStatusEffects();
+        LoadNpcs();
+        LoadClasses();
+        LoadSpawnPoints();
+        LoadLootTables();
+        LoadVendors();
+        LoadQuests();
 
         Console.WriteLine("[DataManager] Carregamento de dados concluído.");
     }
 
-    private static void LoadQuests(JsonSerializerSettings settings)
+    private static void LoadStatusEffects()
+    {
+        string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ServerData", "status_effects.json");
+        try
+        {
+            if (!File.Exists(filePath))
+            {
+                Console.WriteLine($"[AVISO] Arquivo de Status Effects não encontrado: {filePath}");
+                return;
+            }
+            string jsonContent = File.ReadAllText(filePath);
+
+            var settings = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                SerializationBinder = new CustomSerializationBinder()
+            };
+
+            var wrapper = JsonConvert.DeserializeObject<StatusEffectListWrapper>(jsonContent, settings);
+            if (wrapper?.StatusEffects != null)
+            {
+                StatusEffects = wrapper.StatusEffects.ToDictionary(e => e.EffectID, e => e);
+                Console.WriteLine($"[DataManager] {StatusEffects.Count} status effects carregados.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ERRO FATAL] Falha ao carregar status_effects.json: {ex.Message}");
+        }
+    }
+
+    private static void LoadQuests()
     {
         string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ServerData", "quests.json");
         try
@@ -57,6 +85,13 @@ public static class DataManager
                 return;
             }
             string jsonContent = File.ReadAllText(filePath);
+
+
+            var settings = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                SerializationBinder = new CustomSerializationBinder()
+            };
 
             var wrapper = JsonConvert.DeserializeObject<QuestListWrapper>(jsonContent, settings);
             if (wrapper?.Quests != null)
@@ -71,13 +106,20 @@ public static class DataManager
         }
     }
 
-    private static void LoadLootTables(JsonSerializerSettings settings)
+    private static void LoadLootTables()
     {
         string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ServerData", "loottables.json");
         try
         {
             if (!File.Exists(filePath)) { Console.WriteLine($"[AVISO] Arquivo de Loot Tables não encontrado: {filePath}"); return; }
             string jsonContent = File.ReadAllText(filePath);
+
+
+            var settings = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                SerializationBinder = new CustomSerializationBinder()
+            };
 
             var wrapper = JsonConvert.DeserializeObject<LootTableWrapper>(jsonContent, settings);
             if (wrapper?.LootTables != null)
@@ -89,7 +131,7 @@ public static class DataManager
         catch (Exception ex) { Console.WriteLine($"[ERRO FATAL] Falha ao carregar loottables.json: {ex.Message}"); }
     }
 
-    private static void LoadItems(JsonSerializerSettings baseSettings)
+    private static void LoadItems()
     {
         string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ServerData", "items.json");
         try
@@ -101,16 +143,13 @@ public static class DataManager
             }
             string jsonContent = File.ReadAllText(filePath);
 
-            // =================================================================================
-            // CORREÇÃO: Usamos as configurações base diretamente, pois elas já
-            // têm TypeNameHandling.Auto, que é o que precisamos.
-            // O SerializationBinder ainda é necessário para a segurança da deserialização.
-            // =================================================================================
             JsonSerializerSettings itemSettings = new JsonSerializerSettings
             {
-                TypeNameHandling = baseSettings.TypeNameHandling, // Herda 'Auto'
+                // Esta configuração é específica para itens
+                TypeNameHandling = TypeNameHandling.Auto,
                 SerializationBinder = new CustomSerializationBinder()
             };
+
 
             var itemList = JsonConvert.DeserializeObject<List<ServerItemData>>(jsonContent, itemSettings);
             if (itemList != null)
@@ -125,7 +164,7 @@ public static class DataManager
         }
     }
 
-    private static void LoadClasses(JsonSerializerSettings settings)
+    private static void LoadClasses()
     {
         string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ServerData", "classes.json");
         try
@@ -133,9 +172,13 @@ public static class DataManager
             if (!File.Exists(filePath)) { Console.WriteLine($"[AVISO] Arquivo de classes não encontrado: {filePath}"); return; }
             string jsonContent = File.ReadAllText(filePath);
 
-            // =================================================================================
-            // A CORREÇÃO ESTÁ AQUI: Usamos a classe ClassListWrapper para ler o JSON.
-            // =================================================================================
+
+            var settings = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                SerializationBinder = new CustomSerializationBinder()
+            };
+
             var wrapper = JsonConvert.DeserializeObject<ClassListWrapper>(jsonContent, settings);
             if (wrapper?.Classes != null)
             {
@@ -146,13 +189,20 @@ public static class DataManager
         catch (Exception ex) { Console.WriteLine($"[ERRO FATAL] Falha ao carregar classes.json: {ex.Message}"); }
     }
 
-    private static void LoadNpcs(JsonSerializerSettings settings)
+    private static void LoadNpcs()
     {
         string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ServerData", "npcs.json");
         try
         {
             if (!File.Exists(filePath)) { Console.WriteLine($"[ERRO] Arquivo de NPCs não encontrado: {filePath}"); return; }
             string jsonContent = File.ReadAllText(filePath);
+
+
+            var settings = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                SerializationBinder = new CustomSerializationBinder()
+            };
 
             var wrapper = JsonConvert.DeserializeObject<NpcListWrapper>(jsonContent, settings);
             if (wrapper?.Npcs != null)
@@ -181,13 +231,20 @@ public static class DataManager
         catch (Exception ex) { Console.WriteLine($"[ERRO FATAL] Falha ao carregar npcs.json: {ex.Message}"); }
     }
 
-    private static void LoadSpawnPoints(JsonSerializerSettings settings)
+    private static void LoadSpawnPoints()
     {
         string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ServerData", "spawns.json");
         try
         {
             if (!File.Exists(filePath)) { Console.WriteLine($"[ERRO] Arquivo de Spawns não encontrado: {filePath}"); return; }
             string jsonContent = File.ReadAllText(filePath);
+
+
+            var settings = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                SerializationBinder = new CustomSerializationBinder()
+            };
 
             var wrapper = JsonConvert.DeserializeObject<SpawnPointListWrapper>(jsonContent, settings);
             if (wrapper?.SpawnPoints != null)
@@ -199,14 +256,21 @@ public static class DataManager
         catch (Exception ex) { Console.WriteLine($"[ERRO FATAL] Falha ao carregar spawns.json: {ex.Message}"); }
     }
 
-    private static void LoadAbilities(JsonSerializerSettings settings)
+    private static void LoadAbilities()
     {
         string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ServerData", "abilities.json");
         try
         {
             if (!File.Exists(filePath)) { Console.WriteLine($"[AVISO] Arquivo de habilidades não encontrado: {filePath}"); return; }
             string jsonContent = File.ReadAllText(filePath);
-            var wrapper = JsonConvert.DeserializeObject<AbilityListWrapper>(jsonContent, settings);
+
+            var abilitySettings = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                SerializationBinder = new CustomSerializationBinder()
+            };
+
+            var wrapper = JsonConvert.DeserializeObject<AbilityListWrapper>(jsonContent, abilitySettings);
 
             if (wrapper?.Abilities != null)
             {
@@ -231,7 +295,7 @@ public static class DataManager
         }
     }
 
-    private static void LoadVendors(JsonSerializerSettings settings)
+    private static void LoadVendors()
     {
         string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ServerData", "vendors.json");
         try
@@ -242,6 +306,13 @@ public static class DataManager
                 return;
             }
             string jsonContent = File.ReadAllText(filePath);
+
+
+            var settings = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                SerializationBinder = new CustomSerializationBinder()
+            };
 
             var wrapper = JsonConvert.DeserializeObject<VendorListWrapper>(jsonContent, settings);
             if (wrapper?.Vendors != null)
@@ -259,15 +330,11 @@ public static class DataManager
     // =================================================================================
     // Classes Wrapper para a desserialização correta dos arquivos JSON
     // =================================================================================
+    private class StatusEffectListWrapper { public List<ServerStatusEffectData> StatusEffects { get; set; } }
     private class ClassListWrapper { public List<ServerClassData> Classes { get; set; } }
     private class NpcListWrapper { public List<NpcData> Npcs { get; set; } }
     private class SpawnPointListWrapper { public List<SpawnPoint> SpawnPoints { get; set; } }
     private class AbilityListWrapper { public List<AbilityData> Abilities { get; set; } }
     private class VendorListWrapper { public List<VendorData> Vendors { get; set; } }
-    //private class ItemListWrapper { public List<ServerItemData> Items { get; set; } }
-    //private class ClassListWrapper { public List<ServerClassData> Classes { get; set; } }
-    //private class NpcListWrapper { public List<NpcData> Npcs { get; set; } }
-    //private class SpawnPointListWrapper { public List<SpawnPoint> SpawnPoints { get; set; } }
-    //private class AbilityListWrapper { public List<AbilityData> Abilities { get; set; } }
-    //private class VendorListWrapper { public List<VendorData> Vendors { get; set; } }
+    private class ItemListWrapper { public List<ServerItemData> Items { get; set; } }
 }

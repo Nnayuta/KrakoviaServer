@@ -125,7 +125,7 @@ public class PlayerLifecycleManager
         if (!player.IsInCombat && player.CurrentHealth < player.MaxHealth)
         {
             float healthRegenAmount = player.MaxHealth * HEALTH_REGEN_PERCENT;
-            player.ReceiveHealing(healthRegenAmount);
+            player.ReceiveHealing(healthRegenAmount, _server);
             vitalsChanged = true;
         }
 

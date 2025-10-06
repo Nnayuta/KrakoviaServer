@@ -59,7 +59,7 @@ public class Stat
         if (numRemovals > 0)
         {
             // Este log é útil e deve permanecer.
-            Console.WriteLine($"[DEBUG] Stat: Removido {numRemovals} modificador(es) da fonte '{source}'.");
+            // Console.WriteLine($"[DEBUG] Stat: Removido {numRemovals} modificador(es) da fonte '{source}'.");
             _isDirty = true;
             return true;
         }

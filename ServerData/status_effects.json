@@ -1,0 +1,16 @@
+{
+  "StatusEffects": [
+    {
+      "EffectID": "stamina_boost",
+      "Duration": 100.0,
+      "IsBuff": true,
+      "StatModifiers": [
+        {
+          "targetStat": "Stamina",
+          "value": 10.0,
+          "type": "PercentAdd"
+        }
+      ]
+    }
+  ]
+}

@@ -179,15 +179,6 @@ public class CombatManager
     }
 
 
-    /// <summary>
-    /// Método PÚBLICO que determina os alvos e aplica os efeitos de uma habilidade.
-    /// É o "finalizador" de qualquer ação de combate.
-    /// </summary>
-    // Função ALTERADA em CombatManager.cs (substitua a função inteira)
-    /// <summary>
-    /// Método PÚBLICO que determina os alvos e aplica os efeitos de uma habilidade.
-    /// É o "finalizador" de qualquer ação de combate.
-    /// </summary>
     public void ApplyAbilityEffects(ICombatEntity source, AbilityData ability, string targetId)
     {
         var finalTargets = new List<ICombatEntity>();
@@ -210,78 +201,67 @@ public class CombatManager
                 break;
             case TargetType.Projectile:
                 if (FindEntityById(targetId) is { } projectileTarget) finalTargets.Add(projectileTarget);
-                // A lógica do projétil em si (criar, mover) precisaria de um sistema próprio.
-                // Por ora, vamos apenas aplicar os efeitos no alvo final.
                 break;
         }
 
         // --- 2. Notifica os Clientes para a Execução Visual (lógica mantida) ---
         _server.NetworkManager.BroadcastMessageToAll($"EXECUTE_ABILITY|{source.Id}|{ability.ID}|{targetId}");
 
-        // --- 3. Itera sobre cada alvo e aplica a NOVA lista de efeitos ---
-        foreach (var target in finalTargets)
+        var targetEffects = ability.Effects.Where(e => e.Intent == ability.Intent);
+        foreach (var effectData in targetEffects)
         {
-            if (target == null || target.IsDead) continue; // Simplificado
-
-            // Itera sobre a LISTA de efeitos da habilidade
-            foreach (var effectData in ability.Effects)
+            foreach (var target in finalTargets)
             {
-                // Aplica cada efeito individualmente usando o novo método auxiliar
+                if (target == null || target.IsDead) continue;
                 ApplySingleEffect(source, target, effectData);
             }
         }
+
+        // --- 3B. Aplica os efeitos com intenção oposta ao PRÓPRIO CONJURADOR ---
+        var selfEffects = ability.Effects.Where(e => e.Intent != ability.Intent);
+        foreach (var effectData in selfEffects)
+        {
+            if (source.IsDead) continue;
+            ApplySingleEffect(source, source, effectData); // O alvo é o próprio 'source'
+        }
     }
 
+    // =================================================================================
+    // >> MÉTODO AUXILIAR ATUALIZADO (COM O FIX DO NAMEPLATE) <<
+    // =================================================================================
     private void ApplySingleEffect(ICombatEntity caster, ICombatEntity target, ServerAbilityEffectData effectData)
     {
-        // Usa "pattern matching" para executar a lógica correta para cada tipo de efeito.
         if (effectData is ServerDamageEffectData damageEffect)
         {
-            // Calcula o dano base a partir dos stats
             float rawDamage = damageEffect.BaseValue;
             rawDamage += caster.Stats.GetStatValue(StatType.AttackPower) * damageEffect.AttackPowerScaling;
             rawDamage += caster.Stats.GetStatValue(StatType.SpellPower) * damageEffect.SpellPowerScaling;
 
-            // Lógica de Crítico
             bool isCritical = _random.NextDouble() * 100 < caster.Stats.GetStatValue(StatType.CriticalStrikeChance);
-            if (isCritical) rawDamage *= 2.0f; // Dano crítico dobra o dano
+            if (isCritical) rawDamage *= 2.0f;
 
-            // Aplica o dano (o método TakeDamage do alvo cuidará da redução por armadura)
             target.TakeDamage(rawDamage, caster, _server);
 
-            // Envia o evento de combate para o cliente (para o Combat Text)
             var eventType = isCritical ? CombatEventType.CriticalDamage : CombatEventType.PhysicalDamage;
-            BroadcastCombatEvent(target.Id, eventType, (int)rawDamage, isCritical); // Enviamos o rawDamage para o combat text, o dano final é calculado no TakeDamage
+            BroadcastCombatEvent(target.Id, eventType, (int)rawDamage, isCritical);
         }
         else if (effectData is ServerHealEffectData healEffect)
         {
-            // Calcula a cura base a partir dos stats
             float rawHeal = healEffect.BaseValue;
             rawHeal += caster.Stats.GetStatValue(StatType.SpellPower) * healEffect.SpellPowerScaling;
 
-            // Lógica de Crítico para Cura
             bool isCritical = _random.NextDouble() * 100 < caster.Stats.GetStatValue(StatType.CriticalStrikeChance);
-            if (isCritical) rawHeal *= 1.5f; // Cura crítica geralmente é 1.5x
+            if (isCritical) rawHeal *= 1.5f;
 
-            // Aplica a cura
-            target.ReceiveHealing(rawHeal);
+            target.ReceiveHealing(rawHeal, _server);
 
-            // Envia o evento de combate para o cliente
             var eventType = isCritical ? CombatEventType.CriticalHeal : CombatEventType.Heal;
             BroadcastCombatEvent(target.Id, eventType, (int)rawHeal, isCritical);
         }
         else if (effectData is ServerApplyStatusEffectData applyStatusEffect)
         {
-            // Esta é a ponte para o seu futuro sistema de buffs/debuffs.
-            // Por enquanto, apenas registramos no log.
-            // TODO: Chamar um método como target.StatusEffectController.Apply(...)
             Console.WriteLine($"[COMBAT] Aplicando Status Effect '{applyStatusEffect.StatusEffectID}' de {caster.Id} para {target.Id}");
-        }
-
-        // --- Lógica de Morte (agora checada após cada efeito) ---
-        if (target.CurrentHealth <= 0 && !target.IsDead)
-        {
-            ProcessDeath(caster, target);
+            // TODO: Chamar target.StatusEffectController.Apply(...)
         }
     }
 
@@ -396,42 +376,11 @@ public class CombatManager
         return targetsInCone;
     }
 
-
-    /// <summary>
-    /// Verifica se uma entidade morreu após uma ação de combate e gerencia as consequências.
-    /// </summary>
-    private void ProcessDeath(ICombatEntity killer, ICombatEntity victim)
-    {
-        Console.WriteLine($"[MORTE] Entidade {victim.Id} foi derrotada por {killer.Id}.");
-
-        // Notifica o cliente do jogador que ele morreu
-        if (victim is Player deadPlayer)
-        {
-            _server.NetworkManager.SendMessageToClient("YOU_DIED", deadPlayer.EndPoint);
-        }
-
-        // Se um NPC morreu, inicia a lógica de recompensas e respawn
-        if (victim is NpcInstance deadNpc)
-        {
-            _server.NpcAiManager.OnNpcKilled(deadNpc, killer);
-        }
-
-        // Notifica TODOS os clientes que a entidade morreu (para animações, etc.)
-        // Adicionamos o 'hasLoot' aqui
-        bool hasLoot = (victim is NpcInstance npc) ? npc.HasLoot : false;
-        _server.NetworkManager.BroadcastMessageToAll($"ENTITY_DIED|{victim.Id}|{hasLoot}");
-    }
-
     #region Métodos Auxiliares
 
     private void BroadcastCombatEvent(string targetId, CombatEventType eventType, int amount, bool isCritical)
     {
         _server.NetworkManager.BroadcastMessageToAll($"COMBAT_EVENT|{targetId}|{eventType}|{amount}|{isCritical}");
-    }
-
-    private void BroadcastHealthUpdate(ICombatEntity entity)
-    {
-        _server.NetworkManager.BroadcastMessageToAll($"ENTITY_HEALTH_UPDATE|{entity.Id}|{entity.CurrentHealth}|{entity.MaxHealth}");
     }
 
     private bool AreEntitiesFriendly(ICombatEntity entityA, ICombatEntity entityB)
