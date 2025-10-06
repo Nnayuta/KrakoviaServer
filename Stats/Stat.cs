@@ -55,18 +55,15 @@ public class Stat
 
     public bool RemoveAllModifiersFromSource(object source)
     {
-        int initialCount = _modifiers.Count;
         int numRemovals = _modifiers.RemoveAll(mod => mod.Source.Equals(source));
         if (numRemovals > 0)
         {
+            // Este log é útil e deve permanecer.
             Console.WriteLine($"[DEBUG] Stat: Removido {numRemovals} modificador(es) da fonte '{source}'.");
             _isDirty = true;
             return true;
         }
-        else if (initialCount > 0)
-        {
-            Console.WriteLine($"[DEBUG] Stat: Nenhum modificador encontrado para a fonte '{source}'.");
-        }
+
         return false;
     }
 
