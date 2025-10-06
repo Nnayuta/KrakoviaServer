@@ -11,15 +11,22 @@ public class NpcInstance : ICombatEntity, IWorldEntity
     #region IWorldEntity Implementation
     public string GetSpawnMessage()
     {
-        return $"SPAWN_NPC|{this.InstanceId}|{this.BaseData.TypeId}|{(int)this.BaseData.Faction}|{this.BaseData.IsBoss}|{this.Position.X.ToString(CultureInfo.InvariantCulture)},{this.Position.Y.ToString(CultureInfo.InvariantCulture)},{this.Position.Z.ToString(CultureInfo.InvariantCulture)}|{this.CurrentHealth}|{this.MaxHealth}";
+        string positionStr = $"{Position.X:F2},{Position.Y:F2},{Position.Z:F2}";
+        string rotationStr = $"{Rotation.X:F2},{Rotation.Y:F2},{Rotation.Z:F2}"; // Nova parte da rotação
+        return $"SPAWN_NPC|{InstanceId}|{BaseData.TypeId}|{positionStr}|{rotationStr}|{CurrentHealth}|{MaxHealth}";
     }
     #endregion
 
     #region State & AI Properties
     public string InstanceId { get; }
-    public NpcData BaseData { get; }
+    public NpcData BaseData { get; private set; }
     public Vector3 Position { get; set; }
-    public Vector3 SpawnPosition { get; }
+    public Vector3 SpawnPosition { get; private set; }
+    public DateTime LastDamageTime { get; set; }
+
+    public NpcAiType AiType { get; private set; }
+    public Vector3 Rotation { get; set; }
+
     public Vector3 Destination { get; set; }
     public List<Vector3>? PatrolPath { get; }
     public NpcAiState CurrentState { get; set; }
@@ -53,18 +60,22 @@ public class NpcInstance : ICombatEntity, IWorldEntity
     public Dictionary<string, DateTime> AbilityCooldowns { get; } = new Dictionary<string, DateTime>();
     #endregion
 
-    public NpcInstance(Vector3 spawnPosition, List<Vector3>? patrolPath, NpcData baseData, UDPServer server)
+    public NpcInstance(Vector3 position, Vector3 rotation, NpcAiType aiType, List<Vector3>? patrolPath, NpcData baseData, UDPServer server)
     {
         DateTime currentTime = server.CurrentTimeUtc;
 
         this.InstanceId = Guid.NewGuid().ToString("N");
         this.BaseData = baseData;
-        this.SpawnPosition = spawnPosition;
-        this.Position = spawnPosition;
-        this.Destination = spawnPosition;
+        this.SpawnPosition = position;
+        this.Position = position;
+        this.Destination = position;
         this.PatrolPath = patrolPath;
-        this.LastPosition = spawnPosition;
+        this.LastPosition = position;
         this.CurrentState = NpcAiState.Idle;
+
+        this.Rotation = rotation;
+        this.AiType = aiType;
+        this.PatrolPath = patrolPath;
 
         this.NextActionTime = currentTime;
         this.TimeAtLastPosition = currentTime;
@@ -135,11 +146,11 @@ public class NpcInstance : ICombatEntity, IWorldEntity
 
     // Servidor/Entities/NpcInstance.cs
 
-    public void TakeDamage(float amount, ICombatEntity source)
+    public void TakeDamage(float amount, ICombatEntity source, UDPServer server)
     {
         if (IsDead) return;
 
-        float armorValue = this.Stats.GetStatValue(StatType.Armor);
+        float armorValue = this.Stats != null ? this.Stats.GetStatValue(StatType.Armor) : 0f;
         float damageReduction = armorValue / (armorValue + 400 + 85 * source.Level);
         float finalDamage = Math.Max(1, amount * (1 - damageReduction));
 
@@ -153,9 +164,20 @@ public class NpcInstance : ICombatEntity, IWorldEntity
             this.TargetPlayerId = source.Id;
         }
 
-        if (this.CurrentHealth <= 0)
+        if (this.AiType == NpcAiType.Training_Dummy)
         {
-            this.CurrentHealth = 0;
+            this.LastDamageTime = server.CurrentTimeUtc;
+            if (this.CurrentHealth <= 0)
+            {
+                this.CurrentHealth = 1;
+            }
+        }
+        else
+        {
+            if (this.CurrentHealth <= 0)
+            {
+                this.CurrentHealth = 0;
+            }
         }
     }
 

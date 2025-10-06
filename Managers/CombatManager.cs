@@ -245,7 +245,7 @@ public class CombatManager
                     float reduction = armor / (armor + 400 + 85 * source.Level);
                     float finalDamage = Math.Max(1, rawDamage * (1 - reduction));
 
-                    target.TakeDamage((int)finalDamage, source);
+                    target.TakeDamage((int)finalDamage, source, _server);
 
                     var eventType = isCritical ? CombatEventType.CriticalDamage : CombatEventType.PhysicalDamage;
                     BroadcastCombatEvent(target.Id, eventType, (int)finalDamage, isCritical);

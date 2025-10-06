@@ -63,6 +63,19 @@ public class NpcAiManager
     {
         if (npc.IsDead) return;
 
+        if (npc.AiType == NpcAiType.Training_Dummy)
+        {
+            // Se a vida estiver abaixo do máximo e já se passaram 10s desde o último dano
+            if (npc.CurrentHealth < npc.MaxHealth && (_server.CurrentTimeUtc - npc.LastDamageTime).TotalSeconds > 10)
+            {
+                npc.CurrentHealth = npc.MaxHealth;
+                // Notifica os jogadores sobre a atualização de vida
+                _server.NetworkManager.BroadcastMessageToAll($"ENTITY_HEALTH_UPDATE|{npc.Id}|{npc.CurrentHealth}|{npc.MaxHealth}");
+            }
+            // Bonecos de teste não fazem mais nada. Eles não se movem, não atacam, nada.
+            return;
+        }
+
         // A verificação de vida e o relatório de morte continuam sendo uma boa prática
         if (npc.CurrentHealth <= 0)
         {
@@ -91,18 +104,15 @@ public class NpcAiManager
 
     private void HandleIdleState(NpcInstance npc)
     {
-        if (_server.CurrentTimeUtc < npc.NextActionTime)
-        {
-            return;
-        }
+        if (_server.CurrentTimeUtc < npc.NextActionTime) return;
 
         // Primeiro, a lógica de combate sempre tem prioridade.
-        if (IsAggressive(npc.BaseData.AiType))
+        if (IsAggressive(npc.AiType))
         {
             if (TryFindAndSetTarget(npc)) return;
         }
 
-        if (npc.BaseData.AiType == NpcAiType.Ambient_Fleeing)
+        if (npc.AiType == NpcAiType.Ambient_Fleeing)
         {
             Player? nearbyPlayer = FindClosestPlayerInAggroRange(npc);
             if (nearbyPlayer != null)
@@ -113,17 +123,15 @@ public class NpcAiManager
             }
         }
 
-        switch (npc.BaseData.AiType)
+        switch (npc.AiType)
         {
             case NpcAiType.Wandering_Aggressive:
             case NpcAiType.Ambient_Fleeing:
-                // DECIDE PASSEAR E JÁ DEFINE O DESTINO AQUI!
+            case NpcAiType.Ambient_Wandering: // << MUDANÇA: NPCs passivos errantes também usam esta lógica
                 float wanderRadius = npc.BaseData.LeashRange * 0.7f;
-                float angle = (float)(_threadRandom.Value.NextDouble() * 2 * Math.PI);
+                float angle = (float)(_threadRandom.Value!.NextDouble() * 2 * Math.PI);
                 float radius = (float)_threadRandom.Value.NextDouble() * wanderRadius;
                 Vector3 randomPoint = npc.SpawnPosition + new Vector3((float)Math.Cos(angle) * radius, 0, (float)Math.Sin(angle) * radius);
-
-                // Define o novo destino e MUDA o estado.
                 SetNpcDestination(npc, randomPoint);
                 ChangeNpcState(npc, NpcAiState.Wandering);
                 break;
@@ -136,8 +144,12 @@ public class NpcAiManager
                     ChangeNpcState(npc, NpcAiState.Patrolling);
                 }
                 break;
-
-            // Outros tipos de IA ficam em Idle.
+            case NpcAiType.Passive_Aggressive:
+            case NpcAiType.Stationary_Guard:
+            case NpcAiType.Ambient_Passive:
+            case NpcAiType.Training_Dummy:
+                npc.NextActionTime = _server.CurrentTimeUtc.AddSeconds(5);
+                break;
             default:
                 // Para garantir que a pausa funcione, resetamos o timer para ele "pensar" de novo mais tarde.
                 npc.NextActionTime = _server.CurrentTimeUtc.AddSeconds(5);
@@ -148,7 +160,7 @@ public class NpcAiManager
     private void HandleWanderingState(NpcInstance npc)
     {
         // A lógica de procurar um alvo continua sendo a prioridade.
-        if (IsAggressive(npc.BaseData.AiType) && TryFindAndSetTarget(npc)) return;
+        if (IsAggressive(npc.AiType) && TryFindAndSetTarget(npc)) return;
 
         // Chegou ao destino? Volta para Idle e agenda uma pausa.
         if (Vector3.Distance(npc.Position, npc.Destination) < 1.5f)
@@ -397,9 +409,9 @@ public class NpcAiManager
     private bool IsHostileTo(NpcInstance npc, Player player)
     {
         if (npc.ThreatTable.ContainsKey(player.Id)) return true;
-        if (npc.BaseData.AiType == NpcAiType.Passive_Aggressive) return false;
-        if (IsAggressive(npc.BaseData.AiType) && npc.BaseData.Faction == NpcFaction.Enemy) return true;
-        // TODO: Adicionar lógica de facção vs facção
+        if (npc.AiType == NpcAiType.Passive_Aggressive) return false;
+        if (IsAggressive(npc.AiType) && npc.BaseData.Faction == NpcFaction.Enemy) return true;
+
         return false;
     }
 
@@ -465,7 +477,8 @@ public class NpcAiManager
     {
         return aiType == NpcAiType.Passive_Aggressive ||
                aiType == NpcAiType.Patrolling_Aggressive ||
-               aiType == NpcAiType.Wandering_Aggressive;
+               aiType == NpcAiType.Wandering_Aggressive ||
+               aiType == NpcAiType.Stationary_Guard;
     }
 
     private AbilityData? ChooseBestSpecialAbility(NpcInstance npc, ICombatEntity target)

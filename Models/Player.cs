@@ -361,7 +361,7 @@ public class Player : ICombatEntity, IWorldEntity
         }
     }
 
-    public void TakeDamage(float amount, ICombatEntity source)
+    public void TakeDamage(float amount, ICombatEntity source, UDPServer server)
     {
         if (IsDead) return;
 

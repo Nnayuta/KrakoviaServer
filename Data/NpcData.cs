@@ -19,10 +19,10 @@ public class BaseStatData
 /// </summary>
 public class NpcData
 {
-    public string TypeId { get; set; }
+    public required string TypeId { get; set; }
     public NpcFaction Faction { get; set; }
-    public NpcAiType AiType { get; set; }
-    public List<BaseStatData> Stats { get; set; } = new List<BaseStatData>();
+    // public NpcAiType AiType { get; set; }
+    public List<BaseStatData> Stats { get; set; } = [];
 
     public int Level { get; set; }
     public bool IsBoss { get; set; }
@@ -33,7 +33,7 @@ public class NpcData
     public int RespawnTimeSeconds { get; set; }
 
     public float SwingTimer { get; set; }
-    public string AutoAttackAbilityID { get; set; }
+    public required string AutoAttackAbilityID { get; set; }
     public List<string> AbilityIDs { get; set; } = new();
 
     // Propriedades de Recompensa

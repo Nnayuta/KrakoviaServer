@@ -143,7 +143,7 @@ public class WorldManager
                 {
                     Console.WriteLine($"[WorldManager] Ressurgindo um NPC para o grupo '{spawnPoint.NpcTypeId}'...");
                     Vector3 spawnPosition = CalculateSpawnPosition(spawnPoint);
-                    SpawnSingleNpc(npcData, spawnPosition, spawnPoint.PatrolPath, spawnPoint);
+                    SpawnSingleNpc(npcData, spawnPosition, spawnPoint);
 
                     if (spawnPoint.ActiveNpcInstanceIds.Count < spawnPoint.Quantity)
                     {
@@ -173,7 +173,7 @@ public class WorldManager
                 for (int i = 0; i < spawnPoint.Quantity; i++)
                 {
                     Vector3 spawnPosition = CalculateSpawnPosition(spawnPoint);
-                    SpawnSingleNpc(npcData, spawnPosition, spawnPoint.PatrolPath, spawnPoint);
+                    SpawnSingleNpc(npcData, spawnPosition, spawnPoint);
                 }
             }
             else
@@ -188,9 +188,18 @@ public class WorldManager
     /// <summary>
     /// Cria uma nova instância de NPC, a ativa e notifica os clientes.
     /// </summary>
-    private void SpawnSingleNpc(NpcData npcData, Vector3 position, List<Vector3>? patrolPath, SpawnPoint spawnPoint)
+    private void SpawnSingleNpc(NpcData npcData, Vector3 position, SpawnPoint spawnPoint)
     {
-        var newNpc = new NpcInstance(position, patrolPath, npcData, _server);
+        // Agora passamos os dados de comportamento do SpawnPoint para a nova instância do NPC
+        var newNpc = new NpcInstance(
+            position,
+            spawnPoint.InitialRotation,
+            spawnPoint.AiType,
+            spawnPoint.PatrolPath, // Passando o caminho da patrulha também
+            npcData,
+            _server
+        );
+
         _server.ActiveNpcs.TryAdd(newNpc.InstanceId, newNpc);
 
         spawnPoint.ActiveNpcInstanceIds.Add(newNpc.InstanceId);

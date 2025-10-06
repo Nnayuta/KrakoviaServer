@@ -27,6 +27,6 @@ public interface ICombatEntity
     Dictionary<string, DateTime> AbilityCooldowns { get; }
 
     // Métodos de Interação
-    void TakeDamage(float amount, ICombatEntity source);
+    void TakeDamage(float amount, ICombatEntity source, UDPServer server);
     void ReceiveHealing(float amount);
 }
