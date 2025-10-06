@@ -5,15 +5,24 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
+using Newtonsoft.Json;
 
 public class NpcInstance : ICombatEntity, IWorldEntity
 {
     #region IWorldEntity Implementation
     public string GetSpawnMessage()
     {
-        string positionStr = $"{Position.X:F2},{Position.Y:F2},{Position.Z:F2}";
-        string rotationStr = $"{Rotation.X:F2},{Rotation.Y:F2},{Rotation.Z:F2}"; // Nova parte da rotação
-        return $"SPAWN_NPC|{InstanceId}|{BaseData.TypeId}|{positionStr}|{rotationStr}|{CurrentHealth}|{MaxHealth}";
+        string positionStr = string.Join(",",
+            Position.X.ToString("F2", CultureInfo.InvariantCulture),
+            Position.Y.ToString("F2", CultureInfo.InvariantCulture),
+            Position.Z.ToString("F2", CultureInfo.InvariantCulture));
+
+        string rotationStr = string.Join(",",
+            Rotation.X.ToString("F2", CultureInfo.InvariantCulture),
+            Rotation.Y.ToString("F2", CultureInfo.InvariantCulture),
+            Rotation.Z.ToString("F2", CultureInfo.InvariantCulture));
+
+        return $"SPAWN_NPC|{InstanceId}|{BaseData.TypeId}|{positionStr}|{rotationStr}|{CurrentHealth.ToString(CultureInfo.InvariantCulture)}|{MaxHealth.ToString(CultureInfo.InvariantCulture)}";
     }
     #endregion
 
@@ -44,6 +53,12 @@ public class NpcInstance : ICombatEntity, IWorldEntity
     public List<ItemStack>? Loot { get; private set; } = null; // Começa nulo
     public DateTime CorpseDespawnTime { get; private set; }
     public bool HasLoot => Loot != null && Loot.Count > 0;
+    public bool IsCorpse => CurrentState == NpcAiState.Dead && (Loot != null && Loot.Count > 0);
+    public bool IsDespawned => CurrentState == NpcAiState.Dead && (Loot == null || Loot.Count == 0);
+    public bool IsInvulnerable { get; set; }
+    [JsonIgnore] // Não precisa salvar esta propriedade
+    public bool HasStopped { get; set; } = true; // Começa parado
+
 
     #endregion
 
@@ -149,15 +164,27 @@ public class NpcInstance : ICombatEntity, IWorldEntity
     public void TakeDamage(float amount, ICombatEntity source, UDPServer server)
     {
         if (IsDead) return;
+        float armorValue = this.Stats?.GetStatValue(StatType.Armor) ?? 0f;
 
-        float armorValue = this.Stats != null ? this.Stats.GetStatValue(StatType.Armor) : 0f;
-        float damageReduction = armorValue / (armorValue + 400 + 85 * source.Level);
+        // Calcula o valor 'K' com base no nível do atacante.
+        float kConstant = CombatConstants.ARMOR_K_BASE + (CombatConstants.ARMOR_K_LEVEL_MULTIPLIER * source.Level);
+
+        // Calcula a redução de dano, garantindo que não seja divisão por zero se K for 0.
+        float damageReduction = kConstant > 0 ? armorValue / (armorValue + kConstant) : 0f;
+
+        // Aplica o limite máximo de redução de dano (geralmente 75% em MMOs).
+        damageReduction = Math.Min(damageReduction, CombatConstants.MAX_ARMOR_DAMAGE_REDUCTION);
+
+        // Calcula o dano final após a redução. O dano mínimo é sempre 1.
         float finalDamage = Math.Max(1, amount * (1 - damageReduction));
+
+        // =================================================================================
 
         this.CurrentHealth -= finalDamage;
 
         ThreatTable.TryGetValue(source.Id, out float currentThreat);
         ThreatTable[source.Id] = currentThreat + finalDamage;
+        this.NextActionTime = server.CurrentTimeUtc;
 
         if (this.BaseData.Faction != NpcFaction.Enemy)
         {

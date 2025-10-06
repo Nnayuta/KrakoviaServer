@@ -16,6 +16,7 @@ public class NpcAiManager
         new ThreadLocal<Random>(() => new Random(Environment.CurrentManagedThreadId));
 
     private const float BASE_NPC_MOVE_SPEED = 5.0f;
+    private const float CASTER_IDEAL_DISTANCE = 15.0f;
 
     public NpcAiManager(UDPServer server)
     {
@@ -30,13 +31,11 @@ public class NpcAiManager
         const float DELTA_TIME = AI_TICK_RATE_MS / 1000.0f;
         var stopwatch = new Stopwatch();
 
-
         while (!cancellationToken.IsCancellationRequested)
         {
             try
             {
                 stopwatch.Restart();
-                // A sua lógica de processar apenas NPCs ativos já previne a morte instantânea
                 var activeNpcs = _server.ActiveNpcs.Values.Where(npc => npc.IsActive).ToList();
                 if (activeNpcs.Any())
                 {
@@ -63,29 +62,23 @@ public class NpcAiManager
     {
         if (npc.IsDead) return;
 
+        // Lógica de Training Dummy permanece a mesma
         if (npc.AiType == NpcAiType.Training_Dummy)
         {
-            // Se a vida estiver abaixo do máximo e já se passaram 10s desde o último dano
             if (npc.CurrentHealth < npc.MaxHealth && (_server.CurrentTimeUtc - npc.LastDamageTime).TotalSeconds > 10)
             {
                 npc.CurrentHealth = npc.MaxHealth;
-                // Notifica os jogadores sobre a atualização de vida
                 _server.NetworkManager.BroadcastMessageToAll($"ENTITY_HEALTH_UPDATE|{npc.Id}|{npc.CurrentHealth}|{npc.MaxHealth}");
             }
-            // Bonecos de teste não fazem mais nada. Eles não se movem, não atacam, nada.
             return;
         }
 
-        // A verificação de vida e o relatório de morte continuam sendo uma boa prática
         if (npc.CurrentHealth <= 0)
         {
             ICombatEntity? lastAttacker = GetPlayerById(npc.ThreatTable.OrderByDescending(kvp => kvp.Value).FirstOrDefault().Key);
-            OnNpcKilled(npc, lastAttacker); // Chamamos a nossa própria função OnNpcKilled
+            OnNpcKilled(npc, lastAttacker);
             return;
         }
-
-        CheckIfNpcIsStuck(npc);
-        UpdateNpcPosition(npc, deltaTime);
 
         switch (npc.CurrentState)
         {
@@ -97,6 +90,9 @@ public class NpcAiManager
             case NpcAiState.ReturningToSpawn: HandleReturningToSpawnState(npc); break;
             case NpcAiState.Fleeing: HandleFleeingState(npc); break;
         }
+
+        UpdateNpcPosition(npc, deltaTime);
+        CheckIfNpcIsStuck(npc);
     }
     #endregion
 
@@ -109,8 +105,9 @@ public class NpcAiManager
         // Primeiro, a lógica de combate sempre tem prioridade.
         if (IsAggressive(npc.AiType))
         {
-            if (TryFindAndSetTarget(npc)) return;
+            if (TryFindAndSetTarget(npc, true)) return; // 'true' para checar aggro social
         }
+
 
         if (npc.AiType == NpcAiType.Ambient_Fleeing)
         {
@@ -127,11 +124,8 @@ public class NpcAiManager
         {
             case NpcAiType.Wandering_Aggressive:
             case NpcAiType.Ambient_Fleeing:
-            case NpcAiType.Ambient_Wandering: // << MUDANÇA: NPCs passivos errantes também usam esta lógica
-                float wanderRadius = npc.BaseData.LeashRange * 0.7f;
-                float angle = (float)(_threadRandom.Value!.NextDouble() * 2 * Math.PI);
-                float radius = (float)_threadRandom.Value.NextDouble() * wanderRadius;
-                Vector3 randomPoint = npc.SpawnPosition + new Vector3((float)Math.Cos(angle) * radius, 0, (float)Math.Sin(angle) * radius);
+            case NpcAiType.Ambient_Wandering:
+                Vector3 randomPoint = FindWanderPoint(npc);
                 SetNpcDestination(npc, randomPoint);
                 ChangeNpcState(npc, NpcAiState.Wandering);
                 break;
@@ -139,19 +133,12 @@ public class NpcAiManager
             case NpcAiType.Patrolling_Aggressive:
                 if (npc.PatrolPath != null && npc.PatrolPath.Any())
                 {
-                    // Mesma lógica: decide e define o destino aqui.
                     SetNpcDestination(npc, npc.PatrolPath[npc.CurrentPatrolIndex]);
                     ChangeNpcState(npc, NpcAiState.Patrolling);
                 }
                 break;
-            case NpcAiType.Passive_Aggressive:
-            case NpcAiType.Stationary_Guard:
-            case NpcAiType.Ambient_Passive:
-            case NpcAiType.Training_Dummy:
-                npc.NextActionTime = _server.CurrentTimeUtc.AddSeconds(5);
-                break;
+
             default:
-                // Para garantir que a pausa funcione, resetamos o timer para ele "pensar" de novo mais tarde.
                 npc.NextActionTime = _server.CurrentTimeUtc.AddSeconds(5);
                 break;
         }
@@ -159,40 +146,13 @@ public class NpcAiManager
 
     private void HandleWanderingState(NpcInstance npc)
     {
-        // A lógica de procurar um alvo continua sendo a prioridade.
         if (IsAggressive(npc.AiType) && TryFindAndSetTarget(npc)) return;
 
-        // Chegou ao destino? Volta para Idle e agenda uma pausa.
+        // Chegou ao destino? Volta a ficar ocioso.
         if (Vector3.Distance(npc.Position, npc.Destination) < 1.5f)
         {
-            // Ao chegar, ele para (destino = posição atual), entra em Idle e agenda a próxima ação.
-            SetNpcDestination(npc, npc.Position);
             ChangeNpcState(npc, NpcAiState.Idle);
-            npc.NextActionTime = _server.CurrentTimeUtc.AddSeconds(_threadRandom.Value.Next(4, 10));
-        }
-
-        // Se o NPC fica "preso" por muito tempo, força uma nova decisão.
-        else if ((_server.CurrentTimeUtc - npc.LastStateChangeTime).TotalSeconds > 20)
-        {
-            ChangeNpcState(npc, NpcAiState.Idle);
-            npc.NextActionTime = _server.CurrentTimeUtc.AddSeconds(_threadRandom.Value.Next(2, 5));
-            return;
-        }
-
-        // ========================================================================
-        // A CORREÇÃO ESTÁ AQUI
-        // Se o destino do NPC é o local onde ele já está, ele precisa de um novo lugar para ir.
-        // Esta condição é muito mais robusta do que "npc.Position == npc.Destination".
-        // ========================================================================
-        else if (npc.Destination == npc.Position)
-        {
-            // Define um novo ponto aleatório para passear perto do spawn.
-            float wanderRadius = npc.BaseData.LeashRange * 0.7f;
-            float angle = (float)(_threadRandom.Value.NextDouble() * 2 * Math.PI);
-            float radius = (float)_threadRandom.Value.NextDouble() * wanderRadius;
-            Vector3 randomPoint = npc.SpawnPosition + new Vector3((float)Math.Cos(angle) * radius, 0, (float)Math.Sin(angle) * radius);
-
-            SetNpcDestination(npc, randomPoint);
+            npc.NextActionTime = _server.CurrentTimeUtc.AddSeconds(_threadRandom.Value!.Next(4, 10));
         }
     }
 
@@ -255,48 +215,56 @@ public class NpcAiManager
             return;
         }
 
+        // Se já está no alcance para atacar, muda de estado e PARA de se mover.
         if (Vector3.Distance(npc.Position, target.Position) <= npc.BaseData.MaxAbilityRange)
         {
             ChangeNpcState(npc, NpcAiState.Attacking);
+            SetNpcDestination(npc, npc.Position);
             return;
         }
+
+        // Se não, continua perseguindo.
         SetNpcDestination(npc, target.Position);
     }
 
     private void HandleAttackingState(NpcInstance npc)
     {
         ICombatEntity? target = GetCurrentTarget(npc);
-        if (target == null || target.IsDead) { ResetAggro(npc); return; }
+        if (target == null || target.IsDead)
+        {
+            ResetAggro(npc);
+            return;
+        }
 
+        FaceTarget(npc, target);
+
+        // Se o alvo fugiu, volta a perseguir.
         if (Vector3.Distance(npc.Position, target.Position) > npc.BaseData.MaxAbilityRange)
         {
             ChangeNpcState(npc, NpcAiState.Chasing);
             return;
         }
 
-        FaceTarget(npc, target);
+        if (npc.BaseData.AutoAttackAbilityID != null && _server.CurrentTimeUtc >= npc.NextAutoAttackTime)
+        {
+            // A sua verificação de distância aqui já é uma boa prática.
+            if (Vector3.Distance(npc.Position, target.Position) <= DataManager.Abilities[npc.BaseData.AutoAttackAbilityID].Range)
+            {
+                _server.CombatManager.ProcessAbilityRequest(npc, npc.BaseData.AutoAttackAbilityID, target.Id);
+                // Reseta o timer do auto-ataque com base no SwingTimer do NPC.
+                npc.NextAutoAttackTime = _server.CurrentTimeUtc.AddSeconds(npc.BaseData.SwingTimer);
+            }
+        }
 
-        bool isGcdReady = _server.CurrentTimeUtc >= npc.GlobalCooldownEndTime;
-        if (isGcdReady)
+        // --- Passo 2: Processar Habilidades Especiais (dependente do GCD) ---
+        // O NPC só tenta usar uma habilidade especial se não estiver em Global Cooldown.
+        if (_server.CurrentTimeUtc >= npc.GlobalCooldownEndTime)
         {
             AbilityData? specialAbility = ChooseBestSpecialAbility(npc, target);
             if (specialAbility != null)
             {
                 _server.CombatManager.ProcessAbilityRequest(npc, specialAbility.ID, target.Id);
                 npc.GlobalCooldownEndTime = _server.CurrentTimeUtc.AddSeconds(1.5);
-                return;
-            }
-        }
-
-        if (npc.BaseData.AutoAttackAbilityID != null && _server.CurrentTimeUtc >= npc.NextAutoAttackTime)
-        {
-            if (DataManager.Abilities.TryGetValue(npc.BaseData.AutoAttackAbilityID, out var autoAttackAbility))
-            {
-                if (Vector3.Distance(npc.Position, target.Position) <= autoAttackAbility.Range)
-                {
-                    _server.CombatManager.ProcessAbilityRequest(npc, npc.BaseData.AutoAttackAbilityID, target.Id);
-                    npc.NextAutoAttackTime = _server.CurrentTimeUtc.AddSeconds(npc.BaseData.SwingTimer);
-                }
             }
         }
     }
@@ -314,6 +282,7 @@ public class NpcAiManager
             SetNpcDestination(npc, npc.SpawnPosition);
         }
     }
+
 
     private void HandleFleeingState(NpcInstance npc)
     {
@@ -370,15 +339,82 @@ public class NpcAiManager
         return null;
     }
 
-    private bool TryFindAndSetTarget(NpcInstance npc)
+    private Vector3 FindWanderPoint(NpcInstance npc)
+    {
+        float wanderRadius = npc.BaseData.LeashRange * 0.7f;
+        float angle = (float)(_threadRandom.Value!.NextDouble() * 2 * Math.PI);
+        float radius = (float)_threadRandom.Value.NextDouble() * wanderRadius;
+
+        // Cria o deslocamento no plano XZ
+        var offset = new Vector3((float)Math.Cos(angle) * radius, 0, (float)Math.Sin(angle) * radius);
+
+        // Adiciona o deslocamento à posição de spawn, mas preserva o Y original do spawn point.
+        var newPoint = npc.SpawnPosition + offset;
+        newPoint.Y = npc.SpawnPosition.Y;
+
+        return newPoint;
+    }
+
+    private bool TryFindAndSetTarget(NpcInstance npc, bool allowSocialAggro = false)
     {
         ICombatEntity? target = FindBestTarget(npc);
         if (target != null)
         {
-            npc.TargetPlayerId = target.Id;
-            ChangeNpcState(npc, NpcAiState.Chasing);
+            if (npc.TargetPlayerId != target.Id) // Se for um novo alvo
+            {
+                npc.TargetPlayerId = target.Id;
+                ChangeNpcState(npc, NpcAiState.Chasing);
+                if (allowSocialAggro)
+                {
+                    NotifyNearbyAllies(npc, target); // Alerta os amigos!
+                }
+            }
             return true;
         }
+        return false;
+    }
+
+    private void NotifyNearbyAllies(NpcInstance originalNpc, ICombatEntity target)
+    {
+        const float socialAggroRadius = 20f;
+        var nearbyNpcs = _server.ActiveNpcs.Values
+            .Where(otherNpc =>
+                otherNpc.IsActive &&
+                otherNpc.Id != originalNpc.Id &&
+                otherNpc.BaseData.Faction == originalNpc.BaseData.Faction && // Mesma facção
+                otherNpc.CurrentState == NpcAiState.Idle && // Só alerta quem está ocioso
+                Vector3.Distance(originalNpc.Position, otherNpc.Position) <= socialAggroRadius)
+            .ToList();
+
+        foreach (var ally in nearbyNpcs)
+        {
+            // Adiciona uma pequena quantidade de ameaça para "puxar" o aliado para o combate
+            ally.ThreatTable[target.Id] = 1;
+            Console.WriteLine($"[Social Aggro] NPC {originalNpc.Id} alertou o aliado {ally.Id} sobre o alvo {target.Id}");
+        }
+    }
+
+    private bool FindValidWanderPoint(NpcInstance npc, out Vector3 foundPoint)
+    {
+        float wanderRadius = npc.BaseData.LeashRange * 0.7f;
+        const int maxAttempts = 10; // Tenta 10 vezes encontrar um ponto
+
+        for (int i = 0; i < maxAttempts; i++)
+        {
+            float angle = (float)(_threadRandom.Value!.NextDouble() * 2 * Math.PI);
+            float radius = (float)_threadRandom.Value.NextDouble() * wanderRadius;
+            Vector3 potentialPoint = npc.SpawnPosition + new Vector3((float)Math.Cos(angle) * radius, 0, (float)Math.Sin(angle) * radius);
+
+            // VALIDAÇÃO: O ponto está a uma distância razoável do ponto atual?
+            // Isso evita que ele escolha um ponto logo ao lado e fique "tremendo".
+            if (Vector3.Distance(npc.Position, potentialPoint) > 3.0f)
+            {
+                foundPoint = potentialPoint;
+                return true;
+            }
+        }
+
+        foundPoint = npc.Position; // Não encontrou, fica parado
         return false;
     }
 
@@ -409,11 +445,11 @@ public class NpcAiManager
     private bool IsHostileTo(NpcInstance npc, Player player)
     {
         if (npc.ThreatTable.ContainsKey(player.Id)) return true;
-        if (npc.AiType == NpcAiType.Passive_Aggressive) return false;
+        if (npc.AiType == NpcAiType.Passive_Aggressive || npc.AiType == NpcAiType.Ambient_Passive) return false;
         if (IsAggressive(npc.AiType) && npc.BaseData.Faction == NpcFaction.Enemy) return true;
-
         return false;
     }
+
 
     private void ResetAggro(NpcInstance npc)
     {
@@ -422,7 +458,8 @@ public class NpcAiManager
         ChangeNpcState(npc, NpcAiState.ReturningToSpawn);
     }
 
-    public void ChangeNpcState(NpcInstance npc, NpcAiState newState)
+
+    private void ChangeNpcState(NpcInstance npc, NpcAiState newState)
     {
         if (npc.CurrentState == newState) return;
         npc.CurrentState = newState;
@@ -431,29 +468,34 @@ public class NpcAiManager
 
     private void UpdateNpcPosition(NpcInstance npc, float deltaTime)
     {
-        if (Vector3.Distance(npc.Position, npc.Destination) < 0.1f) return;
+        float distanceToDestination = Vector3.Distance(npc.Position, npc.Destination);
 
-        float currentMoveSpeedStat = npc.MovementSpeed;
-        if (currentMoveSpeedStat <= 0)
+        if (distanceToDestination < 0.1f)
         {
-            Console.WriteLine($"[AI-WARN] NPC {npc.InstanceId} tem velocidade 0 e não pode se mover.");
+            if (!npc.HasStopped)
+            {
+                SetNpcDestination(npc, npc.Position);
+                npc.HasStopped = true;
+            }
             return;
         }
+        npc.HasStopped = false;
 
-        float actualMoveSpeed = BASE_NPC_MOVE_SPEED * (currentMoveSpeedStat / 100.0f);
-        float dist = Vector3.Distance(npc.Position, npc.Destination);
+        float actualMoveSpeed = BASE_NPC_MOVE_SPEED * (npc.MovementSpeed / 100.0f);
         float moveAmount = actualMoveSpeed * deltaTime;
 
-        if (moveAmount >= dist)
+        if (moveAmount >= distanceToDestination)
         {
             npc.Position = npc.Destination;
         }
         else
         {
-            npc.Position += Vector3.Normalize(npc.Destination - npc.Position) * moveAmount;
+            // Calcula a direção normalizada do movimento
+            Vector3 direction = Vector3.Normalize(npc.Destination - npc.Position);
+            // Move o NPC na direção correta pela quantidade calculada
+            npc.Position += direction * moveAmount;
         }
     }
-
 
     private void SetNpcDestination(NpcInstance npc, Vector3 newDestination)
     {
@@ -486,10 +528,23 @@ public class NpcAiManager
         return npc.BaseData.AbilityIDs
             .Where(id => id != npc.BaseData.AutoAttackAbilityID)
             .Select(id => DataManager.Abilities.TryGetValue(id, out var ability) ? ability : null)
-            .Where(ability => ability != null && !IsOnCooldown(npc, ability.ID) && Vector3.Distance(npc.Position, target.Position) <= ability.Range)
+            .Where(ability =>
+            {
+                if (ability == null || IsOnCooldown(npc, ability.ID) || Vector3.Distance(npc.Position, target.Position) > ability.Range)
+                    return false;
+
+                // CONTEXTO: Só usa cura se a vida estiver baixa
+                if (ability.EffectType == AbilityEffectType.Heal && npc.CurrentHealth > npc.MaxHealth * 0.6)
+                    return false; // Não cura se tiver mais de 60% de vida
+
+                return true;
+            })
             .OrderByDescending(ability => ability?.Priority ?? 0)
             .FirstOrDefault();
     }
+
+    private bool IsCaster(NpcInstance npc) => npc.BaseData.MaxAbilityRange > 5.0f;
+    private float GetAttackRange(NpcInstance npc) => npc.BaseData.MaxAbilityRange;
 
     private bool IsOnCooldown(NpcInstance npc, string cooldownKey)
     {
@@ -498,6 +553,5 @@ public class NpcAiManager
     }
 
     #endregion
-
     #endregion
 }

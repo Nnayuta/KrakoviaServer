@@ -32,14 +32,17 @@ public class Player : ICombatEntity, IWorldEntity
         string rotationY = this.State.RotationY;
         string equipmentPayload = GetEquipmentPayload();
 
+        string currentHealthStr = this.CurrentHealth.ToString("F0", CultureInfo.InvariantCulture);
+        string maxHealthStr = this.MaxHealth.ToString("F0", CultureInfo.InvariantCulture);
+
         // Serializamos todo o objeto de aparência para JSON.
         // O cliente pode então usar isso para reconstruir a aparência visual completa.
         string appearanceJson = JsonConvert.SerializeObject(this.Appearance);
 
-        Console.WriteLine($"[GetSpawnMessage] Gerando mensagem de spawn para {this.CharacterName}. PermissionLevel ATUAL: {this.PermissionLevel}");
+        // Console.WriteLine($"[GetSpawnMessage] Gerando mensagem de spawn para {this.CharacterName}. PermissionLevel ATUAL: {this.PermissionLevel}");
 
         // Juntamos tudo em uma única mensagem poderosa.
-        return $"SPAWN_PLAYER|{this.Id}|{this.CharacterName}|{position}|{rotationY}|{equipmentPayload}|{appearanceJson}|{this.Level}|{this.CurrentHealth:F0}|{this.MaxHealth:F0}|{this.PermissionLevel}";
+        return $"SPAWN_PLAYER|{this.Id}|{this.CharacterName}|{this.State.Position}|{this.State.RotationY}|{GetEquipmentPayload()}|{JsonConvert.SerializeObject(this.Appearance)}|{this.Level}|{currentHealthStr}|{maxHealthStr}|{this.PermissionLevel}";
     }
 
     public string SessionId { get; }
@@ -83,10 +86,13 @@ public class Player : ICombatEntity, IWorldEntity
     #region ICombatEntity Implementation (Atualizada)
 
     public string Id => this.CharacterId;
+
     public Vector3 Position
     {
+        // O getter depende do Vector3Parser, então vamos garantir que o parser também seja robusto.
         get => Vector3Parser.Parse(this.State.Position);
-        set => this.State.Position = $"{value.X.ToString(CultureInfo.InvariantCulture)},{value.Y.ToString(CultureInfo.InvariantCulture)},{value.Z.ToString(CultureInfo.InvariantCulture)}";
+        // O setter já está correto.
+        set => this.State.Position = $"{value.X.ToString("F2", CultureInfo.InvariantCulture)},{value.Y.ToString("F2", CultureInfo.InvariantCulture)},{value.Z.ToString("F2", CultureInfo.InvariantCulture)}";
     }
     public bool IsDead { get; private set; } = false;
     public Dictionary<string, DateTime> AbilityCooldowns { get; } = new Dictionary<string, DateTime>();
@@ -366,10 +372,19 @@ public class Player : ICombatEntity, IWorldEntity
         if (IsDead) return;
 
         EnterCombat();
-
-        // ATUALIZADO: Cálculo de dano agora usa o valor dinâmico de armadura.
+        // Pega o valor da armadura do sistema de stats.
         float armorValue = this.Stats.GetStatValue(StatType.Armor);
-        float damageReduction = armorValue / (armorValue + 400 + 85 * source.Level);
+
+        // Calcula o valor 'K' com base no nível do atacante (source).
+        float kConstant = CombatConstants.ARMOR_K_BASE + (CombatConstants.ARMOR_K_LEVEL_MULTIPLIER * source.Level);
+
+        // Calcula a redução de dano.
+        float damageReduction = kConstant > 0 ? armorValue / (armorValue + kConstant) : 0f;
+
+        // Aplica o limite máximo de redução de dano (cap).
+        damageReduction = Math.Min(damageReduction, CombatConstants.MAX_ARMOR_DAMAGE_REDUCTION);
+
+        // Calcula o dano final.
         float finalDamage = Math.Max(1, amount * (1 - damageReduction));
 
         this.CurrentHealth -= finalDamage;

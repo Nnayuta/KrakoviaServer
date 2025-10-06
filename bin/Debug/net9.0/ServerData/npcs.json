@@ -3,7 +3,7 @@
     {
       "TypeId": "7d47429f",
       "Faction": "Neutral",
-      "AiType": "Wandering_Aggressive",
+      "AiType": "Passive_Aggressive",
       "Stats": [
         {
           "Stat": "Stamina",
@@ -24,7 +24,7 @@
     {
       "TypeId": "090d7357",
       "Faction": "Enemy",
-      "AiType": "Wandering_Aggressive",
+      "AiType": "Passive_Aggressive",
       "Stats": [
         {
           "Stat": "Strength",
@@ -82,9 +82,40 @@
       "LootTableID": ""
     },
     {
+      "TypeId": "21119d20",
+      "Faction": "Friendly",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 20
+        },
+        {
+          "Stat": "Strength",
+          "Value": 20
+        },
+        {
+          "Stat": "Armor",
+          "Value": 20
+        }
+      ],
+      "Level": 20,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 4.0,
+      "AutoAttackAbilityID": "sword_light_attack",
+      "AbilityIDs": [
+        "sword_heavy_attack"
+      ],
+      "ExperienceReward": 10,
+      "LootTableID": ""
+    },
+    {
       "TypeId": "75448138",
       "Faction": "Neutral",
-      "AiType": "Ambient_Fleeing",
+      "AiType": "Passive_Aggressive",
       "Stats": [
         {
           "Stat": "Stamina",
