@@ -117,10 +117,53 @@ public class PlayerLifecycleManager
 
     private void ProcessSinglePlayerRegeneration(Player player)
     {
-        if (!player.IsDead && !player.IsInCombat && player.CurrentHealth < player.MaxHealth)
+        if (player.IsDead) return;
+
+        bool vitalsChanged = false;
+
+        // --- Regeneração de Vida (Apenas Fora de Combate) ---
+        if (!player.IsInCombat && player.CurrentHealth < player.MaxHealth)
         {
-            float regenAmount = player.MaxHealth * HEALTH_REGEN_PERCENT;
-            player.ReceiveHealing(regenAmount);
+            float healthRegenAmount = player.MaxHealth * HEALTH_REGEN_PERCENT;
+            player.ReceiveHealing(healthRegenAmount);
+            vitalsChanged = true;
+        }
+
+        // =================================================================================
+        // >> NOVA LÓGICA DE REGENERAÇÃO DE MANA <<
+        // =================================================================================
+        if (player.CurrentResource < player.MaxResource)
+        {
+            // Pega o valor base de regeneração (calculado a partir do Intelecto)
+            float baseManaRegen = player.Stats.GetStatValue(StatType.ManaRegeneration);
+            float finalManaRegen = 0;
+
+            if (player.IsInCombat)
+            {
+                // Em combate, usa apenas uma porcentagem da regeneração base
+                float combatRegenPercent = player.Stats.GetStatValue(StatType.CombatManaRegenPercent);
+                finalManaRegen = baseManaRegen * combatRegenPercent;
+            }
+            else
+            {
+                // Fora de combate, usa 100% da regeneração base
+                finalManaRegen = baseManaRegen;
+            }
+
+            if (finalManaRegen > 0)
+            {
+                player.ReceiveResource(finalManaRegen);
+                vitalsChanged = true;
+            }
+        }
+
+        // =================================================================================
+        // Se a vida OU a mana mudaram, envia uma única atualização para o cliente.
+        // Isso evita o envio de pacotes de rede desnecessários a cada tick.
+        // =================================================================================
+        if (vitalsChanged)
+        {
+            _server.NetworkManager.SendVitalsUpdate(player);
         }
     }
 

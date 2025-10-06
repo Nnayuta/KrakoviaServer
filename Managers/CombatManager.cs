@@ -132,7 +132,7 @@ public class CombatManager
 
         if (ability.Intent == AbilityIntent.Harmful && source is Player playerSource)
         {
-            playerSource.EnterCombat();
+            playerSource.EnterCombat(_server);
         }
 
         // --- 3. ROTEAMENTO: CASTING vs. INSTANTÂNEO ---
@@ -192,86 +192,97 @@ public class CombatManager
     {
         var finalTargets = new List<ICombatEntity>();
 
-        // 1. Determina os alvos finais da habilidade
+        // --- 1. Determina os Alvos Finais (lógica mantida) ---
         switch (ability.TargetType)
         {
             case TargetType.Self:
                 finalTargets.Add(source);
                 break;
-
             case TargetType.SingleTarget:
-                if (FindEntityById(targetId) is { } singleTarget)
-                {
-                    finalTargets.Add(singleTarget);
-                }
+                if (FindEntityById(targetId) is { } singleTarget) finalTargets.Add(singleTarget);
                 break;
-
             case TargetType.AreaOfEffect:
                 Vector3 aoePosition = ParseVector3FromTargetId(targetId);
-                float radius = ability.AoeRadius > 0 ? ability.AoeRadius : 5.0f;
-                finalTargets.AddRange(FindTargetsInRadius(aoePosition, radius, source, ability.Intent));
+                finalTargets.AddRange(FindTargetsInRadius(aoePosition, ability.AoeRadius, source, ability.Intent));
                 break;
-
-            // --- LÓGICA DO CONE ADICIONADA ---
             case TargetType.Cone:
-                // Para habilidades em cone, o 'targetId' é irrelevante, pois a origem e direção são do próprio conjurador.
                 finalTargets.AddRange(FindTargetsInCone(source, ability));
                 break;
-
             case TargetType.Projectile:
-                if (FindEntityById(targetId) is { } projectileTarget)
-                {
-                    Console.WriteLine($"[COMBAT] Criando projétil de '{ability.ID}' para o alvo '{targetId}'.");
-                }
+                if (FindEntityById(targetId) is { } projectileTarget) finalTargets.Add(projectileTarget);
+                // A lógica do projétil em si (criar, mover) precisaria de um sistema próprio.
+                // Por ora, vamos apenas aplicar os efeitos no alvo final.
                 break;
         }
 
-        // 2. Itera sobre cada alvo e aplica o efeito principal (esta parte não muda)
+        // --- 2. Notifica os Clientes para a Execução Visual (lógica mantida) ---
+        _server.NetworkManager.BroadcastMessageToAll($"EXECUTE_ABILITY|{source.Id}|{ability.ID}|{targetId}");
+
+        // --- 3. Itera sobre cada alvo e aplica a NOVA lista de efeitos ---
         foreach (var target in finalTargets)
         {
-            if (target == null || (target.IsDead && ability.EffectType != AbilityEffectType.Resurrect)) continue;
+            if (target == null || target.IsDead) continue; // Simplificado
 
-            switch (ability.EffectType)
+            // Itera sobre a LISTA de efeitos da habilidade
+            foreach (var effectData in ability.Effects)
             {
-                case AbilityEffectType.Damage:
-                    float rawDamage = ability.BaseValue;
-                    rawDamage += source.Stats.GetStatValue(StatType.AttackPower) * ability.AttackPowerScaling;
-                    rawDamage += source.Stats.GetStatValue(StatType.SpellPower) * ability.SpellPowerScaling;
-
-                    bool isCritical = _random.NextDouble() * 100 < source.Stats.GetStatValue(StatType.CriticalStrikeChance);
-                    if (isCritical) rawDamage *= 2.0f;
-
-                    float armor = target.Stats.GetStatValue(StatType.Armor);
-                    float reduction = armor / (armor + 400 + 85 * source.Level);
-                    float finalDamage = Math.Max(1, rawDamage * (1 - reduction));
-
-                    target.TakeDamage((int)finalDamage, source, _server);
-
-                    var eventType = isCritical ? CombatEventType.CriticalDamage : CombatEventType.PhysicalDamage;
-                    BroadcastCombatEvent(target.Id, eventType, (int)finalDamage, isCritical);
-                    BroadcastHealthUpdate(target);
-
-                    if (target.CurrentHealth <= 0)
-                    {
-                        ProcessDeath(source, target);
-                    }
-                    break;
-
-                case AbilityEffectType.Heal:
-                    float rawHeal = ability.BaseValue + (source.Stats.GetStatValue(StatType.SpellPower) * ability.SpellPowerScaling);
-                    bool isHealCrit = _random.NextDouble() * 100 < source.Stats.GetStatValue(StatType.CriticalStrikeChance);
-                    if (isHealCrit) rawHeal *= 1.5f;
-
-                    target.ReceiveHealing((int)rawHeal);
-                    var healEventType = isHealCrit ? CombatEventType.CriticalHeal : CombatEventType.Heal;
-                    BroadcastCombatEvent(target.Id, healEventType, (int)rawHeal, isHealCrit);
-                    BroadcastHealthUpdate(target);
-                    break;
+                // Aplica cada efeito individualmente usando o novo método auxiliar
+                ApplySingleEffect(source, target, effectData);
             }
         }
+    }
 
-        // 3. Notifica os clientes para tocarem as animações e VFX
-        _server.NetworkManager.BroadcastMessageToAll($"EXECUTE_ABILITY|{source.Id}|{ability.ID}|{targetId}");
+    private void ApplySingleEffect(ICombatEntity caster, ICombatEntity target, ServerAbilityEffectData effectData)
+    {
+        // Usa "pattern matching" para executar a lógica correta para cada tipo de efeito.
+        if (effectData is ServerDamageEffectData damageEffect)
+        {
+            // Calcula o dano base a partir dos stats
+            float rawDamage = damageEffect.BaseValue;
+            rawDamage += caster.Stats.GetStatValue(StatType.AttackPower) * damageEffect.AttackPowerScaling;
+            rawDamage += caster.Stats.GetStatValue(StatType.SpellPower) * damageEffect.SpellPowerScaling;
+
+            // Lógica de Crítico
+            bool isCritical = _random.NextDouble() * 100 < caster.Stats.GetStatValue(StatType.CriticalStrikeChance);
+            if (isCritical) rawDamage *= 2.0f; // Dano crítico dobra o dano
+
+            // Aplica o dano (o método TakeDamage do alvo cuidará da redução por armadura)
+            target.TakeDamage(rawDamage, caster, _server);
+
+            // Envia o evento de combate para o cliente (para o Combat Text)
+            var eventType = isCritical ? CombatEventType.CriticalDamage : CombatEventType.PhysicalDamage;
+            BroadcastCombatEvent(target.Id, eventType, (int)rawDamage, isCritical); // Enviamos o rawDamage para o combat text, o dano final é calculado no TakeDamage
+        }
+        else if (effectData is ServerHealEffectData healEffect)
+        {
+            // Calcula a cura base a partir dos stats
+            float rawHeal = healEffect.BaseValue;
+            rawHeal += caster.Stats.GetStatValue(StatType.SpellPower) * healEffect.SpellPowerScaling;
+
+            // Lógica de Crítico para Cura
+            bool isCritical = _random.NextDouble() * 100 < caster.Stats.GetStatValue(StatType.CriticalStrikeChance);
+            if (isCritical) rawHeal *= 1.5f; // Cura crítica geralmente é 1.5x
+
+            // Aplica a cura
+            target.ReceiveHealing(rawHeal);
+
+            // Envia o evento de combate para o cliente
+            var eventType = isCritical ? CombatEventType.CriticalHeal : CombatEventType.Heal;
+            BroadcastCombatEvent(target.Id, eventType, (int)rawHeal, isCritical);
+        }
+        else if (effectData is ServerApplyStatusEffectData applyStatusEffect)
+        {
+            // Esta é a ponte para o seu futuro sistema de buffs/debuffs.
+            // Por enquanto, apenas registramos no log.
+            // TODO: Chamar um método como target.StatusEffectController.Apply(...)
+            Console.WriteLine($"[COMBAT] Aplicando Status Effect '{applyStatusEffect.StatusEffectID}' de {caster.Id} para {target.Id}");
+        }
+
+        // --- Lógica de Morte (agora checada após cada efeito) ---
+        if (target.CurrentHealth <= 0 && !target.IsDead)
+        {
+            ProcessDeath(caster, target);
+        }
     }
 
     #region Métodos Auxiliares para Efeitos

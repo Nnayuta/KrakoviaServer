@@ -29,4 +29,23 @@ public enum StatType
     SpellPower,     // Poder de Magia
     CriticalStrikeChance, // A chance % real
     Haste,                // A aceleração % real
+
+    /// <summary>
+    /// A quantidade de Mana (recurso) restaurada a cada "tick" de regeneração fora de combate.
+    /// </summary>
+    ManaRegeneration,
+
+    /// <summary>
+    /// A porcentagem (0.0 a 1.0) de ManaRegeneration que continua ativa durante o combate.
+    /// </summary>
+    CombatManaRegenPercent,
+}
+
+// Adicione em um arquivo de Enums
+public enum GrowthTier
+{
+    None,    // O stat não cresce com o nível.
+    Low,     // Crescimento baixo.
+    Medium,  // Crescimento médio.
+    High     // Crescimento alto.
 }

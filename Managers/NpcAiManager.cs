@@ -530,13 +530,22 @@ public class NpcAiManager
             .Select(id => DataManager.Abilities.TryGetValue(id, out var ability) ? ability : null)
             .Where(ability =>
             {
+                // Validações básicas (permanecem as mesmas)
                 if (ability == null || IsOnCooldown(npc, ability.ID) || Vector3.Distance(npc.Position, target.Position) > ability.Range)
                     return false;
 
-                // CONTEXTO: Só usa cura se a vida estiver baixa
-                if (ability.EffectType == AbilityEffectType.Heal && npc.CurrentHealth > npc.MaxHealth * 0.6)
-                    return false; // Não cura se tiver mais de 60% de vida
+                // --- NOVA LÓGICA CONTEXTUAL ---
+                // Verifica se a habilidade contém um efeito de cura.
+                bool isHealAbility = ability.Effects.Any(e => e is ServerHealEffectData);
 
+                // Se for uma habilidade de cura, só a use se a vida do NPC estiver baixa.
+                if (isHealAbility && npc.CurrentHealth > npc.MaxHealth * 0.6)
+                {
+                    // Não usa a cura se tiver mais de 60% de vida.
+                    return false;
+                }
+
+                // Se nenhuma condição especial impedir o uso, a habilidade é válida.
                 return true;
             })
             .OrderByDescending(ability => ability?.Priority ?? 0)

@@ -20,24 +20,37 @@ public class CharacterStats
         {
             _stats.Add(statType, new Stat(0));
         }
+        
+        // Calcula os valores base dos atributos primários usando o novo sistema.
+        float finalStrength = ClassStatCalculator.GetStatAtLevel(classData.BaseStrength, classData.StrengthGrowth, _level);
+        float finalAgility = ClassStatCalculator.GetStatAtLevel(classData.BaseAgility, classData.AgilityGrowth, _level);
+        float finalIntellect = ClassStatCalculator.GetStatAtLevel(classData.BaseIntelligence, classData.IntelligenceGrowth, _level);
+        float finalStamina = ClassStatCalculator.GetStatAtLevel(classData.BaseStamina, classData.StaminaGrowth, _level);
 
-        // Define APENAS os valores base puros da classe e nível.
-        _stats[StatType.Strength].SetBaseValue(classData.BaseStrength + (classData.StrengthPerLevel * (_level - 1)));
-        _stats[StatType.Agility].SetBaseValue(classData.BaseAgility + (classData.AgilityPerLevel * (_level - 1)));
-        _stats[StatType.Intellect].SetBaseValue(classData.BaseIntelligence + (classData.IntelligencePerLevel * (_level - 1)));
-        _stats[StatType.Stamina].SetBaseValue(classData.BaseStamina + (classData.StaminaPerLevel * (_level - 1)));
+        _stats[StatType.Strength].SetBaseValue(finalStrength);
+        _stats[StatType.Agility].SetBaseValue(finalAgility);
+        _stats[StatType.Intellect].SetBaseValue(finalIntellect);
+        _stats[StatType.Stamina].SetBaseValue(finalStamina);
 
-        // Define a vida e mana base que vêm da classe, ANTES da contribuição de outros stats.
-        _stats[StatType.Health].SetBaseValue(classData.BaseHealth + (classData.HealthPerLevel * (_level - 1)));
-        _stats[StatType.Mana].SetBaseValue(classData.BaseResource + (classData.ResourcePerLevel * (_level - 1)));
+        // Atribui outros valores base definidos na classe.
+        float finalHealth = ClassStatCalculator.GetStatAtLevel(classData.BaseHealth, classData.HealthGrowth, _level);
+        float finalResource = ClassStatCalculator.GetStatAtLevel(classData.BaseResource, classData.ResourceGrowth, _level);
 
-        // Define a chance de crítico base (geralmente 5%).
+        _stats[StatType.Health].SetBaseValue(finalHealth);
+        _stats[StatType.Mana].SetBaseValue(finalResource);
+
         _stats[StatType.CriticalStrikeChance].SetBaseValue(5.0f);
     }
 
     public float GetStatValue(StatType statType)
     {
         return _stats[statType].Value;
+    }
+
+    public void AddStatModifier_NoRecalculate(StatType statType, StatModifier modifier)
+    {
+        _stats[statType].AddModifier(modifier);
+        // Note que não chamamos CalculateAllDerivedStats() aqui.
     }
 
     public void AddStatModifier(StatType statType, StatModifier modifier)
@@ -127,6 +140,14 @@ public class CharacterStats
             _stats[StatType.Haste].AddModifier(hasteRatingModifier);
         }
 
+        float manaRegenFromIntellect = 5f + (GetStatValue(StatType.Intellect) * 0.1f);
+        if (manaRegenFromIntellect > 0)
+        {
+            var manaRegenModifier = new StatModifier(manaRegenFromIntellect, StatModifierType.Flat, PRIMARY_STAT_SOURCE);
+            _stats[StatType.ManaRegeneration].AddModifier(manaRegenModifier);
+        }
+
+
         // Notifica que os stats derivados foram atualizados.
         OnStatChanged?.Invoke(StatType.Health);
         OnStatChanged?.Invoke(StatType.Mana);
@@ -134,5 +155,7 @@ public class CharacterStats
         OnStatChanged?.Invoke(StatType.SpellPower);
         OnStatChanged?.Invoke(StatType.CriticalStrikeChance);
         OnStatChanged?.Invoke(StatType.Haste);
+        OnStatChanged?.Invoke(StatType.ManaRegeneration);
+        OnStatChanged?.Invoke(StatType.CombatManaRegenPercent);
     }
 }

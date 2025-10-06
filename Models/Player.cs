@@ -165,10 +165,10 @@ public class Player : ICombatEntity, IWorldEntity
     {
         if (!DataManager.Classes.TryGetValue(this.ClassID, out var classData)) return;
 
-        // 1. Cria uma nova instância de CharacterStats
+        // 1. Cria uma nova instância de CharacterStats. Continua igual.
         this.Stats = new CharacterStats(classData, this.Level);
 
-        // 2. Aplica os stats dos itens equipados
+        // 2. Aplica os stats de TODOS os itens equipados, mas sem recalcular a cada vez.
         foreach (ItemStack equippedStack in this.PlayerEquipment.equippedItems.Values)
         {
             if (equippedStack != null && DataManager.Items.TryGetValue(equippedStack.ItemID, out var itemData))
@@ -177,13 +177,13 @@ public class Player : ICombatEntity, IWorldEntity
             }
         }
 
-        // 3. Recalcula os stats derivados
         this.Stats.CalculateAllDerivedStats();
 
+        // 4. Ajusta a vida/mana atuais para não excederem os novos máximos.
         this.CurrentHealth = Math.Min(this.CurrentHealth, this.MaxHealth);
         this.CurrentResource = Math.Min(this.CurrentResource, this.MaxResource);
 
-        // 4. Recalcula as proficiências, pois elas podem depender do nível (habilidades passivas).
+        // 5. Recalcula as proficiências (continua igual).
         RecalculateProficiencies();
     }
 
@@ -193,13 +193,17 @@ public class Player : ICombatEntity, IWorldEntity
         foreach (var statInfo in itemData.Stats)
         {
             var modifier = new StatModifier(statInfo.Value, StatModifierType.Flat, itemData.itemID);
-            this.Stats.AddStatModifier(statInfo.Stat, modifier);
+            // Usa o novo método que não dispara o recálculo
+            this.Stats.AddStatModifier_NoRecalculate(statInfo.Stat, modifier);
         }
     }
 
-    public void EnterCombat()
+    public void EnterCombat(UDPServer _server)
     {
-        LastCombatTime = _server.CurrentTimeUtc;
+        if (_server != null)
+        {
+            LastCombatTime = _server.CurrentTimeUtc;
+        }
     }
 
     /// <summary>
@@ -368,7 +372,7 @@ public class Player : ICombatEntity, IWorldEntity
     {
         if (IsDead) return;
 
-        EnterCombat();
+        EnterCombat(_server);
         // Pega o valor da armadura do sistema de stats.
         float armorValue = this.Stats.GetStatValue(StatType.Armor);
 
@@ -414,6 +418,16 @@ public class Player : ICombatEntity, IWorldEntity
         }
 
         _server?.NetworkManager.SendVitalsUpdate(this);
+    }
+
+    public void ReceiveResource(float amount)
+    {
+        if (IsDead) return;
+        this.CurrentResource += amount;
+        if (this.CurrentResource > this.MaxResource)
+        {
+            this.CurrentResource = this.MaxResource;
+        }
     }
 
     #endregion

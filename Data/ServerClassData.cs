@@ -24,12 +24,18 @@ public class ServerClassData
     public int BaseStamina { get; set; }
 
     // Crescimento por Nível
-    public float HealthPerLevel { get; set; }
-    public float ResourcePerLevel { get; set; }
-    public float StrengthPerLevel { get; set; }
-    public float AgilityPerLevel { get; set; }
-    public float IntelligencePerLevel { get; set; }
-    public float StaminaPerLevel { get; set; }
+    public GrowthTier HealthGrowth { get; set; }
+    public GrowthTier ResourceGrowth { get; set; }
+    public GrowthTier StrengthGrowth { get; set; }
+    public GrowthTier AgilityGrowth { get; set; }
+    public GrowthTier IntelligenceGrowth { get; set; }
+    public GrowthTier StaminaGrowth { get; set; }
+
+    /// <summary>
+    /// A porcentagem de regeneração de mana que esta classe mantém em combate.
+    /// 0.3 = 30%
+    /// </summary>
+    public float BaseCombatManaRegenPercent { get; set; } = 0f; // Padrão é 0% para classes não-caster
 
     // Habilidades e Itens
     public AbilityUnlockMap BaseAbilityUnlocks { get; set; } = new();
