@@ -1,6 +1,35 @@
 {
   "Npcs": [
     {
+      "TypeId": "074a36b5",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Strength",
+          "Value": 10
+        },
+        {
+          "Stat": "Stamina",
+          "Value": 100
+        },
+        {
+          "Stat": "AttackPower",
+          "Value": 5
+        }
+      ],
+      "Level": 10,
+      "IsBoss": true,
+      "AggroRange": 20.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 120,
+      "SwingTimer": 4.0,
+      "AutoAttackAbilityID": "giant_cb536791",
+      "AbilityIDs": [],
+      "ExperienceReward": 500,
+      "LootTableID": ""
+    },
+    {
       "TypeId": "21119d20",
       "Faction": "Friendly",
       "AiType": "Passive_Aggressive",

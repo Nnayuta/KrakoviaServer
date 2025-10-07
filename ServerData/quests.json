@@ -4,6 +4,7 @@
       "QuestID": "ervas_medicas_01",
       "RequiredLevel": 1,
       "PrerequisiteQuestIDs": [],
+      "Category": "Side",
       "Objectives": [
         {
           "Type": "Collect",
@@ -33,6 +34,7 @@
       "PrerequisiteQuestIDs": [],
       "QuestGiverID": "21119d19",
       "QuestCompleterID": "21119d19",
+      "Category": "Side",
       "Objectives": [
         {
           "Type": "Slay",
