@@ -15,60 +15,65 @@ public class MariaDBCharacterDatabase : ICharacterDatabase
         _connectionString = connectionString;
     }
 
-    // =====================================================================
-    // MÉTODO DE SALVAR
-    // =====================================================================
     public async Task SaveAsync(CharacterData dataToSave)
     {
         using (var connection = new MySqlConnection(_connectionString))
         {
             await connection.OpenAsync();
-            // Usar uma transação é CRUCIAL para garantir a integridade dos dados.
             await using (var transaction = await connection.BeginTransactionAsync())
             {
                 try
                 {
-                    // 1. Atualiza os dados simples na tabela principal 'characters'
+                    // 1. Atualiza os dados principais (sem alterações)
                     var updateCharacterCmd = new MySqlCommand(
                         @"UPDATE characters SET
-                            level = @level,
-                            experience = @experience,
-                            bronze = @bronze,
-                            position = @position
-                          WHERE id = @id;",
-                        connection, transaction);
+                        level = @level, experience = @experience, bronze = @bronze, position = @position,
+                        inventory_size = @inventory_size
+                      WHERE id = @id;", connection, transaction);
 
                     updateCharacterCmd.Parameters.AddWithValue("@level", dataToSave.Level);
                     updateCharacterCmd.Parameters.AddWithValue("@experience", dataToSave.CurrentExperience);
                     updateCharacterCmd.Parameters.AddWithValue("@bronze", dataToSave.TotalBronze);
                     updateCharacterCmd.Parameters.AddWithValue("@position", dataToSave.Position);
+                    updateCharacterCmd.Parameters.AddWithValue("@inventory_size", dataToSave.PlayerInventory.slots.Count);
                     updateCharacterCmd.Parameters.AddWithValue("@id", dataToSave.CharacterId);
                     await updateCharacterCmd.ExecuteNonQueryAsync();
 
-                    // 2. Limpa os dados antigos de inventário, equipamento e barra de ações
+                    // =================================================================================
+                    // >> CORREÇÃO E OTIMIZAÇÃO AQUI <<
+                    // Unificamos todos os comandos DELETE em uma única string e um único comando.
+                    // =================================================================================
                     var deleteCmdText = @"
-                        DELETE FROM character_inventory WHERE character_id = @id;
-                        DELETE FROM character_equipment WHERE character_id = @id;
-                        DELETE FROM character_actionbar WHERE character_id = @id;";
+                    DELETE FROM character_inventory WHERE character_id = @id;
+                    DELETE FROM character_equipment WHERE character_id = @id;
+                    DELETE FROM character_actionbar WHERE character_id = @id;
+                    DELETE FROM character_quests WHERE character_id = @id;"; // Adicionamos a linha de quests aqui.
+
                     var deleteCmd = new MySqlCommand(deleteCmdText, connection, transaction);
+                    // O parâmetro @id agora é adicionado a este comando unificado.
                     deleteCmd.Parameters.AddWithValue("@id", dataToSave.CharacterId);
                     await deleteCmd.ExecuteNonQueryAsync();
 
-                    // 3. Insere os novos dados (usando bulk insert para eficiência)
+                    // Os comandos de delete separados foram removidos.
+
+                    // 3. Insere os novos dados (sem alterações)
                     await BulkInsertInventoryAsync(dataToSave, connection, transaction);
                     await BulkInsertEquipmentAsync(dataToSave, connection, transaction);
                     await BulkInsertActionBarAsync(dataToSave, connection, transaction);
+                    await BulkInsertQuestsAsync(dataToSave, connection, transaction);
 
-                    // 4. Se tudo deu certo, confirma a transação
+                    // 4. Confirma a transação (sem alterações)
                     await transaction.CommitAsync();
                     Console.WriteLine($"[DB-SAVE] Dados para o personagem {dataToSave.CharacterId} salvos com sucesso.");
                 }
                 catch (Exception ex)
                 {
-                    // 5. Se algo deu errado, desfaz tudo (rollback)
+                    // 5. Rollback (sem alterações)
                     await transaction.RollbackAsync();
                     Console.WriteLine($"[DB-ERROR] Falha ao salvar dados do personagem {dataToSave.CharacterId}. Rollback executado. Erro: {ex.Message}");
-                    throw; // Lança a exceção para cima para que o servidor saiba que algo deu errado.
+                    // Adicionar o stack trace aqui é ótimo para depuração
+                    Console.WriteLine(ex.StackTrace);
+                    throw;
                 }
             }
         }
@@ -94,6 +99,7 @@ public class MariaDBCharacterDatabase : ICharacterDatabase
                 await LoadInventoryAsync(characterData, connection);
                 await LoadEquipmentAsync(characterData, connection);
                 await LoadActionBarAsync(characterData, connection);
+                await LoadQuestLogAsync(characterData, connection);
 
                 // <<< A CORREÇÃO >>>
                 // Verifica se é um personagem "recém-criado" (Nível 1 e sem equipamentos).
@@ -135,8 +141,8 @@ public class MariaDBCharacterDatabase : ICharacterDatabase
         {
             if (await reader.ReadAsync())
             {
-                // Personagem EXISTE, carrega os dados
-                return new CharacterData(
+                // Cria o objeto CharacterData
+                var charData = new CharacterData(
                     authInfo.CharacterId,
                     Convert.ToString(reader["class_id"]),
                     Convert.ToInt32(reader["level"]),
@@ -145,8 +151,16 @@ public class MariaDBCharacterDatabase : ICharacterDatabase
                 {
                     CurrentExperience = Convert.ToInt64(reader["experience"]),
                     TotalBronze = Convert.ToInt64(reader["bronze"]),
-                    Position = Convert.ToString(reader["position"])
+                    Position = Convert.ToString(reader["position"]),
+
+                    // >> NOVO <<: Lê o tamanho do inventário do banco de dados
+                    InventorySize = Convert.ToInt32(reader["inventory_size"])
                 };
+
+                // >> MUDANÇA CRÍTICA <<: Recria o inventário com o tamanho correto ANTES de carregar os itens.
+                charData.PlayerInventory = new Inventory(charData.InventorySize);
+
+                return charData;
             }
         }
         return null;
@@ -384,6 +398,63 @@ public class MariaDBCharacterDatabase : ICharacterDatabase
                         ContentID = Convert.ToString(reader["content_id"])
                     };
                 }
+            }
+        }
+    }
+
+    private async Task BulkInsertQuestsAsync(CharacterData data, MySqlConnection conn, MySqlTransaction tr)
+    {
+        if (!data.QuestLog.AllQuests.Any()) return;
+
+        var sb = new StringBuilder("INSERT INTO character_quests (character_id, quest_id, status, progress_json, completion_time) VALUES ");
+        var parameters = new List<MySqlParameter>();
+        int paramIndex = 0;
+
+        foreach (var progress in data.QuestLog.AllQuests.Values)
+        {
+            sb.Append($"(@charId{paramIndex}, @qId{paramIndex}, @status{paramIndex}, @json{paramIndex}, @time{paramIndex}),");
+            parameters.Add(new MySqlParameter($"@charId{paramIndex}", data.CharacterId));
+            parameters.Add(new MySqlParameter($"@qId{paramIndex}", progress.QuestID));
+            parameters.Add(new MySqlParameter($"@status{paramIndex}", progress.Status.ToString()));
+
+            // Serializa o progresso dos objetivos para JSON
+            string progressJson = progress.Status == QuestStatus.InProgress ? JsonConvert.SerializeObject(progress.ObjectiveProgress) : null;
+            parameters.Add(new MySqlParameter($"@json{paramIndex}", progressJson));
+
+            // Adiciona o timestamp de conclusão
+            parameters.Add(new MySqlParameter($"@time{paramIndex}", progress.CompletionTime));
+
+            paramIndex++;
+        }
+
+        sb.Length--; // Remove a última vírgula
+        var cmd = new MySqlCommand(sb.ToString(), conn, tr);
+        cmd.Parameters.AddRange(parameters.ToArray());
+        await cmd.ExecuteNonQueryAsync();
+    }
+
+    // >> NOVO MÉTODO PARA CARREGAR O LOG DE QUESTS <<
+    private async Task LoadQuestLogAsync(CharacterData data, MySqlConnection conn)
+    {
+        var cmd = new MySqlCommand("SELECT * FROM character_quests WHERE character_id = @id", conn);
+        cmd.Parameters.AddWithValue("@id", data.CharacterId);
+        using (var reader = await cmd.ExecuteReaderAsync())
+        {
+            while (await reader.ReadAsync())
+            {
+                var progress = new QuestProgress
+                {
+                    QuestID = Convert.ToString(reader["quest_id"]),
+                    Status = Enum.Parse<QuestStatus>(Convert.ToString(reader["status"])),
+                    CompletionTime = reader["completion_time"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader["completion_time"])
+                };
+
+                if (progress.Status == QuestStatus.InProgress && reader["progress_json"] != DBNull.Value)
+                {
+                    progress.ObjectiveProgress = JsonConvert.DeserializeObject<Dictionary<string, int>>(Convert.ToString(reader["progress_json"]));
+                }
+
+                data.QuestLog.AllQuests[progress.QuestID] = progress;
             }
         }
     }

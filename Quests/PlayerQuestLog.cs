@@ -1,6 +1,7 @@
 // Servidor/Quests/PlayerQuestLog.cs
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 public enum QuestStatus { NotStarted, InProgress, Completed }
 
@@ -11,13 +12,20 @@ public class PlayerQuestProgress
     public Dictionary<string, int> ObjectiveProgress = new Dictionary<string, int>();
 }
 
+// Esta classe agora é o DTO (Data Transfer Object) para o progresso
 public class QuestProgress
 {
-    public string? QuestID;
-    public QuestStatus Status;
-    public Dictionary<string, int> ObjectiveProgress = new Dictionary<string, int>();
+    public string QuestID { get; set; }
+    public QuestStatus Status { get; set; }
 
-    // Construtor principal para quests ativas
+    // Este dicionário será salvo como JSON no banco de dados
+    public Dictionary<string, int> ObjectiveProgress { get; set; } = new Dictionary<string, int>();
+
+    // Timestamp de conclusão, crucial para quests diárias
+    [JsonIgnore] // Não precisa ir para o cliente, mas o BD usa
+    public DateTime? CompletionTime { get; set; }
+
+    // Construtores
     public QuestProgress(string questId)
     {
         QuestID = questId;
@@ -30,99 +38,124 @@ public class QuestProgress
             }
         }
     }
-
-    // =================================================================================
-    // NOVO: Adicionar um construtor vazio para facilitar a deserialização e a criação
-    // de instâncias temporárias.
-    // =================================================================================
-    public QuestProgress() { }
+    public QuestProgress() { } // Construtor vazio para deserialização
 }
 
 // Classe que gerencia todas as quests de um único jogador.
 public class PlayerQuestLog
 {
-    private readonly Player _owner;
-    public Dictionary<string, QuestProgress> ActiveQuests { get; private set; } = new();
-    public HashSet<string> CompletedQuests { get; private set; } = new();
+    // Usamos um único dicionário como fonte da verdade. É mais simples de gerenciar e salvar.
+    public Dictionary<string, QuestProgress> AllQuests { get; private set; } = new Dictionary<string, QuestProgress>();
+
+    [JsonIgnore]
+    private Player _owner; // << Mude para 'private'
 
     public PlayerQuestLog(Player owner)
     {
         _owner = owner;
     }
 
+    public void SetOwner(Player owner)
+    {
+        _owner = owner;
+    }
+
+    // Construtor vazio para o Newtonsoft.Json
+    public PlayerQuestLog() { }
+
     public void AcceptQuest(string questId)
     {
-        if (CanAcceptQuest(questId))
-        {
-            var newProgress = new QuestProgress(questId);
-            ActiveQuests.Add(questId, newProgress);
-            Console.WriteLine($"[Quest] Jogador '{_owner.Username}' aceitou a quest '{questId}'.");
+        if (!CanAcceptQuest(questId)) return;
 
-            // TODO: Notificar o cliente sobre a nova quest.
-        }
-    }
-
-    public bool CanAcceptQuest(string questId)
-    {
-        if (!DataManager.Quests.TryGetValue(questId, out var questData)) return false; // Quest não existe.
-        if (GetQuestStatus(questId) != QuestStatus.NotStarted) return false; // Já tem ou completou.
-        if (_owner.Level < questData.RequiredLevel) return false; // Nível baixo.
-
-        // Verifica os pré-requisitos.
-        foreach (string prereqId in questData.PrerequisiteQuestIDs)
-        {
-            if (!CompletedQuests.Contains(prereqId)) return false;
-        }
-        return true;
-    }
-
-    public void AbandonQuest(string questId)
-    {
-        if (ActiveQuests.ContainsKey(questId))
-        {
-            ActiveQuests.Remove(questId);
-            Console.WriteLine($"[Quest] Jogador '{_owner.Username}' abandonou a quest '{questId}'.");
-        }
+        var newProgress = new QuestProgress(questId);
+        AllQuests[questId] = newProgress;
+        Console.WriteLine($"[Quest] Jogador '{_owner.CharacterName}' aceitou a quest '{questId}'.");
     }
 
     public void CompleteQuest(string questId)
     {
-        if (ActiveQuests.Remove(questId)) // Remove da lista de ativas
-        {
-            CompletedQuests.Add(questId); // Adiciona na lista de completas
-            Console.WriteLine($"[Quest] Jogador '{_owner.Username}' completou a quest '{questId}'.");
-        }
+        if (!AllQuests.TryGetValue(questId, out var progress) || progress.Status != QuestStatus.InProgress) return;
+
+        progress.Status = QuestStatus.Completed;
+        progress.CompletionTime = DateTime.UtcNow; // Salva o timestamp!
+        Console.WriteLine($"[Quest] Jogador '{_owner.CharacterName}' completou a quest '{questId}'.");
     }
 
-    public bool AreObjectivesComplete(string questId)
+    public bool CanAcceptQuest(string questId)
     {
-        // Se a quest não está ativa, não pode ser completada
-        if (!ActiveQuests.TryGetValue(questId, out var progress)) return false;
-
-        // Se os dados da quest não existem, não pode ser completada
         if (!DataManager.Quests.TryGetValue(questId, out var questData)) return false;
 
-        // Itera por todos os objetivos definidos para a quest
-        foreach (var objective in questData.Objectives)
-        {
-            // Pega o progresso atual do jogador para este objetivo
-            progress.ObjectiveProgress.TryGetValue(objective.TargetID, out int currentAmount);
+        // Regras básicas
+        QuestStatus currentStatus = GetQuestStatus(questId);
+        if (currentStatus != QuestStatus.NotStarted) return false;
+        if (_owner.Level < questData.RequiredLevel) return false;
 
-            // Se o progresso atual for menor que o necessário, os objetivos não estão completos
-            if (currentAmount < objective.RequiredAmount)
+        // Pré-requisitos
+        foreach (string prereqId in questData.PrerequisiteQuestIDs)
+        {
+            if (GetQuestStatus(prereqId) != QuestStatus.Completed) return false;
+        }
+
+        // >> LÓGICA DE QUEST DIÁRIA <<
+        if (questData.Category == QuestCategory.Daily)
+        {
+            if (AllQuests.TryGetValue(questId, out var oldProgress) && oldProgress.Status == QuestStatus.Completed)
             {
-                return false;
+                // TODO: Uma lógica de "reset diário" (ex: todo dia às 8h) é melhor, mas para a jam, 24h funciona.
+                if (oldProgress.CompletionTime.HasValue && DateTime.UtcNow < oldProgress.CompletionTime.Value.AddHours(24))
+                {
+                    Console.WriteLine($"[Quest] Tentativa de aceitar a quest diária '{questId}' antes do reset.");
+                    return false; // Não pode aceitar, ainda não se passaram 24h.
+                }
             }
         }
 
-        // Se o loop terminar sem retornar falso, todos os objetivos foram cumpridos
         return true;
     }
 
     public QuestStatus GetQuestStatus(string questId)
     {
-        if (CompletedQuests.Contains(questId)) return QuestStatus.Completed;
-        if (ActiveQuests.ContainsKey(questId)) return QuestStatus.InProgress;
+        if (AllQuests.TryGetValue(questId, out var progress))
+        {
+            return progress.Status;
+        }
         return QuestStatus.NotStarted;
     }
+
+    public void AbandonQuest(string questId)
+    {
+        // A lógica de abandonar agora apenas remove a quest do dicionário principal.
+        if (AllQuests.TryGetValue(questId, out var progress) && progress.Status == QuestStatus.InProgress)
+        {
+            AllQuests.Remove(questId);
+            Console.WriteLine($"[Quest] Jogador '{_owner.CharacterName}' abandonou a quest '{questId}'.");
+        }
+    }
+
+    public bool AreObjectivesComplete(string questId)
+    {
+        if (!AllQuests.TryGetValue(questId, out var progress) || progress.Status != QuestStatus.InProgress) return false;
+        if (!DataManager.Quests.TryGetValue(questId, out var questData)) return false;
+
+        foreach (var objective in questData.Objectives)
+        {
+            progress.ObjectiveProgress.TryGetValue(objective.TargetID, out int currentAmount);
+            if (currentAmount < objective.RequiredAmount)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // =================================================================================
+    // >> PROPRIEDADES DE CONVENIÊNCIA ADICIONADAS AQUI <<
+    // Para que o código antigo no QuestManager e NetworkManager funcione com poucas mudanças.
+    // =================================================================================
+
+    [JsonIgnore]
+    public IEnumerable<QuestProgress> ActiveQuests => AllQuests.Values.Where(q => q.Status == QuestStatus.InProgress);
+    [JsonIgnore]
+    public IEnumerable<string> CompletedQuestIDs => AllQuests.Where(kvp => kvp.Value.Status == QuestStatus.Completed).Select(kvp => kvp.Key);
+
 }

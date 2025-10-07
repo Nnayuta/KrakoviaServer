@@ -4,7 +4,7 @@ using System.Collections.Generic;
 // Enums replicados do cliente
 public enum ItemQuality { Common, Uncommon, Rare, Epic, Legendary }
 public enum ItemType { Weapon, Shield, Armor, Consumable }
-public enum EquipmentSlot { MainHand, OffHand, Head, Chest, Legs, Feet }
+public enum EquipmentSlot { MainHand, OffHand, Head, Chest, Legs, Feet, Hands, Cloak }
 public enum WeaponHandType { OneHanded, TwoHanded }
 public enum ArmorType { Cloth, Leather, Mail, Plate }
 public enum WeaponType

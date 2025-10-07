@@ -324,13 +324,6 @@
           "SpellPowerScaling": 0.0,
           "EffectType": "ServerDamageEffectData",
           "Intent": "Harmful"
-        },
-        {
-          "$type": "ServerHealEffectData",
-          "BaseValue": 40.0,
-          "SpellPowerScaling": 1.2,
-          "EffectType": "ServerHealEffectData",
-          "Intent": "Helpful"
         }
       ],
       "Cooldown": 8.0,

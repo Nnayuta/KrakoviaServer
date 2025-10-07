@@ -141,6 +141,8 @@ public class Player : ICombatEntity, IWorldEntity
         this.PlayerInventory = characterData.PlayerInventory;
         this.PlayerEquipment = characterData.PlayerEquipment;
         this.PlayerActionBar = characterData.PlayerActionBar;
+        this.QuestLog = characterData.QuestLog;
+        this.QuestLog.SetOwner(this);
 
         this.PlayerEquipment.OnEquipmentChanged += OnEquipmentChanged;
 
@@ -258,8 +260,12 @@ public class Player : ICombatEntity, IWorldEntity
         string eqPayload = string.Join("|", this.PlayerEquipment.equippedItems.Select(kvp => $"{kvp.Key},{(kvp.Value == null ? "null" : $"{kvp.Value.InstanceID},{kvp.Value.ItemID},{kvp.Value.Quantity}")}"));
         _server.NetworkManager.SendMessageToClient($"EQUIPMENT_UPDATE|{eqPayload}", this.EndPoint);
 
-        _server.NetworkManager.SendVitalsUpdate(this);
+        _server.NetworkManager.SendInventoryUpdate(this);
+        _server.NetworkManager.SendEquipmentUpdate(this);
+        _server.NetworkManager.SendCurrencyUpdate(this);
         _server.NetworkManager.SendStatsUpdate(this);
+        _server.NetworkManager.SendFullQuestLog(this);
+        _server.NetworkManager.SendVitalsUpdate(this);
     }
 
     public List<string> CalculateKnownAbilities()
@@ -483,7 +489,12 @@ public class Player : ICombatEntity, IWorldEntity
             TotalBronze = this.TotalBronze,
             PlayerInventory = this.PlayerInventory,
             PlayerEquipment = this.PlayerEquipment,
-            PlayerActionBar = this.PlayerActionBar
+            PlayerActionBar = this.PlayerActionBar,
+            Appearance = this.Appearance,
+            CharacterId = this.CharacterId,
+            ClassID = this.ClassID,
+            Level = this.Level,
+            QuestLog = this.QuestLog
         };
     }
 }

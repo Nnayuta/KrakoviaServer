@@ -20,9 +20,12 @@ public class ServerQuestReward
     public string? AbilityID { get; set; }
 }
 
+public enum QuestCategory { Main, Side, Daily, Weekly }
+
 public class ServerQuestData
 {
     public string QuestID { get; set; }
+    public QuestCategory Category { get; set; }
     public int RequiredLevel { get; set; }
     public List<string> PrerequisiteQuestIDs { get; set; } = new List<string>();
     public string QuestGiverID { get; set; }

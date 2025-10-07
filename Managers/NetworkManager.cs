@@ -60,25 +60,16 @@ public class NetworkManager
         SendEquipmentUpdate(player);
         SendCurrencyUpdate(player);
         SendStatsUpdate(player);
-        SendVitalsUpdate(player);
         SendFullQuestLog(player);
+        SendVitalsUpdate(player);
     }
 
     public void SendFullQuestLog(Player player)
     {
-        // Pega as quests ativas (que são do tipo 'QuestProgress' do servidor)
-        var activeQuests = player.QuestLog.ActiveQuests.Values.ToList();
+        // A nova estrutura `AllQuests` já contém tudo que precisamos.
+        // Nós apenas pegamos todos os valores e os enviamos.
+        var fullLog = player.QuestLog.AllQuests.Values.ToList();
 
-        // Pega as quests completadas e as transforma em objetos 'QuestProgress'
-        var completedQuests = player.QuestLog.CompletedQuests.Select(questId => new QuestProgress(questId)
-        {
-            Status = QuestStatus.Completed
-        }).ToList();
-
-        // Junta as duas listas
-        var fullLog = activeQuests.Concat(completedQuests).ToList();
-
-        // Serializa a lista unificada para JSON
         string json = JsonConvert.SerializeObject(fullLog);
         SendMessageToClient($"QUEST_LOG_INIT|{json}", player.EndPoint);
     }

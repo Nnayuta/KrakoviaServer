@@ -10,14 +10,15 @@ public class QuestManager
     }
 
 
+
     public void HandleAcceptQuestRequest(Player player, string questId)
     {
         if (!player.QuestLog.CanAcceptQuest(questId)) return;
 
         player.QuestLog.AcceptQuest(questId);
 
-        // Após aceitar, notifica o cliente sobre o novo estado desta quest
-        if (player.QuestLog.ActiveQuests.TryGetValue(questId, out var progress))
+        // Acessa o progresso através do dicionário principal
+        if (player.QuestLog.AllQuests.TryGetValue(questId, out var progress))
         {
             _server.NetworkManager.SendQuestUpdate(player, progress);
         }
@@ -27,19 +28,16 @@ public class QuestManager
     {
         if (!DataManager.Quests.TryGetValue(questId, out var questData)) return;
 
-        // Verifica se o jogador está falando com o NPC correto e se os objetivos estão completos
-        // TODO: Precisamos saber em quem o jogador está focado. Por enquanto, vamos ignorar a checagem de NPC.
         if (player.QuestLog.AreObjectivesComplete(questId))
         {
             GiveRewards(player, questData);
             player.QuestLog.CompleteQuest(questId);
 
-            // Notifica o cliente que a quest está completa.
-            _server.NetworkManager.SendQuestUpdate(player, new QuestProgress
+            // Pega o progresso atualizado para enviar ao cliente
+            if (player.QuestLog.AllQuests.TryGetValue(questId, out var progress))
             {
-                QuestID = questId,
-                Status = QuestStatus.Completed
-            });
+                _server.NetworkManager.SendQuestUpdate(player, progress);
+            }
         }
     }
 
@@ -70,35 +68,34 @@ public class QuestManager
         _server.NetworkManager.SendInventoryUpdate(player); // Envia o inventário atualizado
     }
 
+
     public void HandleAbandonQuestRequest(Player player, string questId)
     {
-        if (player.QuestLog.ActiveQuests.ContainsKey(questId))
+        // A lógica de checagem agora é mais simples
+        if (player.QuestLog.GetQuestStatus(questId) == QuestStatus.InProgress)
         {
             player.QuestLog.AbandonQuest(questId);
-
-            // Após abandonar, envia o log de quests completo para ressincronizar o cliente
             _server.NetworkManager.SendFullQuestLog(player);
         }
     }
 
 
-    // Chamado pelo CombatManager/NpcAiManager quando algo morre
     public void OnEntitySlain(Player killer, NpcInstance victim)
     {
-        // Itera sobre uma cópia para evitar problemas de modificação da coleção
-        foreach (var questProgress in killer.QuestLog.ActiveQuests.Values.ToList())
+        // Itera sobre as quests ativas usando a nova propriedade de conveniência
+        foreach (var questProgress in killer.QuestLog.ActiveQuests.ToList())
         {
+            // O resto da lógica já estava correto
             if (DataManager.Quests.TryGetValue(questProgress.QuestID, out var questData))
             {
                 foreach (var objective in questData.Objectives)
                 {
                     if (objective.Type == QuestObjectiveType.Slay &&
                         objective.TargetID == victim.BaseData.TypeId &&
-                        questProgress.ObjectiveProgress[objective.TargetID] < objective.RequiredAmount)
+                        questProgress.ObjectiveProgress.TryGetValue(objective.TargetID, out int currentAmount) &&
+                        currentAmount < objective.RequiredAmount)
                     {
                         questProgress.ObjectiveProgress[objective.TargetID]++;
-
-                        // Notifica o cliente sobre o progresso
                         _server.NetworkManager.SendQuestUpdate(killer, questProgress);
                     }
                 }

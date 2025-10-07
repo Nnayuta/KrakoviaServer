@@ -67,7 +67,7 @@ $@"
         // --- Opção 2: Usar o banco de dados MariaDB (para produção) ---
         // Descomente esta seção quando estiver pronto.
         Console.WriteLine("Conectando ao banco de dados MariaDB...");
-         string connectionString = "Server=127.0.0.1;Database=krakovia;User=root;Password=;";
+        string connectionString = "Server=127.0.0.1;Database=krakovia;User=root;Password=;";
         IAccountDatabase accountDatabase = new MariaDBAccountDatabase(connectionString);
         ICharacterDatabase characterDatabase = new MariaDBCharacterDatabase(connectionString);
 
