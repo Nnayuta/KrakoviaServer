@@ -32,7 +32,6 @@ public class NpcInstance : ICombatEntity, IWorldEntity
     public Vector3 Position { get; set; }
     public Vector3 SpawnPosition { get; private set; }
     public DateTime LastDamageTime { get; set; }
-
     public NpcAiType AiType { get; private set; }
     public Vector3 Rotation { get; set; }
 
@@ -75,6 +74,10 @@ public class NpcInstance : ICombatEntity, IWorldEntity
     public Dictionary<string, DateTime> AbilityCooldowns { get; } = new Dictionary<string, DateTime>();
     #endregion
 
+
+    [JsonIgnore] public INpcBehavior Behavior { get; set; } // (NOVO) Armazena o comportamento da IA
+    [JsonIgnore] public Vector3 AggroPosition { get; set; } // (NOVO) Ponto de início do combate para o leash
+
     public NpcInstance(Vector3 position, Vector3 rotation, NpcAiType aiType, List<Vector3>? patrolPath, NpcData baseData, UDPServer server)
     {
         DateTime currentTime = server.CurrentTimeUtc;
@@ -87,6 +90,7 @@ public class NpcInstance : ICombatEntity, IWorldEntity
         this.PatrolPath = patrolPath;
         this.LastPosition = position;
         this.CurrentState = NpcAiState.Idle;
+        this.AggroPosition = position;
 
         this.Rotation = rotation;
         this.AiType = aiType;
@@ -164,6 +168,9 @@ public class NpcInstance : ICombatEntity, IWorldEntity
     public void TakeDamage(float amount, ICombatEntity source, UDPServer server)
     {
         if (IsDead) return;
+
+        server.NpcAiManager.OnNpcDamaged(this, source);
+
         float armorValue = this.Stats?.GetStatValue(StatType.Armor) ?? 0f;
 
         // Calcula o valor 'K' com base no nível do atacante.

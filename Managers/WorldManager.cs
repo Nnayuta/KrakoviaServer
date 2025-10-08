@@ -37,6 +37,23 @@ public class WorldManager
         }
     }
 
+    public Player? GetCreditPlayer(NpcInstance npc, ICombatEntity? killer)
+    {
+        if (npc.ThreatTable.Any())
+        {
+            var topThreatPlayerId = npc.ThreatTable.OrderByDescending(kvp => kvp.Value).FirstOrDefault().Key;
+            if (_server.ConnectedPlayers.TryGetValue(topThreatPlayerId, out var playerFromThreat))
+            {
+                return playerFromThreat;
+            }
+        }
+        if (killer is Player killerPlayer)
+        {
+            return killerPlayer;
+        }
+        return null;
+    }
+
     public void ProcessNpcDeath(NpcInstance npc, ICombatEntity? killer)
     {
         // 1. Define o estado do NPC como morto e inativo
@@ -44,12 +61,12 @@ public class WorldManager
         npc.IsActive = false;
         npc.SetCorpseDespawnTimer(120.0f, _server.CurrentTimeUtc);
 
-        // 2. Processa recompensas de XP
-        Player? creditPlayer = _server.NpcAiManager.GetCreditPlayer(npc, killer); // Reutiliza o método de busca
+        Player? creditPlayer = this.GetCreditPlayer(npc, killer);
         if (creditPlayer != null && npc.BaseData.ExperienceReward > 0)
         {
             _server.PlayerProgressionManager.GrantExperience(creditPlayer, npc.BaseData.ExperienceReward);
         }
+
 
         // 3. Processa recompensas de Loot
         if (!string.IsNullOrEmpty(npc.BaseData.LootTableID))
@@ -160,6 +177,97 @@ public class WorldManager
     }
 
     /// <summary>
+    /// Invoca NPCs que desaparecem após um certo tempo. Perfeito para lacaios de chefes.
+    /// </summary>
+    public void SpawnTemporaryNpcs(string npcTypeId, Vector3 centerPosition, int quantity, float spawnRadius, float duration)
+    {
+        if (!DataManager.Npcs.TryGetValue(npcTypeId, out NpcData? npcData))
+        {
+            Console.WriteLine($"[AVISO] Tentativa de invocar NPC temporário com TypeId inválido: '{npcTypeId}'");
+            return;
+        }
+
+        for (int i = 0; i < quantity; i++)
+        {
+            // Usa a lógica existente para calcular uma posição aleatória
+            Vector3 spawnPosition = centerPosition;
+            if (quantity > 1 && spawnRadius > 0f)
+            {
+                double angle = _random.NextDouble() * 2 * Math.PI;
+                double radius = Math.Sqrt(_random.NextDouble()) * spawnRadius;
+                spawnPosition += new Vector3((float)(Math.Cos(angle) * radius), 0, (float)(Math.Sin(angle) * radius));
+            }
+
+            // Usa a lógica de spawn existente
+            var newNpc = SpawnSingleNpc(npcData, spawnPosition, null); // Passa null para spawnPoint pois não é de um ponto fixo
+
+            if (duration > 0)
+            {
+                // Agenda a "morte" (despawn) do NPC
+                _server.Scheduler.ScheduleTask(() =>
+                {
+                    if (newNpc != null && !newNpc.IsDead)
+                    {
+                        // Remove o NPC do mundo de forma limpa
+                        if (_server.ActiveNpcs.TryRemove(newNpc.InstanceId, out _))
+                        {
+                            _server.NetworkManager.BroadcastMessageToAll($"DESTROY_NPC|{newNpc.InstanceId}");
+                        }
+                    }
+                }, TimeSpan.FromSeconds(duration));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Cria uma zona de perigo no chão que aplica efeitos em intervalos.
+    /// </summary>
+    public void CreateHazard(ICombatEntity source, Vector3 position, float radius, float duration, float tickRate, List<ServerAbilityEffectData> tickEffects)
+    {
+        string hazardId = Guid.NewGuid().ToString("N");
+
+        // Notifica os clientes para criarem o efeito visual da zona
+        _server.NetworkManager.BroadcastMessageToAll($"CREATE_HAZARD|{hazardId}|{position.X},{position.Y},{position.Z}|{radius}|{duration}");
+
+        DateTime endTime = _server.CurrentTimeUtc.AddSeconds(duration);
+        DateTime nextTickTime = _server.CurrentTimeUtc.AddSeconds(tickRate);
+
+        // Usa o Agendador para aplicar os efeitos em ticks
+        Action tickAction = null;
+        tickAction = () =>
+        {
+            if (_server.CurrentTimeUtc < endTime)
+            {
+                // Encontra todos os jogadores dentro do raio
+                var targetsInHazard = _server.ConnectedPlayers.Values
+                    .Where(p => !p.IsDead && Vector3.Distance(p.Position, position) <= radius)
+                    .ToList();
+
+                // Aplica todos os efeitos de tick a cada alvo
+                foreach (var target in targetsInHazard)
+                {
+                    foreach (var effect in tickEffects)
+                    {
+                        // Reutiliza a lógica do CombatManager!
+                        _server.CombatManager.ApplySingleEffect(source, target, effect);
+                    }
+                }
+
+                // Agenda o próximo tick
+                _server.Scheduler.ScheduleTask(tickAction, TimeSpan.FromSeconds(tickRate));
+            }
+            else
+            {
+                // Notifica os clientes para removerem o efeito visual da zona
+                _server.NetworkManager.BroadcastMessageToAll($"DESTROY_HAZARD|{hazardId}");
+            }
+        };
+
+        // Inicia o primeiro tick
+        _server.Scheduler.ScheduleTask(tickAction, TimeSpan.FromSeconds(tickRate));
+    }
+
+    /// <summary>
     /// Spawna todos os NPCs pela primeira vez quando o servidor inicia.
     /// </summary>
     public void InitializeSpawns()
@@ -184,30 +292,36 @@ public class WorldManager
         Console.WriteLine($"[WorldManager] {_server.ActiveNpcs.Count} NPCs instanciados.");
     }
 
-
-    /// <summary>
-    /// Cria uma nova instância de NPC, a ativa e notifica os clientes.
-    /// </summary>
-    private void SpawnSingleNpc(NpcData npcData, Vector3 position, SpawnPoint spawnPoint)
+    private NpcInstance SpawnSingleNpc(NpcData npcData, Vector3 position, SpawnPoint? spawnPoint)
     {
-        // Agora passamos os dados de comportamento do SpawnPoint para a nova instância do NPC
         var newNpc = new NpcInstance(
             position,
-            spawnPoint.InitialRotation,
-            spawnPoint.AiType,
-            spawnPoint.PatrolPath, // Passando o caminho da patrulha também
+            spawnPoint?.InitialRotation ?? Vector3.Zero,
+            spawnPoint?.AiType ?? NpcAiType.Wandering_Aggressive, // Usa um padrão se não houver spawn point
+            spawnPoint?.PatrolPath,
             npcData,
             _server
         );
 
+        newNpc.Behavior = _server.NpcAiManager.GetBehavior(newNpc.AiType);
+
         _server.ActiveNpcs.TryAdd(newNpc.InstanceId, newNpc);
 
-        spawnPoint.ActiveNpcInstanceIds.Add(newNpc.InstanceId);
+        // Se houver um spawn point (não é um lacaio temporário), adiciona o ID a ele.
+        if (spawnPoint != null)
+        {
+            spawnPoint.ActiveNpcInstanceIds.Add(newNpc.InstanceId);
+        }
+
         newNpc.IsActive = true;
 
         string spawnMessage = newNpc.GetSpawnMessage();
         _server.NetworkManager.BroadcastMessageToAll(spawnMessage);
+
+        // (CORREÇÃO) Retorna o NPC recém-criado.
+        return newNpc;
     }
+
     /// <summary>
     /// Calcula uma posição de spawn aleatória dentro do raio do spawn point.
     /// </summary>

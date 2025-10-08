@@ -443,16 +443,11 @@ public class Player : ICombatEntity, IWorldEntity
     {
         // Prevenção contra chamadas duplas: só executa se não estiver morto.
         if (IsDead) return;
-
         this.IsDead = true; // Define o estado de morte PRIMEIRO.
-
         Console.WriteLine($"[MORTE] Jogador {this.CharacterName} ({this.Id}) foi derrotado por {killer.Id}.");
 
-        // Notifica o cliente específico que ele morreu.
-        server.NetworkManager.SendMessageToClient("YOU_DIED", this.EndPoint);
-
         // Notifica todos os outros jogadores que esta entidade morreu.
-        server.NetworkManager.BroadcastMessageToOthers(this, $"ENTITY_DIED|{this.Id}|{false}"); // 'false' porque jogadores não têm
+        server.NetworkManager.BroadcastMessageToAll($"ENTITY_DIED|{this.Id}|{false}");
     }
 
     #endregion

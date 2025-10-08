@@ -118,7 +118,7 @@
       "Effects": [
         {
           "$type": "ServerDamageEffectData",
-          "BaseValue": 20.0,
+          "BaseValue": 50.0,
           "AttackPowerScaling": 1.2,
           "SpellPowerScaling": 0.0,
           "EffectType": "ServerDamageEffectData",
@@ -126,7 +126,7 @@
         }
       ],
       "Cooldown": 1.0,
-      "Range": 5.0,
+      "Range": 10.0,
       "ResourceCost": 0.0,
       "RequiresTarget": false,
       "WeaponRequirement": "None",

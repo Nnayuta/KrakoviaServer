@@ -30,6 +30,7 @@ public class UDPServer
     public readonly QuestManager QuestManager;
     public readonly LootManager LootManager;
     public readonly InterestManager InterestManager;
+    public readonly Scheduler Scheduler;
 
     private readonly ICharacterDatabase _characterDb;
     private readonly UdpClient _udpListener;
@@ -54,6 +55,7 @@ public class UDPServer
         PlayerProgressionManager = new PlayerProgressionManager(this);
         QuestManager = new QuestManager(this);
         LootManager = new LootManager(this);
+        Scheduler = new Scheduler(this);
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -73,6 +75,8 @@ public class UDPServer
         Console.WriteLine("STARTING INTEREST MANAGER");
         Task interestAndActivationTask = InterestManager.UpdateInterestAndActivationAsync(cancellationToken);
 
+        Task schedulerTask = Scheduler.RunAsync(cancellationToken);
+
         Console.WriteLine("STARTING PLAYER LIFECYCLE MANAGER");
         Task playerLifecycleTask = PlayerLifecycleManager.Action_LoopAsync(cancellationToken);
 
@@ -91,6 +95,7 @@ public class UDPServer
             aiTask,
             interestAndActivationTask,
             playerLifecycleTask,
+            schedulerTask,
             timeoutTask
         );
     }

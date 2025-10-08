@@ -229,7 +229,7 @@ public class CombatManager
     // =================================================================================
     // >> MÉTODO AUXILIAR ATUALIZADO (COM O FIX DO NAMEPLATE) <<
     // =================================================================================
-    private void ApplySingleEffect(ICombatEntity caster, ICombatEntity target, ServerAbilityEffectData effectData)
+    public void ApplySingleEffect(ICombatEntity caster, ICombatEntity target, ServerAbilityEffectData effectData)
     {
         if (effectData is ServerDamageEffectData damageEffect)
         {
@@ -262,6 +262,28 @@ public class CombatManager
         {
             Console.WriteLine($"[COMBAT] Aplicando Status Effect '{applyStatusEffect.StatusEffectID}' de {caster.Id} para {target.Id}");
             // TODO: Chamar target.StatusEffectController.Apply(...)
+        }
+        else if (effectData is ServerSummonNpcEffectData summonEffect)
+        {
+            // O alvo determina ONDE invocar. Se o alvo for o chão, usa a posição do alvo.
+            // Se for uma entidade, invoca perto dela.
+            _server.WorldManager.SpawnTemporaryNpcs(
+                summonEffect.NpcTypeId,
+                target.Position, // A posição do alvo é o centro do spawn
+                summonEffect.Quantity,
+                summonEffect.SpawnRadius,
+                summonEffect.DurationSeconds);
+        }
+        else if (effectData is ServerCreateHazardEffectData hazardEffect)
+        {
+            // Cria uma nova zona de perigo no mundo.
+            _server.WorldManager.CreateHazard(
+                caster,
+                target.Position, // A posição do alvo é o centro da zona
+                hazardEffect.Radius,
+                hazardEffect.DurationSeconds,
+                hazardEffect.TickRate,
+                hazardEffect.TickEffects);
         }
     }
 
@@ -425,7 +447,7 @@ public class CombatManager
     // Este método parece ser chamado de fora, então o mantemos público.
     public void ReportNpcDeath(NpcInstance npc, ICombatEntity? lastAttacker)
     {
-        _server.NpcAiManager.OnNpcKilled(npc, lastAttacker);
+        _server.WorldManager.ProcessNpcDeath(npc, lastAttacker);
     }
     #endregion
 }

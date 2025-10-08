@@ -7,7 +7,7 @@
       "Stats": [
         {
           "Stat": "Strength",
-          "Value": 10
+          "Value": 30
         },
         {
           "Stat": "Stamina",
@@ -15,7 +15,11 @@
         },
         {
           "Stat": "AttackPower",
-          "Value": 5
+          "Value": 10
+        },
+        {
+          "Stat": "Health",
+          "Value": 2000
         }
       ],
       "Level": 10,
