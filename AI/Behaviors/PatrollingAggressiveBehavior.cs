@@ -19,8 +19,6 @@ public class PatrollingAggressiveBehavior : WanderingAggressiveBehavior
         switch (npc.CurrentState)
         {
             case NpcAiState.Idle:
-                // (CORREÇÃO) Chamando o método HandleIdleState da classe PAI (base) para evitar conflito de nome.
-                // Mas na verdade, queremos nossa própria lógica aqui.
                 HandleIdleState(npc);
                 break;
             case NpcAiState.Patrolling:

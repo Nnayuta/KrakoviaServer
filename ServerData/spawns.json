@@ -1,29 +1,13 @@
 {
   "SpawnPoints": [
     {
-      "NpcTypeId": "090d7357",
-      "Quantity": 10,
-      "SpawnRadius": 88.8,
-      "Position": {
-        "X": 125.0,
-        "Y": 2.8,
-        "Z": 226.4
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
       "NpcTypeId": "75448138",
-      "Quantity": 50,
-      "SpawnRadius": 300.0,
+      "Quantity": 60,
+      "SpawnRadius": 200.0,
       "Position": {
-        "X": 246.0,
-        "Y": 0.69,
-        "Z": 26.0
+        "X": 295.0,
+        "Y": 1.19,
+        "Z": 128.0
       },
       "AiType": 3,
       "InitialRotation": {
@@ -33,13 +17,61 @@
       }
     },
     {
+      "NpcTypeId": "wolf_3fab7236",
+      "Quantity": 10,
+      "SpawnRadius": 120.0,
+      "Position": {
+        "X": -31.0,
+        "Y": 2.86,
+        "Z": 312.0
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
       "NpcTypeId": "090d7357",
       "Quantity": 10,
-      "SpawnRadius": 77.4,
+      "SpawnRadius": 120.0,
       "Position": {
-        "X": 213.0,
-        "Y": 2.8,
-        "Z": -59.0
+        "X": -425.0,
+        "Y": 12.47,
+        "Z": 17.0
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "21119d19",
+      "Quantity": 1,
+      "SpawnRadius": 5.0,
+      "Position": {
+        "X": 178.09,
+        "Y": 5.83,
+        "Z": 344.15
+      },
+      "AiType": 5,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 270.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "wolf_3fab7236",
+      "Quantity": 10,
+      "SpawnRadius": 120.0,
+      "Position": {
+        "X": 159.0,
+        "Y": 1.05,
+        "Z": 201.0
       },
       "AiType": 2,
       "InitialRotation": {
@@ -53,20 +85,20 @@
       "Quantity": 2,
       "SpawnRadius": 5.0,
       "Position": {
-        "X": 140.7,
+        "X": 114.8,
         "Y": 5.83,
-        "Z": 439.8
+        "Z": 444.3
       },
       "PatrolPath": [
         {
-          "X": 136.2,
+          "X": 113.9,
           "Y": 5.83,
-          "Z": 421.3
+          "Z": 425.3
         },
         {
           "X": 85.5,
           "Y": 5.83,
-          "Z": 421.3
+          "Z": 422.31
         },
         {
           "X": 85.8,
@@ -74,24 +106,24 @@
           "Z": 402.3
         },
         {
-          "X": 138.9,
+          "X": 133.4,
           "Y": 5.83,
-          "Z": 402.3
+          "Z": 405.9
         },
         {
-          "X": 138.9,
+          "X": 135.47,
           "Y": 5.83,
           "Z": 387.3
         },
         {
           "X": 138.9,
           "Y": 5.83,
-          "Z": 339.9
+          "Z": 343.1
         },
         {
-          "X": 163.0,
+          "X": 160.9,
           "Y": 5.83,
-          "Z": 339.9
+          "Z": 341.0
         },
         {
           "X": 163.0,
@@ -99,9 +131,9 @@
           "Z": 375.9
         },
         {
-          "X": 178.1,
+          "X": 175.69,
           "Y": 5.83,
-          "Z": 405.5
+          "Z": 409.13
         },
         {
           "X": 178.1,
@@ -109,10 +141,58 @@
           "Z": 438.1
         }
       ],
-      "AiType": 1,
+      "AiType": 6,
       "InitialRotation": {
         "X": 0.0,
         "Y": 178.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "wolf_3fab7236",
+      "Quantity": 10,
+      "SpawnRadius": 120.0,
+      "Position": {
+        "X": 360.5,
+        "Y": 1.01,
+        "Z": 284.3
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "090d7357",
+      "Quantity": 10,
+      "SpawnRadius": 120.0,
+      "Position": {
+        "X": -208.0,
+        "Y": 0.67,
+        "Z": 351.0
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "75448138",
+      "Quantity": 50,
+      "SpawnRadius": 200.0,
+      "Position": {
+        "X": -341.0,
+        "Y": 1.08,
+        "Z": 250.0
+      },
+      "AiType": 3,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
         "Z": 0.0
       }
     },
@@ -121,38 +201,38 @@
       "Quantity": 2,
       "SpawnRadius": 5.0,
       "Position": {
-        "X": 168.7,
+        "X": 198.2,
         "Y": 5.83,
-        "Z": 340.1
+        "Z": 336.7
       },
       "PatrolPath": [
         {
-          "X": 173.59,
+          "X": 193.55,
           "Y": 5.83,
           "Z": 358.5
         },
         {
           "X": 210.58,
           "Y": 5.83,
-          "Z": 357.42
+          "Z": 363.28
         },
         {
           "X": 208.28,
           "Y": 5.83,
-          "Z": 376.47
+          "Z": 382.15
         },
         {
-          "X": 171.3,
+          "X": 187.41,
           "Y": 5.83,
-          "Z": 377.55
+          "Z": 382.91
         },
         {
-          "X": 171.61,
+          "X": 168.76,
           "Y": 5.83,
           "Z": 392.55
         },
         {
-          "X": 172.62,
+          "X": 168.69,
           "Y": 5.83,
           "Z": 439.94
         },
@@ -162,7 +242,7 @@
           "Z": 440.45
         },
         {
-          "X": 147.76,
+          "X": 143.06,
           "Y": 5.83,
           "Z": 404.46
         },
@@ -172,12 +252,12 @@
           "Z": 375.19
         },
         {
-          "X": 131.34,
+          "X": 131.35,
           "Y": 5.83,
-          "Z": 342.59
+          "Z": 334.18
         }
       ],
-      "AiType": 1,
+      "AiType": 6,
       "InitialRotation": {
         "X": 0.0,
         "Y": 178.0,
@@ -201,63 +281,15 @@
       }
     },
     {
-      "NpcTypeId": "21119d19",
-      "Quantity": 1,
-      "SpawnRadius": 5.0,
-      "Position": {
-        "X": 176.7,
-        "Y": 5.83,
-        "Z": 365.66
-      },
-      "AiType": 5,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 178.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "090d7357",
-      "Quantity": 10,
-      "SpawnRadius": 77.4,
-      "Position": {
-        "X": 339.0,
-        "Y": 2.8,
-        "Z": 319.9
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
       "NpcTypeId": "75448138",
       "Quantity": 50,
-      "SpawnRadius": 300.0,
+      "SpawnRadius": 200.0,
       "Position": {
-        "X": -200.0,
-        "Y": 0.69,
-        "Z": 176.0
+        "X": -65.0,
+        "Y": 1.38,
+        "Z": 0.0
       },
       "AiType": 3,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "090d7357",
-      "Quantity": 10,
-      "SpawnRadius": 77.4,
-      "Position": {
-        "X": -51.2,
-        "Y": 2.8,
-        "Z": 359.0
-      },
-      "AiType": 2,
       "InitialRotation": {
         "X": 0.0,
         "Y": 0.0,

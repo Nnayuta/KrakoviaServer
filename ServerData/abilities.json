@@ -80,7 +80,7 @@
       "CastTime": 0.0,
       "CanMoveWhileCasting": false,
       "ProjectileSpeed": 0.0,
-      "TargetType": "AreaOfEffect",
+      "TargetType": "AreaOfEffectGround",
       "AoeRadius": 0.0,
       "ConeAngle": 0.0
     },
@@ -135,8 +135,8 @@
       "CastTime": 0.0,
       "CanMoveWhileCasting": false,
       "ProjectileSpeed": 0.0,
-      "TargetType": "Cone",
-      "AoeRadius": 0.0,
+      "TargetType": "AreaOfEffectGround",
+      "AoeRadius": 8.0,
       "ConeAngle": 0.0
     },
     {
@@ -191,7 +191,7 @@
       "CastTime": 3.0,
       "CanMoveWhileCasting": true,
       "ProjectileSpeed": 0.0,
-      "TargetType": "AreaOfEffect",
+      "TargetType": "AreaOfEffectGround",
       "AoeRadius": 0.0,
       "ConeAngle": 0.0
     },
@@ -219,7 +219,7 @@
       "CastTime": 2.0,
       "CanMoveWhileCasting": true,
       "ProjectileSpeed": 0.0,
-      "TargetType": "Cone",
+      "TargetType": "AreaOfEffectTarget",
       "AoeRadius": 0.0,
       "ConeAngle": 0.0
     },
@@ -252,6 +252,43 @@
       "ConeAngle": 0.0
     },
     {
+      "ID": "healer_priest_02",
+      "Name": "Oração da Esperança",
+      "Intent": "Helpful",
+      "Effects": [
+        {
+          "$type": "ServerCreateHazardEffectData",
+          "DurationSeconds": 10.0,
+          "Radius": 3.0,
+          "TickRate": 1.0,
+          "TickEffects": [
+            {
+              "$type": "ServerHealEffectData",
+              "BaseValue": 25.0,
+              "SpellPowerScaling": 1.25,
+              "EffectType": "ServerHealEffectData",
+              "Intent": "Helpful"
+            }
+          ],
+          "EffectType": "ServerCreateHazardEffectData",
+          "Intent": "Harmful"
+        }
+      ],
+      "Cooldown": 6.0,
+      "Range": 30.0,
+      "ResourceCost": 24.0,
+      "RequiresTarget": true,
+      "WeaponRequirement": "None",
+      "Priority": 0,
+      "Type": "Active",
+      "CastTime": 3.5,
+      "CanMoveWhileCasting": false,
+      "ProjectileSpeed": 0.0,
+      "TargetType": "AreaOfEffectGround",
+      "AoeRadius": 4.0,
+      "ConeAngle": 0.0
+    },
+    {
       "ID": "damage_priest_01",
       "Name": "Sombra Penitente",
       "Intent": "Harmful",
@@ -263,13 +300,6 @@
           "SpellPowerScaling": 0.0,
           "EffectType": "ServerDamageEffectData",
           "Intent": "Harmful"
-        },
-        {
-          "$type": "ServerHealEffectData",
-          "BaseValue": 40.0,
-          "SpellPowerScaling": 1.2,
-          "EffectType": "ServerHealEffectData",
-          "Intent": "Helpful"
         }
       ],
       "Cooldown": 2.0,
@@ -302,7 +332,7 @@
       "Cooldown": 4.0,
       "Range": 30.0,
       "ResourceCost": 12.0,
-      "RequiresTarget": true,
+      "RequiresTarget": false,
       "WeaponRequirement": "None",
       "Priority": 0,
       "Type": "Active",
@@ -310,33 +340,6 @@
       "CanMoveWhileCasting": false,
       "ProjectileSpeed": 0.0,
       "TargetType": "SingleTarget",
-      "AoeRadius": 0.0,
-      "ConeAngle": 0.0
-    },
-    {
-      "ID": "healer_priest_02",
-      "Name": "Oração da Esperança",
-      "Intent": "Helpful",
-      "Effects": [
-        {
-          "$type": "ServerHealEffectData",
-          "BaseValue": 25.0,
-          "SpellPowerScaling": 1.25,
-          "EffectType": "ServerHealEffectData",
-          "Intent": "Helpful"
-        }
-      ],
-      "Cooldown": 6.0,
-      "Range": 30.0,
-      "ResourceCost": 24.0,
-      "RequiresTarget": true,
-      "WeaponRequirement": "None",
-      "Priority": 0,
-      "Type": "Active",
-      "CastTime": 3.5,
-      "CanMoveWhileCasting": false,
-      "ProjectileSpeed": 0.0,
-      "TargetType": "AreaOfEffect",
       "AoeRadius": 0.0,
       "ConeAngle": 0.0
     },
@@ -357,15 +360,15 @@
       "Cooldown": 8.0,
       "Range": 5.0,
       "ResourceCost": 5.0,
-      "RequiresTarget": false,
+      "RequiresTarget": true,
       "WeaponRequirement": "MeleeWeapon",
       "Priority": 0,
       "Type": "Active",
       "CastTime": 0.0,
       "CanMoveWhileCasting": false,
       "ProjectileSpeed": 0.0,
-      "TargetType": "Cone",
-      "AoeRadius": 0.0,
+      "TargetType": "AreaOfEffectTarget",
+      "AoeRadius": 3.0,
       "ConeAngle": 0.0
     },
     {
@@ -421,6 +424,89 @@
       "CanMoveWhileCasting": false,
       "ProjectileSpeed": 0.0,
       "TargetType": "SingleTarget",
+      "AoeRadius": 0.0,
+      "ConeAngle": 0.0
+    },
+    {
+      "ID": "wolf_ability_20ce2139",
+      "Name": "Patada Wolf",
+      "Intent": "Harmful",
+      "Effects": [
+        {
+          "$type": "ServerDamageEffectData",
+          "BaseValue": 20.0,
+          "AttackPowerScaling": 1.2,
+          "SpellPowerScaling": 0.0,
+          "EffectType": "ServerDamageEffectData",
+          "Intent": "Harmful"
+        }
+      ],
+      "Cooldown": 0.0,
+      "Range": 5.0,
+      "ResourceCost": 0.0,
+      "RequiresTarget": false,
+      "WeaponRequirement": "None",
+      "Priority": 0,
+      "Type": "Active",
+      "CastTime": 0.0,
+      "CanMoveWhileCasting": false,
+      "ProjectileSpeed": 0.0,
+      "TargetType": "SingleTarget",
+      "AoeRadius": 0.0,
+      "ConeAngle": 0.0
+    },
+    {
+      "ID": "wolf_ability_029ab43c",
+      "Name": "Mordida Wolf",
+      "Intent": "Harmful",
+      "Effects": [],
+      "Cooldown": 5.0,
+      "Range": 0.0,
+      "ResourceCost": 0.0,
+      "RequiresTarget": false,
+      "WeaponRequirement": "None",
+      "Priority": 0,
+      "Type": "Active",
+      "CastTime": 0.0,
+      "CanMoveWhileCasting": false,
+      "ProjectileSpeed": 0.0,
+      "TargetType": "SingleTarget",
+      "AoeRadius": 0.0,
+      "ConeAngle": 0.0
+    },
+    {
+      "ID": "wolf_ability_73e22c18",
+      "Name": "Mordida Frontal",
+      "Intent": "Harmful",
+      "Effects": [
+        {
+          "$type": "ServerDamageEffectData",
+          "BaseValue": 20.0,
+          "AttackPowerScaling": 1.2,
+          "SpellPowerScaling": 0.0,
+          "EffectType": "ServerDamageEffectData",
+          "Intent": "Harmful"
+        },
+        {
+          "$type": "ServerDamageEffectData",
+          "BaseValue": 20.0,
+          "AttackPowerScaling": 1.2,
+          "SpellPowerScaling": 0.0,
+          "EffectType": "ServerDamageEffectData",
+          "Intent": "Harmful"
+        }
+      ],
+      "Cooldown": 12.0,
+      "Range": 0.0,
+      "ResourceCost": 0.0,
+      "RequiresTarget": false,
+      "WeaponRequirement": "None",
+      "Priority": 0,
+      "Type": "Active",
+      "CastTime": 0.0,
+      "CanMoveWhileCasting": false,
+      "ProjectileSpeed": 0.0,
+      "TargetType": "Self",
       "AoeRadius": 0.0,
       "ConeAngle": 0.0
     }

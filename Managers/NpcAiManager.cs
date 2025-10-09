@@ -28,6 +28,7 @@ public class NpcAiManager
         { NpcAiType.Passive_Aggressive, passiveAggressive },
         { NpcAiType.Patrolling_Aggressive, new PatrollingAggressiveBehavior(server) },
         { NpcAiType.Stationary_Guard, new StationaryGuardBehavior(server) },
+        { NpcAiType.Patrolling_Guard, new PatrollingGuardBehavior(server) },
 
         // Passivos e de Ambiente
         { NpcAiType.Ambient_Fleeing, new AmbientFleeingBehavior(server) },

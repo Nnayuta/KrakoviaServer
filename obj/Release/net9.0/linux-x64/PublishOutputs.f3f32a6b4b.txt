@@ -1,7 +1,0 @@
-C:\Users\naayu\source\repos\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\Krakovia Server.pdb
-C:\Users\naayu\source\repos\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\ServerData\abilities.json
-C:\Users\naayu\source\repos\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\ServerData\classes.json
-C:\Users\naayu\source\repos\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\ServerData\items.json
-C:\Users\naayu\source\repos\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\ServerData\npcs.json
-C:\Users\naayu\source\repos\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\ServerData\spawns.json
-C:\Users\naayu\source\repos\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\Krakovia Server

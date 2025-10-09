@@ -1,167 +1,20 @@
 {
   "Npcs": [
     {
-      "TypeId": "074a36b5",
-      "Faction": "Enemy",
-      "AiType": "Passive_Aggressive",
-      "Stats": [
-        {
-          "Stat": "Strength",
-          "Value": 30
-        },
-        {
-          "Stat": "Stamina",
-          "Value": 100
-        },
-        {
-          "Stat": "AttackPower",
-          "Value": 10
-        },
-        {
-          "Stat": "Health",
-          "Value": 2000
-        }
-      ],
-      "Level": 10,
-      "IsBoss": true,
-      "AggroRange": 20.0,
-      "LeashRange": 30.0,
-      "RespawnTimeSeconds": 120,
-      "SwingTimer": 4.0,
-      "AutoAttackAbilityID": "giant_cb536791",
-      "AbilityIDs": [],
-      "ExperienceReward": 500,
-      "LootTableID": ""
-    },
-    {
-      "TypeId": "21119d20",
-      "Faction": "Friendly",
-      "AiType": "Passive_Aggressive",
-      "Stats": [
-        {
-          "Stat": "Stamina",
-          "Value": 20
-        },
-        {
-          "Stat": "Strength",
-          "Value": 20
-        },
-        {
-          "Stat": "Armor",
-          "Value": 20
-        }
-      ],
-      "Level": 20,
-      "IsBoss": false,
-      "AggroRange": 15.0,
-      "LeashRange": 30.0,
-      "RespawnTimeSeconds": 60,
-      "SwingTimer": 4.0,
-      "AutoAttackAbilityID": "sword_light_attack",
-      "AbilityIDs": [
-        "sword_heavy_attack"
-      ],
-      "ExperienceReward": 10,
-      "LootTableID": ""
-    },
-    {
-      "TypeId": "21119d26",
-      "Faction": "Friendly",
-      "AiType": "Passive_Aggressive",
-      "Stats": [
-        {
-          "Stat": "Stamina",
-          "Value": 20
-        },
-        {
-          "Stat": "Strength",
-          "Value": 20
-        },
-        {
-          "Stat": "Armor",
-          "Value": 20
-        }
-      ],
-      "Level": 20,
-      "IsBoss": false,
-      "AggroRange": 15.0,
-      "LeashRange": 30.0,
-      "RespawnTimeSeconds": 60,
-      "SwingTimer": 4.0,
-      "AutoAttackAbilityID": "sword_light_attack",
-      "AbilityIDs": [
-        "sword_heavy_attack"
-      ],
-      "ExperienceReward": 10,
-      "LootTableID": ""
-    },
-    {
-      "TypeId": "21119d19",
-      "Faction": "Friendly",
-      "AiType": "Passive_Aggressive",
-      "Stats": [
-        {
-          "Stat": "Stamina",
-          "Value": 20
-        },
-        {
-          "Stat": "Strength",
-          "Value": 20
-        },
-        {
-          "Stat": "Armor",
-          "Value": 20
-        }
-      ],
-      "Level": 20,
-      "IsBoss": false,
-      "AggroRange": 15.0,
-      "LeashRange": 30.0,
-      "RespawnTimeSeconds": 60,
-      "SwingTimer": 4.0,
-      "AutoAttackAbilityID": "sword_light_attack",
-      "AbilityIDs": [
-        "sword_heavy_attack"
-      ],
-      "ExperienceReward": 10,
-      "LootTableID": ""
-    },
-    {
-      "TypeId": "7d47429f",
-      "Faction": "Neutral",
-      "AiType": "Passive_Aggressive",
-      "Stats": [
-        {
-          "Stat": "Stamina",
-          "Value": 100
-        }
-      ],
-      "Level": 1,
-      "IsBoss": false,
-      "AggroRange": 15.0,
-      "LeashRange": 30.0,
-      "RespawnTimeSeconds": 10,
-      "SwingTimer": 4.0,
-      "AutoAttackAbilityID": null,
-      "AbilityIDs": [],
-      "ExperienceReward": 0,
-      "LootTableID": ""
-    },
-    {
       "TypeId": "090d7357",
       "Faction": "Enemy",
       "AiType": "Passive_Aggressive",
       "Stats": [
         {
           "Stat": "Strength",
-          "Value": 2
+          "Value": 8
         },
         {
           "Stat": "Stamina",
-          "Value": 4
+          "Value": 16
         }
       ],
-      "Level": 1,
+      "Level": 3,
       "IsBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
@@ -198,6 +51,181 @@
       "SwingTimer": 4.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
+      "ExperienceReward": 10,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "7d47429f",
+      "Faction": "Neutral",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 1000
+        }
+      ],
+      "Level": 1,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 10,
+      "SwingTimer": 4.0,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "ExperienceReward": 0,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "074a36b5",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Strength",
+          "Value": 50
+        },
+        {
+          "Stat": "Stamina",
+          "Value": 30
+        },
+        {
+          "Stat": "AttackPower",
+          "Value": 10
+        },
+        {
+          "Stat": "Health",
+          "Value": 5000
+        }
+      ],
+      "Level": 10,
+      "IsBoss": true,
+      "AggroRange": 20.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 120,
+      "SwingTimer": 4.0,
+      "AutoAttackAbilityID": "giant_cb536791",
+      "AbilityIDs": [],
+      "ExperienceReward": 500,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "21119d20",
+      "Faction": "Friendly",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 500
+        },
+        {
+          "Stat": "Strength",
+          "Value": 250
+        },
+        {
+          "Stat": "Armor",
+          "Value": 100
+        }
+      ],
+      "Level": 60,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 4.0,
+      "AutoAttackAbilityID": "sword_light_attack",
+      "AbilityIDs": [
+        "sword_heavy_attack"
+      ],
+      "ExperienceReward": 10,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "21119d26",
+      "Faction": "Friendly",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 100
+        },
+        {
+          "Stat": "Strength",
+          "Value": 100
+        },
+        {
+          "Stat": "Armor",
+          "Value": 100
+        }
+      ],
+      "Level": 20,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 4.0,
+      "AutoAttackAbilityID": "sword_light_attack",
+      "AbilityIDs": [
+        "sword_heavy_attack"
+      ],
+      "ExperienceReward": 10,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "21119d19",
+      "Faction": "Friendly",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 100
+        },
+        {
+          "Stat": "Strength",
+          "Value": 100
+        },
+        {
+          "Stat": "Armor",
+          "Value": 100
+        }
+      ],
+      "Level": 20,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 4.0,
+      "AutoAttackAbilityID": "sword_light_attack",
+      "AbilityIDs": [
+        "sword_heavy_attack"
+      ],
+      "ExperienceReward": 10,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "wolf_3fab7236",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Strength",
+          "Value": 10
+        },
+        {
+          "Stat": "Stamina",
+          "Value": 25
+        }
+      ],
+      "Level": 1,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": "wolf_ability_20ce2139",
+      "AbilityIDs": [
+        "wolf_ability_029ab43c",
+        "wolf_ability_73e22c18"
+      ],
       "ExperienceReward": 10,
       "LootTableID": ""
     }

@@ -17,6 +17,7 @@ public enum NpcAiType
     /// A diferença para o Passive_Aggressive é que este NUNCA se move da sua posição inicial, mesmo fora de combate.
     /// </summary>
     Stationary_Guard,
+    Patrolling_Guard,
 
     /// <summary>
     /// NPC que anda por uma área de forma aleatória, mas é totalmente passivo e não reage a ataques.

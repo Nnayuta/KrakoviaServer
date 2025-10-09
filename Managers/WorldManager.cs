@@ -219,52 +219,57 @@ public class WorldManager
         }
     }
 
-    /// <summary>
-    /// Cria uma zona de perigo no chão que aplica efeitos em intervalos.
-    /// </summary>
-    public void CreateHazard(ICombatEntity source, Vector3 position, float radius, float duration, float tickRate, List<ServerAbilityEffectData> tickEffects)
+    public void CreateHazard(ICombatEntity source, AbilityData sourceAbility, Vector3 position, float radius, float duration, float tickRate, List<ServerAbilityEffectData> tickEffects)
     {
         string hazardId = Guid.NewGuid().ToString("N");
 
-        // Notifica os clientes para criarem o efeito visual da zona
-        _server.NetworkManager.BroadcastMessageToAll($"CREATE_HAZARD|{hazardId}|{position.X},{position.Y},{position.Z}|{radius}|{duration}");
+        _server.NetworkManager.BroadcastMessageToAll($"CREATE_HAZARD|{hazardId}|{sourceAbility.ID}|{position.X.ToString(CultureInfo.InvariantCulture)},{position.Y.ToString(CultureInfo.InvariantCulture)},{position.Z.ToString(CultureInfo.InvariantCulture)}|{radius.ToString(CultureInfo.InvariantCulture)}|{duration.ToString(CultureInfo.InvariantCulture)}");
 
         DateTime endTime = _server.CurrentTimeUtc.AddSeconds(duration);
-        DateTime nextTickTime = _server.CurrentTimeUtc.AddSeconds(tickRate);
 
-        // Usa o Agendador para aplicar os efeitos em ticks
         Action tickAction = null;
         tickAction = () =>
         {
             if (_server.CurrentTimeUtc < endTime)
             {
-                // Encontra todos os jogadores dentro do raio
-                var targetsInHazard = _server.ConnectedPlayers.Values
-                    .Where(p => !p.IsDead && Vector3.Distance(p.Position, position) <= radius)
-                    .ToList();
-
-                // Aplica todos os efeitos de tick a cada alvo
-                foreach (var target in targetsInHazard)
+                foreach (var effect in tickEffects)
                 {
-                    foreach (var effect in tickEffects)
+                    var validTargets = _server.ConnectedPlayers.Values.Cast<ICombatEntity>()
+                        .Concat(_server.ActiveNpcs.Values.Cast<ICombatEntity>())
+                        .Where(p =>
+                            !p.IsDead &&
+                            Vector3.Distance(p.Position, position) <= radius &&
+                            ((effect.Intent == AbilityIntent.Helpful && AreEntitiesFriendly(source, p)) ||
+                             (effect.Intent == AbilityIntent.Harmful && !AreEntitiesFriendly(source, p)))
+                        ).ToList();
+
+                    foreach (var target in validTargets)
                     {
-                        // Reutiliza a lógica do CombatManager!
-                        _server.CombatManager.ApplySingleEffect(source, target, effect);
+                        // (CORREÇÃO) Voltamos a chamar ApplySingleEffect.
+                        // Isso aplica apenas o efeito do tick (ex: a cura), e não a habilidade inteira de novo.
+                        _server.CombatManager.ApplySingleEffect(source, target, effect, sourceAbility);
                     }
                 }
 
-                // Agenda o próximo tick
                 _server.Scheduler.ScheduleTask(tickAction, TimeSpan.FromSeconds(tickRate));
             }
             else
             {
-                // Notifica os clientes para removerem o efeito visual da zona
                 _server.NetworkManager.BroadcastMessageToAll($"DESTROY_HAZARD|{hazardId}");
             }
         };
 
-        // Inicia o primeiro tick
         _server.Scheduler.ScheduleTask(tickAction, TimeSpan.FromSeconds(tickRate));
+    }
+
+    // (NOVO) Adicione este método auxiliar ao seu WorldManager.cs para evitar duplicação de código.
+    private bool AreEntitiesFriendly(ICombatEntity entityA, ICombatEntity entityB)
+    {
+        if (entityA is Player && entityB is Player) return true;
+        if (entityA is Player && entityB is NpcInstance npc) return npc.BaseData.Faction == NpcFaction.Friendly;
+        if (entityA is NpcInstance npc2 && entityB is Player) return npc2.BaseData.Faction == NpcFaction.Friendly;
+        if (entityA is NpcInstance n1 && entityB is NpcInstance n2) return n1.BaseData.Faction == n2.BaseData.Faction;
+        return false;
     }
 
     /// <summary>

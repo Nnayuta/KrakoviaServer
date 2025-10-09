@@ -178,12 +178,13 @@ public class CombatManager
         }
     }
 
-
     public void ApplyAbilityEffects(ICombatEntity source, AbilityData ability, string targetId)
     {
         var finalTargets = new List<ICombatEntity>();
+        Vector3 aoeCenter = source.Position; // A posição padrão para o centro do AoE é o próprio conjurador
 
-        // --- 1. Determina os Alvos Finais (lógica mantida) ---
+        // --- 1. Determina os Alvos Finais e o Centro do Efeito ---
+        // Esta parte determina quais criaturas serão afetadas e onde o centro do AoE está.
         switch (ability.TargetType)
         {
             case TargetType.Self:
@@ -192,9 +193,20 @@ public class CombatManager
             case TargetType.SingleTarget:
                 if (FindEntityById(targetId) is { } singleTarget) finalTargets.Add(singleTarget);
                 break;
-            case TargetType.AreaOfEffect:
-                Vector3 aoePosition = ParseVector3FromTargetId(targetId);
-                finalTargets.AddRange(FindTargetsInRadius(aoePosition, ability.AoeRadius, source, ability.Intent));
+            case TargetType.AreaOfEffectSelf:
+                aoeCenter = source.Position;
+                finalTargets.AddRange(FindTargetsInRadius(aoeCenter, ability.AoeRadius, source, ability.Intent));
+                break;
+            case TargetType.AreaOfEffectTarget:
+                if (FindEntityById(targetId) is { } aoeTarget)
+                {
+                    aoeCenter = aoeTarget.Position; // O centro é a posição do alvo
+                    finalTargets.AddRange(FindTargetsInRadius(aoeCenter, ability.AoeRadius, source, ability.Intent));
+                }
+                break;
+            case TargetType.AreaOfEffectGround:
+                aoeCenter = ParseVector3FromTargetId(targetId); // O centro é a posição do chão
+                finalTargets.AddRange(FindTargetsInRadius(aoeCenter, ability.AoeRadius, source, ability.Intent));
                 break;
             case TargetType.Cone:
                 finalTargets.AddRange(FindTargetsInCone(source, ability));
@@ -204,32 +216,55 @@ public class CombatManager
                 break;
         }
 
-        // --- 2. Notifica os Clientes para a Execução Visual (lógica mantida) ---
+        // --- 2. Notifica os Clientes para a Execução Visual ---
+        // A mensagem de rede é enviada aqui, antes da aplicação da lógica, para que os efeitos visuais sejam imediatos.
         _server.NetworkManager.BroadcastMessageToAll($"EXECUTE_ABILITY|{source.Id}|{ability.ID}|{targetId}");
 
-        var targetEffects = ability.Effects.Where(e => e.Intent == ability.Intent);
-        foreach (var effectData in targetEffects)
+        // --- 3. Separa e Aplica os Efeitos (LÓGICA CORRIGIDA) ---
+
+        // Parte A: Lida com efeitos que acontecem NO CHÃO (Hazards, Summons).
+        // Estes são aplicados uma única vez, na localização 'aoeCenter'.
+        var groundEffects = ability.Effects
+            .Where(e => e is ServerCreateHazardEffectData || e is ServerSummonNpcEffectData);
+
+        if (groundEffects.Any())
+        {
+            // Cria um alvo temporário na posição central do AoE para passar para o método.
+            var groundTarget = new WorldPositionTarget(aoeCenter);
+            foreach (var effectData in groundEffects)
+            {
+                ApplySingleEffect(source, groundTarget, effectData, ability);
+            }
+        }
+
+        // Parte B: Lida com efeitos que afetam as CRIATURAS na área (Dano, Cura Direta, Buffs).
+        // Estes são aplicados a cada alvo encontrado na lista 'finalTargets'.
+        var directTargetEffects = ability.Effects
+            .Where(e => !(e is ServerCreateHazardEffectData || e is ServerSummonNpcEffectData));
+
+        foreach (var effectData in directTargetEffects)
         {
             foreach (var target in finalTargets)
             {
                 if (target == null || target.IsDead) continue;
-                ApplySingleEffect(source, target, effectData);
+                ApplySingleEffect(source, target, effectData, ability);
             }
         }
 
-        // --- 3B. Aplica os efeitos com intenção oposta ao PRÓPRIO CONJURADOR ---
+        // --- 4. Aplica os Efeitos com Intenção Oposta ao Próprio Conjurador ---
+        // (Ex: uma habilidade de dano que também cura o caster). Lógica mantida.
         var selfEffects = ability.Effects.Where(e => e.Intent != ability.Intent);
         foreach (var effectData in selfEffects)
         {
             if (source.IsDead) continue;
-            ApplySingleEffect(source, source, effectData); // O alvo é o próprio 'source'
+            ApplySingleEffect(source, source, effectData, ability);
         }
     }
 
     // =================================================================================
     // >> MÉTODO AUXILIAR ATUALIZADO (COM O FIX DO NAMEPLATE) <<
     // =================================================================================
-    public void ApplySingleEffect(ICombatEntity caster, ICombatEntity target, ServerAbilityEffectData effectData)
+    public void ApplySingleEffect(ICombatEntity caster, ICombatEntity target, ServerAbilityEffectData effectData, AbilityData sourceAbility)
     {
         if (effectData is ServerDamageEffectData damageEffect)
         {
@@ -276,10 +311,11 @@ public class CombatManager
         }
         else if (effectData is ServerCreateHazardEffectData hazardEffect)
         {
-            // Cria uma nova zona de perigo no mundo.
+            // (MUDANÇA) Passa a 'ability' inteira para que o WorldManager saiba o ID.
             _server.WorldManager.CreateHazard(
                 caster,
-                target.Position, // A posição do alvo é o centro da zona
+                sourceAbility, // Passa a habilidade original
+                target.Position,
                 hazardEffect.Radius,
                 hazardEffect.DurationSeconds,
                 hazardEffect.TickRate,
@@ -450,4 +486,37 @@ public class CombatManager
         _server.WorldManager.ProcessNpcDeath(npc, lastAttacker);
     }
     #endregion
+}
+
+
+/// <summary>
+/// Representa um alvo que é apenas uma posição no mundo, não uma criatura.
+/// Usado para habilidades de AoE no chão, para que possam ser passadas para métodos
+/// que esperam um ICombatEntity.
+/// </summary>
+public class WorldPositionTarget : ICombatEntity
+{
+    public string Id => "ground_target";
+    public Vector3 Position { get; }
+    public bool IsDead => false;
+
+    // --- (CORREÇÃO) IMPLEMENTAÇÕES VAZIAS PARA SATISFAZER A INTERFACE ---
+    public CharacterStats? Stats => null;
+    public int Level => 0;
+    public float CurrentHealth { get; set; } = 1;
+    public float MaxHealth => 1;
+    public float CurrentResource { get; set; } = 0;
+    public float MaxResource => 0;
+    public float MovementSpeed => 0;
+    public Dictionary<string, DateTime> AbilityCooldowns { get; } = new Dictionary<string, DateTime>();
+
+    // Métodos que não fazem nada para um alvo no chão
+    public void TakeDamage(float amount, ICombatEntity source, UDPServer server) { }
+    public void ReceiveHealing(float amount, UDPServer server) { }
+    public void ProcessDeath(ICombatEntity killer, UDPServer server) { }
+
+    public WorldPositionTarget(Vector3 position)
+    {
+        Position = position;
+    }
 }
