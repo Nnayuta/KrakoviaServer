@@ -47,28 +47,30 @@ public class PatrollingGuardBehavior : PatrollingAggressiveBehavior
     // (NOVO) Método para encontrar monstros que estão atacando jogadores ou outros NPCs amigos.
     private NpcInstance? FindEnemyAttackingAlly(NpcInstance guard)
     {
-        // Procura por todos os monstros inimigos ativos
-        return _server.ActiveNpcs.Values
+        // Usa a grade para encontrar entidades próximas
+        var nearbyEntities = _server.GridManager.GetEntitiesInRadius(guard.Position, ASSIST_RADIUS);
+
+        return nearbyEntities
+            .OfType<NpcInstance>() // Pega apenas NPCs
             .Where(npc =>
-                npc.IsActive &&
                 !npc.IsDead &&
-                npc.BaseData.Faction == NpcFaction.Enemy && // É um monstro inimigo
-                Vector3.Distance(guard.Position, npc.Position) <= ASSIST_RADIUS && // Está perto do guarda
+                npc.BaseData.Faction == NpcFaction.Enemy &&
                 npc.TargetPlayerId != null) // E está atacando um jogador
-            .OrderBy(npc => Vector3.Distance(guard.Position, npc.Position))
+            .OrderBy(npc => Vector3.DistanceSquared(guard.Position, npc.Position))
             .FirstOrDefault();
     }
-
     // (NOVO) Método para encontrar o monstro inimigo mais próximo, ignorando jogadores.
     private NpcInstance? FindClosestEnemyMonster(NpcInstance guard)
     {
-        return _server.ActiveNpcs.Values
+        // Usa a grade para encontrar entidades próximas
+        var nearbyEntities = _server.GridManager.GetEntitiesInRadius(guard.Position, guard.BaseData.AggroRange);
+
+        return nearbyEntities
+            .OfType<NpcInstance>()
             .Where(npc =>
-                npc.IsActive &&
                 !npc.IsDead &&
-                npc.BaseData.Faction == NpcFaction.Enemy && // Filtra apenas por NPCs inimigos
-                Vector3.Distance(guard.Position, npc.Position) <= guard.BaseData.AggroRange)
-            .OrderBy(npc => Vector3.Distance(guard.Position, npc.Position))
+                npc.BaseData.Faction == NpcFaction.Enemy)
+            .OrderBy(npc => Vector3.DistanceSquared(guard.Position, npc.Position))
             .FirstOrDefault();
     }
 

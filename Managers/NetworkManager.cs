@@ -371,8 +371,8 @@ public class NetworkManager
             float.Parse(parts[3], CultureInfo.InvariantCulture)
         );
 
+        _server.GridManager.UpdateEntity(player);
         string messageToBroadcast = $"{parts[0]}|{player.Id}|{string.Join("|", parts.Skip(1))}";
-        // BroadcastMessage(messageToBroadcast, player.Id);
         BroadcastMessageToRelevantPlayers(player.Position, messageToBroadcast);
     }
 
@@ -383,21 +383,27 @@ public class NetworkManager
     /// <param name="centerPosition">O ponto onde a ação aconteceu.</param>
     /// <param name="message">A mensagem a ser enviada.</param>
     /// <param name="visibilityRange">O raio de envio. Usar o mesmo do InterestManager é uma boa ideia.</param>
-    public void BroadcastMessageToRelevantPlayers(Vector3 centerPosition, string message, float visibilityRange = 50f)
+    public void BroadcastMessageToRelevantPlayers(Vector3 centerPosition, string message, float visibilityRange = 80f)
     {
         byte[] data = Encoding.ASCII.GetBytes(message);
         float visRangeSqr = visibilityRange * visibilityRange;
 
-        // Itera sobre todos os jogadores conectados
-        foreach (var player in _server.ConnectedPlayers.Values)
+        // A busca na grade retorna uma lista de candidatos
+        var candidateEntities = _server.GridManager.GetEntitiesInRadius(centerPosition, visibilityRange);
+
+        // Filtra para apenas jogadores e envia a mensagem
+        // Usar um loop simples é muitas vezes mais rápido que LINQ para tarefas de alta frequência
+        foreach (var entity in candidateEntities)
         {
-            // Se o jogador estiver dentro do raio da ação, envia a mensagem.
-            if (Vector3.DistanceSquared(player.Position, centerPosition) < visRangeSqr)
+            if (entity is Player player)
             {
+                // A verificação de distância aqui é redundante se GetEntitiesInRadius já a faz.
+                // Vamos confiar no GridManager.
                 _udpListener.Send(data, data.Length, player.EndPoint);
             }
         }
     }
+
 
     public void BroadcastMessageToAll(string message)
     {

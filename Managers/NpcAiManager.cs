@@ -116,6 +116,7 @@ public class NpcAiManager
         {
             Vector3 direction = Vector3.Normalize(npc.Destination - npc.Position);
             npc.Position += direction * moveAmount;
+            _server.GridManager.UpdateEntity(npc);
         }
     }
 

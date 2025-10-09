@@ -72,7 +72,9 @@ public class InterestManager
 
         foreach (var npc in liveNpcs)
         {
-            bool shouldBeActive = players.Any(p => !p.IsPendingInitialization && Vector3.DistanceSquared(npc.Position, p.Position) < AI_ACTIVATION_RANGE * AI_ACTIVATION_RANGE);
+            var nearbyEntities = _server.GridManager.GetEntitiesInRadius(npc.Position, AI_ACTIVATION_RANGE);
+            bool shouldBeActive = nearbyEntities.Any(e => e is Player);
+
             if (shouldBeActive && !npc.IsActive)
             {
                 WakeUpNpcAI(npc);
@@ -91,20 +93,7 @@ public class InterestManager
     {
         if (player.IsPendingInitialization) return;
 
-        var entitiesInView = new Dictionary<string, IWorldEntity>();
-        var visRangeSqr = VISIBILITY_RANGE * VISIBILITY_RANGE;
-
-        foreach (var npc in liveNpcs)
-            if (Vector3.DistanceSquared(player.Position, npc.Position) < visRangeSqr)
-                entitiesInView[npc.Id] = npc;
-
-        foreach (var corpse in deadNpcs)
-            if (Vector3.DistanceSquared(player.Position, corpse.Position) < visRangeSqr)
-                entitiesInView[corpse.Id] = corpse;
-
-        foreach (var otherPlayer in allPlayers)
-            if (player.Id != otherPlayer.Id && !otherPlayer.IsPendingInitialization && Vector3.DistanceSquared(player.Position, otherPlayer.Position) < visRangeSqr)
-                entitiesInView[otherPlayer.Id] = otherPlayer;
+        var entitiesInView = _server.GridManager.GetEntitiesInRadius(player.Position, VISIBILITY_RANGE).ToDictionary(e => e.Id);
 
         var knownEntities = player.KnownPlayerIds.Union(player.KnownNpcIds).ToHashSet();
 

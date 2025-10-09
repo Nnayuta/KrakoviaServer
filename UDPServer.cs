@@ -31,6 +31,7 @@ public class UDPServer
     public readonly LootManager LootManager;
     public readonly InterestManager InterestManager;
     public readonly Scheduler Scheduler;
+    public readonly SpatialGridManager GridManager;
 
     private readonly ICharacterDatabase _characterDb;
     private readonly UdpClient _udpListener;
@@ -56,6 +57,7 @@ public class UDPServer
         QuestManager = new QuestManager(this);
         LootManager = new LootManager(this);
         Scheduler = new Scheduler(this);
+        GridManager = new SpatialGridManager();
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)

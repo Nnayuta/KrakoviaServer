@@ -1,77 +1,13 @@
 {
   "SpawnPoints": [
     {
-      "NpcTypeId": "75448138",
-      "Quantity": 60,
-      "SpawnRadius": 200.0,
-      "Position": {
-        "X": 295.0,
-        "Y": 1.19,
-        "Z": 128.0
-      },
-      "AiType": 3,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "wolf_3fab7236",
-      "Quantity": 10,
-      "SpawnRadius": 120.0,
-      "Position": {
-        "X": -31.0,
-        "Y": 2.86,
-        "Z": 312.0
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
       "NpcTypeId": "090d7357",
       "Quantity": 10,
       "SpawnRadius": 120.0,
       "Position": {
-        "X": -425.0,
-        "Y": 12.47,
-        "Z": 17.0
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "21119d19",
-      "Quantity": 1,
-      "SpawnRadius": 5.0,
-      "Position": {
-        "X": 178.09,
-        "Y": 5.83,
-        "Z": 344.15
-      },
-      "AiType": 5,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 270.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "wolf_3fab7236",
-      "Quantity": 10,
-      "SpawnRadius": 120.0,
-      "Position": {
-        "X": 159.0,
-        "Y": 1.05,
-        "Z": 201.0
+        "X": -208.0,
+        "Y": 0.67,
+        "Z": 351.0
       },
       "AiType": 2,
       "InitialRotation": {
@@ -149,6 +85,22 @@
       }
     },
     {
+      "NpcTypeId": "75448138",
+      "Quantity": 50,
+      "SpawnRadius": 200.0,
+      "Position": {
+        "X": -65.0,
+        "Y": 1.38,
+        "Z": 0.0
+      },
+      "AiType": 3,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
       "NpcTypeId": "wolf_3fab7236",
       "Quantity": 10,
       "SpawnRadius": 120.0,
@@ -165,13 +117,13 @@
       }
     },
     {
-      "NpcTypeId": "090d7357",
+      "NpcTypeId": "wolf_3fab7236",
       "Quantity": 10,
       "SpawnRadius": 120.0,
       "Position": {
-        "X": -208.0,
-        "Y": 0.67,
-        "Z": 351.0
+        "X": -31.0,
+        "Y": 2.86,
+        "Z": 312.0
       },
       "AiType": 2,
       "InitialRotation": {
@@ -181,15 +133,15 @@
       }
     },
     {
-      "NpcTypeId": "75448138",
-      "Quantity": 50,
-      "SpawnRadius": 200.0,
+      "NpcTypeId": "wolf_3fab7236",
+      "Quantity": 10,
+      "SpawnRadius": 120.0,
       "Position": {
-        "X": -341.0,
-        "Y": 1.08,
-        "Z": 250.0
+        "X": 159.0,
+        "Y": 1.05,
+        "Z": 201.0
       },
-      "AiType": 3,
+      "AiType": 2,
       "InitialRotation": {
         "X": 0.0,
         "Y": 0.0,
@@ -265,6 +217,22 @@
       }
     },
     {
+      "NpcTypeId": "75448138",
+      "Quantity": 60,
+      "SpawnRadius": 200.0,
+      "Position": {
+        "X": 295.0,
+        "Y": 1.19,
+        "Z": 128.0
+      },
+      "AiType": 3,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
       "NpcTypeId": "074a36b5",
       "Quantity": 1,
       "SpawnRadius": 10.0,
@@ -281,13 +249,45 @@
       }
     },
     {
+      "NpcTypeId": "21119d19",
+      "Quantity": 1,
+      "SpawnRadius": 5.0,
+      "Position": {
+        "X": 178.09,
+        "Y": 5.83,
+        "Z": 344.15
+      },
+      "AiType": 5,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 270.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "090d7357",
+      "Quantity": 10,
+      "SpawnRadius": 120.0,
+      "Position": {
+        "X": -425.0,
+        "Y": 12.47,
+        "Z": 17.0
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
       "NpcTypeId": "75448138",
       "Quantity": 50,
       "SpawnRadius": 200.0,
       "Position": {
-        "X": -65.0,
-        "Y": 1.38,
-        "Z": 0.0
+        "X": -341.0,
+        "Y": 1.08,
+        "Z": 250.0
       },
       "AiType": 3,
       "InitialRotation": {

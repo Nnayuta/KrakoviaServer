@@ -37,9 +37,13 @@ public abstract class BaseBehavior : INpcBehavior
 
     protected Player? FindClosestPlayer(NpcInstance npc, float range)
     {
-        return _server.ConnectedPlayers.Values
-            .Where(p => !p.IsDead && Vector3.Distance(npc.Position, p.Position) <= range)
-            .OrderBy(p => Vector3.Distance(npc.Position, p.Position))
+        var nearbyEntities = _server.GridManager.GetEntitiesInRadius(npc.Position, range);
+
+        // Agora, filtramos e ordenamos apenas a pequena lista de entidades próximas
+        return nearbyEntities
+            .OfType<Player>() // Pega apenas as entidades que são jogadores
+            .Where(p => !p.IsDead)
+            .OrderBy(p => Vector3.DistanceSquared(npc.Position, p.Position)) // Usa DistanceSquared para ser mais rápido
             .FirstOrDefault();
     }
 
