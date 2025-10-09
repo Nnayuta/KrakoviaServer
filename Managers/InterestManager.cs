@@ -14,16 +14,9 @@ using System.Threading.Tasks;
 /// </summary>
 public class InterestManager
 {
-    private static readonly byte[] SharedBuffer = new byte[2048];
     private readonly UDPServer _server;
     private const float AI_ACTIVATION_RANGE = 100f;
     private const float VISIBILITY_RANGE = 60f;
-
-    private static readonly float AI_ACTIVATION_RANGE_SQR = AI_ACTIVATION_RANGE * AI_ACTIVATION_RANGE;
-    private static readonly float VISIBILITY_RANGE_SQR = VISIBILITY_RANGE * VISIBILITY_RANGE;
-
-    private readonly Dictionary<string, IWorldEntity> _entityCache = new();
-    private readonly HashSet<string> _reuseSet = new();
 
     public InterestManager(UDPServer server)
     {
@@ -39,10 +32,9 @@ public class InterestManager
         {
             try
             {
+                await Task.Delay(500, cancellationToken);
+
                 var players = _server.ConnectedPlayers.Values.ToList();
-                await Task.Delay(players.Count == 0 ? 1000 : 200, cancellationToken);
-
-
                 var liveNpcs = _server.ActiveNpcs.Values.ToList();
                 var deadNpcs = _server.DeadNpcCor_pses.Values.ToList();
 
@@ -69,40 +61,25 @@ public class InterestManager
     /// </summary>
     private void UpdateAiActivation(List<NpcInstance> liveNpcs, List<Player> players)
     {
-        if (players.Count == 0)
+        if (!players.Any())
         {
-            foreach (var npc in liveNpcs)
+            foreach (var npc in liveNpcs.Where(n => n.IsActive))
             {
-                if (npc.IsActive) npc.IsActive = false;
+                HibernateNpcAI(npc);
             }
             return;
         }
 
         foreach (var npc in liveNpcs)
         {
-            bool nearPlayer = false;
-            var npcPos = npc.Position;
-
-            foreach (var p in players)
+            bool shouldBeActive = players.Any(p => !p.IsPendingInitialization && Vector3.DistanceSquared(npc.Position, p.Position) < AI_ACTIVATION_RANGE * AI_ACTIVATION_RANGE);
+            if (shouldBeActive && !npc.IsActive)
             {
-                if (p.IsPendingInitialization) continue;
-                var dx = p.Position.X - npcPos.X;
-                var dy = p.Position.Y - npcPos.Y;
-                var dz = p.Position.Z - npcPos.Z;
-                if ((dx * dx + dy * dy + dz * dz) < AI_ACTIVATION_RANGE_SQR)
-                {
-                    nearPlayer = true;
-                    break;
-                }
+                WakeUpNpcAI(npc);
             }
-
-            if (nearPlayer)
+            else if (!shouldBeActive && npc.IsActive)
             {
-                if (!npc.IsActive) npc.IsActive = true;
-            }
-            else
-            {
-                if (npc.IsActive) npc.IsActive = false;
+                HibernateNpcAI(npc);
             }
         }
     }
@@ -114,71 +91,40 @@ public class InterestManager
     {
         if (player.IsPendingInitialization) return;
 
-        _entityCache.Clear();
-        var pos = player.Position;
+        var entitiesInView = new Dictionary<string, IWorldEntity>();
+        var visRangeSqr = VISIBILITY_RANGE * VISIBILITY_RANGE;
 
-        // Live NPCs
         foreach (var npc in liveNpcs)
-        {
-            var dx = npc.Position.X - pos.X;
-            var dy = npc.Position.Y - pos.Y;
-            var dz = npc.Position.Z - pos.Z;
-            if ((dx * dx + dy * dy + dz * dz) < VISIBILITY_RANGE_SQR)
-                _entityCache[npc.Id] = npc;
-        }
+            if (Vector3.DistanceSquared(player.Position, npc.Position) < visRangeSqr)
+                entitiesInView[npc.Id] = npc;
 
-        // Dead NPCs
         foreach (var corpse in deadNpcs)
+            if (Vector3.DistanceSquared(player.Position, corpse.Position) < visRangeSqr)
+                entitiesInView[corpse.Id] = corpse;
+
+        foreach (var otherPlayer in allPlayers)
+            if (player.Id != otherPlayer.Id && !otherPlayer.IsPendingInitialization && Vector3.DistanceSquared(player.Position, otherPlayer.Position) < visRangeSqr)
+                entitiesInView[otherPlayer.Id] = otherPlayer;
+
+        var knownEntities = player.KnownPlayerIds.Union(player.KnownNpcIds).ToHashSet();
+
+        var newEntityIds = entitiesInView.Keys.Except(knownEntities).ToList();
+        foreach (var entityId in newEntityIds)
         {
-            var dx = corpse.Position.X - pos.X;
-            var dy = corpse.Position.Y - pos.Y;
-            var dz = corpse.Position.Z - pos.Z;
-            if ((dx * dx + dy * dy + dz * dz) < VISIBILITY_RANGE_SQR)
-                _entityCache[corpse.Id] = corpse;
+            IWorldEntity entity = entitiesInView[entityId];
+            _server.NetworkManager.SendMessageToClient(entity.GetSpawnMessage(), player.EndPoint);
+            if (entity is Player) player.KnownPlayerIds.Add(entityId);
+            else if (entity is NpcInstance) player.KnownNpcIds.Add(entityId);
         }
 
-        // Players
-        foreach (var other in allPlayers)
+        var oldEntityIds = knownEntities.Except(entitiesInView.Keys).ToList();
+        foreach (var entityId in oldEntityIds)
         {
-            if (other.Id == player.Id || other.IsPendingInitialization) continue;
-            var dx = other.Position.X - pos.X;
-            var dy = other.Position.Y - pos.Y;
-            var dz = other.Position.Z - pos.Z;
-            if ((dx * dx + dy * dy + dz * dz) < VISIBILITY_RANGE_SQR)
-                _entityCache[other.Id] = other;
-        }
-
-        _reuseSet.Clear();
-        foreach (var id in player.KnownPlayerIds) _reuseSet.Add(id);
-        foreach (var id in player.KnownNpcIds) _reuseSet.Add(id);
-
-        // --- Spawn novos ---
-        foreach (var kvp in _entityCache)
-        {
-            if (!_reuseSet.Contains(kvp.Key))
-            {
-                var entity = kvp.Value;
-                _server.NetworkManager.SendMessageToClient(entity.GetSpawnMessage(), player.EndPoint);
-                if (entity is Player)
-                    player.KnownPlayerIds.Add(kvp.Key);
-                else if (entity is NpcInstance)
-                    player.KnownNpcIds.Add(kvp.Key);
-            }
-        }
-
-        // --- Remover antigos ---
-        foreach (var oldId in _reuseSet)
-        {
-            if (!_entityCache.ContainsKey(oldId))
-            {
-                string msg = player.KnownPlayerIds.Remove(oldId)
-                    ? $"PLAYER_LEFT|{oldId}"
-                    : player.KnownNpcIds.Remove(oldId)
-                        ? $"DESTROY_NPC|{oldId}"
-                        : null;
-                if (msg != null)
-                    _server.NetworkManager.SendMessageToClient(msg, player.EndPoint);
-            }
+            string despawnMessage;
+            if (player.KnownPlayerIds.Remove(entityId)) despawnMessage = $"PLAYER_LEFT|{entityId}";
+            else if (player.KnownNpcIds.Remove(entityId)) despawnMessage = $"DESTROY_NPC|{entityId}";
+            else continue;
+            _server.NetworkManager.SendMessageToClient(despawnMessage, player.EndPoint);
         }
     }
 

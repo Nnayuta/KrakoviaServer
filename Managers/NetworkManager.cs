@@ -1,13 +1,11 @@
 ﻿// Managers/NetworkManager.cs
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading; // Adicionado para CancellationToken
 using System.Threading.Tasks;
@@ -15,7 +13,6 @@ using Newtonsoft.Json;
 
 public class NetworkManager
 {
-    private static readonly byte[] SharedBuffer = new byte[2048];
     private readonly UDPServer _server;
     private readonly UdpClient _udpListener;
     // <<< MUDANÇA 1: Adicionamos um campo para a nossa interface de banco de dados de personagens.
@@ -386,19 +383,19 @@ public class NetworkManager
     /// <param name="centerPosition">O ponto onde a ação aconteceu.</param>
     /// <param name="message">A mensagem a ser enviada.</param>
     /// <param name="visibilityRange">O raio de envio. Usar o mesmo do InterestManager é uma boa ideia.</param>
-    public void BroadcastMessageToRelevantPlayers(Vector3 center, string message, float range = 50f)
+    public void BroadcastMessageToRelevantPlayers(Vector3 centerPosition, string message, float visibilityRange = 50f)
     {
-        var data = Encoding.ASCII.GetBytes(message);
-        float rangeSqr = range * range;
+        byte[] data = Encoding.ASCII.GetBytes(message);
+        float visRangeSqr = visibilityRange * visibilityRange;
 
-        Span<Player> snapshot = CollectionsMarshal.AsSpan(_server.ConnectedPlayers.Values.ToList());
-        foreach (ref readonly var player in snapshot)
+        // Itera sobre todos os jogadores conectados
+        foreach (var player in _server.ConnectedPlayers.Values)
         {
-            var dx = player.Position.X - center.X;
-            var dy = player.Position.Y - center.Y;
-            var dz = player.Position.Z - center.Z;
-            if ((dx * dx + dy * dy + dz * dz) < rangeSqr)
+            // Se o jogador estiver dentro do raio da ação, envia a mensagem.
+            if (Vector3.DistanceSquared(player.Position, centerPosition) < visRangeSqr)
+            {
                 _udpListener.Send(data, data.Length, player.EndPoint);
+            }
         }
     }
 
@@ -440,10 +437,9 @@ public class NetworkManager
         }
     }
 
-    private static readonly ArrayPool<byte> BufferPool = ArrayPool<byte>.Shared;
     public void SendMessageToClient(string message, IPEndPoint endPoint)
     {
-        int len = Encoding.ASCII.GetBytes(message, 0, message.Length, SharedBuffer, 0);
-        _udpListener.Send(SharedBuffer, len, endPoint);
+        byte[] data = Encoding.ASCII.GetBytes(message);
+        _udpListener.Send(data, data.Length, endPoint);
     }
 }
