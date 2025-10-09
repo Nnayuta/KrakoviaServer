@@ -218,7 +218,7 @@ public class CombatManager
 
         // --- 2. Notifica os Clientes para a Execução Visual ---
         // A mensagem de rede é enviada aqui, antes da aplicação da lógica, para que os efeitos visuais sejam imediatos.
-        _server.NetworkManager.BroadcastMessageToAll($"EXECUTE_ABILITY|{source.Id}|{ability.ID}|{targetId}");
+        _server.NetworkManager.BroadcastMessageToRelevantPlayers(source.Position, $"EXECUTE_ABILITY|{source.Id}|{ability.ID}|{targetId}");
 
         // --- 3. Separa e Aplica os Efeitos (LÓGICA CORRIGIDA) ---
 
@@ -278,7 +278,8 @@ public class CombatManager
             target.TakeDamage(rawDamage, caster, _server);
 
             var eventType = isCritical ? CombatEventType.CriticalDamage : CombatEventType.PhysicalDamage;
-            BroadcastCombatEvent(target.Id, eventType, (int)rawDamage, isCritical);
+            string message = $"COMBAT_EVENT|{target.Id}|{eventType}|{(int)rawDamage}|{isCritical}";
+            _server.NetworkManager.BroadcastMessageToRelevantPlayers(target.Position, message);
         }
         else if (effectData is ServerHealEffectData healEffect)
         {
@@ -291,7 +292,9 @@ public class CombatManager
             target.ReceiveHealing(rawHeal, _server);
 
             var eventType = isCritical ? CombatEventType.CriticalHeal : CombatEventType.Heal;
-            BroadcastCombatEvent(target.Id, eventType, (int)rawHeal, isCritical);
+
+            string message = $"COMBAT_EVENT|{target.Id}|{eventType}|{(int)rawHeal}|{isCritical}";
+            _server.NetworkManager.BroadcastMessageToRelevantPlayers(target.Position, message);
         }
         else if (effectData is ServerApplyStatusEffectData applyStatusEffect)
         {
@@ -435,11 +438,6 @@ public class CombatManager
     }
 
     #region Métodos Auxiliares
-
-    private void BroadcastCombatEvent(string targetId, CombatEventType eventType, int amount, bool isCritical)
-    {
-        _server.NetworkManager.BroadcastMessageToAll($"COMBAT_EVENT|{targetId}|{eventType}|{amount}|{isCritical}");
-    }
 
     private bool AreEntitiesFriendly(ICombatEntity entityA, ICombatEntity entityB)
     {

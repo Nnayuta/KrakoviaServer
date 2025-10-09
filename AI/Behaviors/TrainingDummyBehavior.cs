@@ -14,7 +14,7 @@ public class TrainingDummyBehavior : INpcBehavior
         if (npc.CurrentHealth < npc.MaxHealth && (_server.CurrentTimeUtc - npc.LastDamageTime).TotalSeconds > 10)
         {
             npc.CurrentHealth = npc.MaxHealth;
-            _server.NetworkManager.BroadcastMessageToAll($"ENTITY_HEALTH_UPDATE|{npc.Id}|{npc.CurrentHealth}|{npc.MaxHealth}");
+            _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, $"ENTITY_HEALTH_UPDATE|{npc.Id}|{npc.CurrentHealth}|{npc.MaxHealth}");
         }
     }
 

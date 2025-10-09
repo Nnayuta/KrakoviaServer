@@ -65,6 +65,7 @@ public class Player : ICombatEntity, IWorldEntity
     public ActionBarData PlayerActionBar { get; private set; }
     public List<WeaponType> CurrentWeaponProficiencies { get; private set; } = new();
     public PlayerQuestLog QuestLog { get; private set; }
+    public bool IsPendingInitialization { get; set; } = false;
     #endregion
 
     public DateTime LastCombatTime { get; private set; }
@@ -402,7 +403,7 @@ public class Player : ICombatEntity, IWorldEntity
         }
 
         server.NetworkManager.SendVitalsUpdate(this);
-        server.NetworkManager.BroadcastMessageToAll($"ENTITY_HEALTH_UPDATE|{this.Id}|{this.CurrentHealth}|{this.MaxHealth}");
+        server.NetworkManager.BroadcastMessageToRelevantPlayers(this.Position, $"ENTITY_HEALTH_UPDATE|{this.Id}|{this.CurrentHealth}|{this.MaxHealth}");
     }
 
     public void Respawn(Vector3 position)
@@ -426,7 +427,7 @@ public class Player : ICombatEntity, IWorldEntity
 
 
         server?.NetworkManager.SendVitalsUpdate(this);
-        server?.NetworkManager.BroadcastMessageToAll($"ENTITY_HEALTH_UPDATE|{this.Id}|{this.CurrentHealth}|{this.MaxHealth}");
+        server?.NetworkManager.BroadcastMessageToRelevantPlayers(this.Position, $"ENTITY_HEALTH_UPDATE|{this.Id}|{this.CurrentHealth}|{this.MaxHealth}");
     }
 
     public void ReceiveResource(float amount)
@@ -447,7 +448,7 @@ public class Player : ICombatEntity, IWorldEntity
         Console.WriteLine($"[MORTE] Jogador {this.CharacterName} ({this.Id}) foi derrotado por {killer.Id}.");
 
         // Notifica todos os outros jogadores que esta entidade morreu.
-        server.NetworkManager.BroadcastMessageToAll($"ENTITY_DIED|{this.Id}|{false}");
+        server.NetworkManager.BroadcastMessageToRelevantPlayers(this.Position, $"ENTITY_DIED|{this.Id}|{false}");
     }
 
     #endregion

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Linq;
+using System.Globalization;
 
 public class PlayerLifecycleManager
 {
@@ -177,18 +178,22 @@ public class PlayerLifecycleManager
         // 1. Encontra o cemitério mais próximo
         Vector3 respawnPosition = FindClosestGraveyard(player.Position);
 
-        // 2. Chama o método de respawn no próprio jogador para atualizar seu estado
+        // 2. Atualiza o estado do jogador
         player.Respawn(respawnPosition);
 
         Console.WriteLine($"[RESPAWN] {player.Username} ressuscitou em {respawnPosition}.");
 
-        // 3. Notifica o cliente sobre o sucesso, sua nova posição e estado de vida
-        string posString = $"{respawnPosition.X},{respawnPosition.Y},{respawnPosition.Z}";
+        // 3. Notifica o próprio cliente sobre o sucesso (continua igual)
+        string posString = $"{respawnPosition.X.ToString(CultureInfo.InvariantCulture)},{respawnPosition.Y.ToString(CultureInfo.InvariantCulture)},{respawnPosition.Z.ToString(CultureInfo.InvariantCulture)}";
         _server.NetworkManager.SendMessageToClient($"RESPAWN_SUCCESSFUL|{posString}|{player.CurrentHealth}|{player.MaxHealth}", player.EndPoint);
 
-        // 4. Notifica todos os outros jogadores que esta entidade voltou à vida
-        _server.NetworkManager.BroadcastMessageToAll($"ENTITY_RESURRECTED|{player.Id}|{player.CurrentHealth}|{player.MaxHealth}");
+        // 4. (CORREÇÃO) Notifica os jogadores PRÓXIMOS que esta entidade voltou à vida
+        string message = $"ENTITY_RESURRECTED|{player.Id}|{player.CurrentHealth}|{player.MaxHealth}";
+
+        // Usamos a NOVA posição de ressurreição como o centro do evento.
+        _server.NetworkManager.BroadcastMessageToRelevantPlayers(respawnPosition, message);
     }
+
 
     private Vector3 FindClosestGraveyard(Vector3 playerPosition)
     {

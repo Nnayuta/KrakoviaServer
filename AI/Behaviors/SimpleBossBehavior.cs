@@ -36,7 +36,7 @@ public class SimpleBossBehavior : WanderingAggressiveBehavior
         {
             _currentPhase = BossPhase.Phase2;
             // Grita "ENRAGE!" ou algo assim
-            _server.NetworkManager.BroadcastMessageToAll($"NPC_CHAT|{npc.Id}|Chega de brincadeira!");
+            _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, $"NPC_CHAT|{npc.Id}|Chega de brincadeira!");
             // Reseta o timer de habilidade para usar a nova habilidade imediatamente
             _nextSpecialAbilityTime = _server.CurrentTimeUtc;
         }

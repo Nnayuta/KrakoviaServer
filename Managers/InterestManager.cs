@@ -14,12 +14,16 @@ using System.Threading.Tasks;
 /// </summary>
 public class InterestManager
 {
+    private static readonly byte[] SharedBuffer = new byte[2048];
     private readonly UDPServer _server;
-
-    // Distância para um jogador ATIVAR A IA de um NPC (geralmente maior que a visibilidade).
     private const float AI_ACTIVATION_RANGE = 100f;
-    // Distância para um jogador VER uma entidade (NPC, outro jogador, corpo).
-    private const float VISIBILITY_RANGE = 80f;
+    private const float VISIBILITY_RANGE = 60f;
+
+    private static readonly float AI_ACTIVATION_RANGE_SQR = AI_ACTIVATION_RANGE * AI_ACTIVATION_RANGE;
+    private static readonly float VISIBILITY_RANGE_SQR = VISIBILITY_RANGE * VISIBILITY_RANGE;
+
+    private readonly Dictionary<string, IWorldEntity> _entityCache = new();
+    private readonly HashSet<string> _reuseSet = new();
 
     public InterestManager(UDPServer server)
     {
@@ -35,27 +39,21 @@ public class InterestManager
         {
             try
             {
-                // Roda a verificação 2x por segundo.
-                await Task.Delay(500, cancellationToken);
-
                 var players = _server.ConnectedPlayers.Values.ToList();
-                var liveNpcs = _server.ActiveNpcs.Values.ToList();
+                await Task.Delay(players.Count == 0 ? 1000 : 200, cancellationToken);
 
-                // =================================================================================
-                // ATUALIZAÇÃO: Agora também consideramos os corpos dos NPCs mortos.
-                // =================================================================================
+
+                var liveNpcs = _server.ActiveNpcs.Values.ToList();
                 var deadNpcs = _server.DeadNpcCor_pses.Values.ToList();
 
-                // Passo 1: Gerenciar Ativação da IA (Apenas para NPCs vivos)
                 UpdateAiActivation(liveNpcs, players);
 
-                // Se não há jogadores online, não há necessidade de gerenciar a visibilidade.
                 if (!players.Any()) continue;
 
-                // Passo 2: Gerenciar Visibilidade para cada jogador, incluindo os corpos.
                 foreach (var player in players)
                 {
-                    UpdatePlayerVisibility(player, liveNpcs, deadNpcs);
+                    // (CORREÇÃO) Agora passamos a lista 'players' para o método.
+                    UpdatePlayerVisibility(player, liveNpcs, deadNpcs, players);
                 }
             }
             catch (TaskCanceledException)
@@ -71,25 +69,40 @@ public class InterestManager
     /// </summary>
     private void UpdateAiActivation(List<NpcInstance> liveNpcs, List<Player> players)
     {
-        if (!players.Any())
+        if (players.Count == 0)
         {
-            foreach (var npc in liveNpcs.Where(n => n.IsActive))
+            foreach (var npc in liveNpcs)
             {
-                HibernateNpcAI(npc);
+                if (npc.IsActive) npc.IsActive = false;
             }
             return;
         }
 
         foreach (var npc in liveNpcs)
         {
-            bool shouldBeActive = players.Any(p => Vector3.DistanceSquared(npc.Position, p.Position) < AI_ACTIVATION_RANGE * AI_ACTIVATION_RANGE);
-            if (shouldBeActive && !npc.IsActive)
+            bool nearPlayer = false;
+            var npcPos = npc.Position;
+
+            foreach (var p in players)
             {
-                WakeUpNpcAI(npc);
+                if (p.IsPendingInitialization) continue;
+                var dx = p.Position.X - npcPos.X;
+                var dy = p.Position.Y - npcPos.Y;
+                var dz = p.Position.Z - npcPos.Z;
+                if ((dx * dx + dy * dy + dz * dz) < AI_ACTIVATION_RANGE_SQR)
+                {
+                    nearPlayer = true;
+                    break;
+                }
             }
-            else if (!shouldBeActive && npc.IsActive)
+
+            if (nearPlayer)
             {
-                HibernateNpcAI(npc);
+                if (!npc.IsActive) npc.IsActive = true;
+            }
+            else
+            {
+                if (npc.IsActive) npc.IsActive = false;
             }
         }
     }
@@ -97,100 +110,106 @@ public class InterestManager
     /// <summary>
     /// Para um jogador específico, envia mensagens SPAWN/DESTROY para as entidades que entram/saem de sua visão.
     /// </summary>
-    private void UpdatePlayerVisibility(Player player, List<NpcInstance> liveNpcs, List<NpcInstance> deadNpcs)
+    private void UpdatePlayerVisibility(Player player, List<NpcInstance> liveNpcs, List<NpcInstance> deadNpcs, List<Player> allPlayers)
     {
-        var entitiesInView = new Dictionary<string, IWorldEntity>();
-        var visRangeSqr = VISIBILITY_RANGE * VISIBILITY_RANGE;
+        if (player.IsPendingInitialization) return;
 
-        // 1. Adiciona NPCs VIVOS na visão
+        _entityCache.Clear();
+        var pos = player.Position;
+
+        // Live NPCs
         foreach (var npc in liveNpcs)
         {
-            if (Vector3.DistanceSquared(player.Position, npc.Position) < visRangeSqr)
-            {
-                entitiesInView[npc.Id] = npc;
-            }
+            var dx = npc.Position.X - pos.X;
+            var dy = npc.Position.Y - pos.Y;
+            var dz = npc.Position.Z - pos.Z;
+            if ((dx * dx + dy * dy + dz * dz) < VISIBILITY_RANGE_SQR)
+                _entityCache[npc.Id] = npc;
         }
 
-        // 2. Adiciona CORPOS na visão
+        // Dead NPCs
         foreach (var corpse in deadNpcs)
         {
-            if (Vector3.DistanceSquared(player.Position, corpse.Position) < visRangeSqr)
+            var dx = corpse.Position.X - pos.X;
+            var dy = corpse.Position.Y - pos.Y;
+            var dz = corpse.Position.Z - pos.Z;
+            if ((dx * dx + dy * dy + dz * dz) < VISIBILITY_RANGE_SQR)
+                _entityCache[corpse.Id] = corpse;
+        }
+
+        // Players
+        foreach (var other in allPlayers)
+        {
+            if (other.Id == player.Id || other.IsPendingInitialization) continue;
+            var dx = other.Position.X - pos.X;
+            var dy = other.Position.Y - pos.Y;
+            var dz = other.Position.Z - pos.Z;
+            if ((dx * dx + dy * dy + dz * dz) < VISIBILITY_RANGE_SQR)
+                _entityCache[other.Id] = other;
+        }
+
+        _reuseSet.Clear();
+        foreach (var id in player.KnownPlayerIds) _reuseSet.Add(id);
+        foreach (var id in player.KnownNpcIds) _reuseSet.Add(id);
+
+        // --- Spawn novos ---
+        foreach (var kvp in _entityCache)
+        {
+            if (!_reuseSet.Contains(kvp.Key))
             {
-                entitiesInView[corpse.Id] = corpse;
+                var entity = kvp.Value;
+                _server.NetworkManager.SendMessageToClient(entity.GetSpawnMessage(), player.EndPoint);
+                if (entity is Player)
+                    player.KnownPlayerIds.Add(kvp.Key);
+                else if (entity is NpcInstance)
+                    player.KnownNpcIds.Add(kvp.Key);
             }
         }
 
-        // 3. Adiciona outros JOGADORES na visão
-        foreach (var otherPlayer in _server.ConnectedPlayers.Values)
+        // --- Remover antigos ---
+        foreach (var oldId in _reuseSet)
         {
-            if (player.Id != otherPlayer.Id && Vector3.DistanceSquared(player.Position, otherPlayer.Position) < visRangeSqr)
+            if (!_entityCache.ContainsKey(oldId))
             {
-                entitiesInView[otherPlayer.Id] = otherPlayer;
+                string msg = player.KnownPlayerIds.Remove(oldId)
+                    ? $"PLAYER_LEFT|{oldId}"
+                    : player.KnownNpcIds.Remove(oldId)
+                        ? $"DESTROY_NPC|{oldId}"
+                        : null;
+                if (msg != null)
+                    _server.NetworkManager.SendMessageToClient(msg, player.EndPoint);
             }
-        }
-
-        // --- Lógica de "Diff" (Diferença) para decidir o que spawnar/destruir ---
-
-        var knownEntities = player.KnownPlayerIds.Union(player.KnownNpcIds).ToHashSet();
-
-        // Entidades que ENTRARAM na visão (estão em 'entitiesInView' mas não em 'knownEntities')
-        var newEntityIds = entitiesInView.Keys.Except(knownEntities).ToList();
-        foreach (var entityId in newEntityIds)
-        {
-            IWorldEntity entity = entitiesInView[entityId];
-            _server.NetworkManager.SendMessageToClient(entity.GetSpawnMessage(), player.EndPoint);
-
-            if (entity is Player) player.KnownPlayerIds.Add(entityId);
-            else if (entity is NpcInstance) player.KnownNpcIds.Add(entityId);
-        }
-
-        // Entidades que SAÍRAM da visão (estão em 'knownEntities' mas não em 'entitiesInView')
-        var oldEntityIds = knownEntities.Except(entitiesInView.Keys).ToList();
-        foreach (var entityId in oldEntityIds)
-        {
-            string despawnMessage;
-            if (player.KnownPlayerIds.Remove(entityId))
-            {
-                despawnMessage = $"PLAYER_LEFT|{entityId}";
-            }
-            else if (player.KnownNpcIds.Remove(entityId))
-            {
-                // A mensagem DESTROY_NPC agora é enviada corretamente quando um NPC
-                // (vivo OU morto) sai da área de visibilidade.
-                despawnMessage = $"DESTROY_NPC|{entityId}";
-            }
-            else continue;
-
-            _server.NetworkManager.SendMessageToClient(despawnMessage, player.EndPoint);
         }
     }
 
     /// <summary>
-    /// Chamado quando um novo jogador se conecta. Envia o estado inicial das entidades visíveis.
+    /// Chamado quando um jogador envia sua primeira atualização de posição,
+    /// significando que ele está oficialmente "no mundo".
     /// </summary>
-    public void OnPlayerConnected(Player newPlayer)
+    public void OnPlayerEnteredWorld(Player newPlayer)
     {
-        var allVisibleEntities = new List<IWorldEntity>();
-        allVisibleEntities.AddRange(_server.ConnectedPlayers.Values);
-        allVisibleEntities.AddRange(_server.ActiveNpcs.Values);
-        allVisibleEntities.AddRange(_server.DeadNpcCor_pses.Values); // Inclui os corpos
+        Console.WriteLine($"[InterestManager] {newPlayer.Username} entrou no mundo em {newPlayer.Position}. Sincronizando visibilidade.");
 
-        var entitiesInView = allVisibleEntities
-            .Where(e => e.Id != newPlayer.Id && Vector3.DistanceSquared(newPlayer.Position, e.Position) < VISIBILITY_RANGE * VISIBILITY_RANGE)
-            .ToList();
+        var allLiveNpcs = _server.ActiveNpcs.Values.ToList();
+        var allDeadNpcs = _server.DeadNpcCor_pses.Values.ToList();
+        var allPlayers = _server.ConnectedPlayers.Values.ToList();
 
-        if (!entitiesInView.Any()) return;
+        // (CORREÇÃO) Passa a lista 'allPlayers' para a chamada do método.
+        UpdatePlayerVisibility(newPlayer, allLiveNpcs, allDeadNpcs, allPlayers);
 
-        var spawnMessages = new List<string>();
-        foreach (var entity in entitiesInView)
+        foreach (var existingPlayer in allPlayers)
         {
-            spawnMessages.Add(entity.GetSpawnMessage());
-            if (entity is Player) newPlayer.KnownPlayerIds.Add(entity.Id);
-            else if (entity is NpcInstance) newPlayer.KnownNpcIds.Add(entity.Id);
-        }
+            if (existingPlayer.Id == newPlayer.Id) continue;
 
-        if (spawnMessages.Any())
-            _server.NetworkManager.SendMessageToClient(string.Join("\n", spawnMessages), newPlayer.EndPoint);
+            if (Vector3.DistanceSquared(existingPlayer.Position, newPlayer.Position) < VISIBILITY_RANGE * VISIBILITY_RANGE)
+            {
+                if (!existingPlayer.KnownPlayerIds.Contains(newPlayer.Id))
+                {
+                    _server.NetworkManager.SendMessageToClient(newPlayer.GetSpawnMessage(), existingPlayer.EndPoint);
+                    existingPlayer.KnownPlayerIds.Add(newPlayer.Id);
+                }
+            }
+        }
     }
 
     #region Métodos Auxiliares
@@ -205,8 +224,9 @@ public class InterestManager
     {
         if (!npc.IsActive) return;
         npc.IsActive = false;
-        npc.Position = npc.SpawnPosition;
-        npc.Destination = npc.SpawnPosition;
+        // Não reseta a posição, pois isso pode causar saltos visuais se ele hibernar e acordar rapidamente.
+        // npc.Position = npc.SpawnPosition;
+        // npc.Destination = npc.SpawnPosition;
     }
 
     #endregion

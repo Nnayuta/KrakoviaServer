@@ -215,7 +215,7 @@ public class NpcInstance : ICombatEntity, IWorldEntity
             }
         }
 
-        server.NetworkManager.BroadcastMessageToAll($"ENTITY_HEALTH_UPDATE|{this.Id}|{this.CurrentHealth}|{this.MaxHealth}");
+        server.NetworkManager.BroadcastMessageToRelevantPlayers(this.Position, $"ENTITY_HEALTH_UPDATE|{this.Id}|{this.CurrentHealth}|{this.MaxHealth}");
     }
 
     public void ProcessDeath(ICombatEntity killer, UDPServer server)
@@ -240,7 +240,7 @@ public class NpcInstance : ICombatEntity, IWorldEntity
             this.CurrentHealth = this.MaxHealth;
         }
 
-        server.NetworkManager.BroadcastMessageToAll($"ENTITY_HEALTH_UPDATE|{this.Id}|{this.CurrentHealth}|{this.MaxHealth}");
+        server.NetworkManager.BroadcastMessageToRelevantPlayers(this.Position, $"ENTITY_HEALTH_UPDATE|{this.Id}|{this.CurrentHealth}|{this.MaxHealth}");
     }
 
     public void ChangeNpcState(NpcAiState newState, DateTime currentTime)

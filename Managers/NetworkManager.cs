@@ -1,11 +1,13 @@
 ﻿// Managers/NetworkManager.cs
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading; // Adicionado para CancellationToken
 using System.Threading.Tasks;
@@ -13,6 +15,7 @@ using Newtonsoft.Json;
 
 public class NetworkManager
 {
+    private static readonly byte[] SharedBuffer = new byte[2048];
     private readonly UDPServer _server;
     private readonly UdpClient _udpListener;
     // <<< MUDANÇA 1: Adicionamos um campo para a nossa interface de banco de dados de personagens.
@@ -287,6 +290,7 @@ public class NetworkManager
 
             CharacterData characterData = await _characterDb.LoadOrCreateAsync(playerInfo);
             var newPlayer = new Player(clientEndPoint, playerInfo, _server, characterData);
+            newPlayer.IsPendingInitialization = true;
 
             if (_server.ConnectedPlayers.TryAdd(clientKey, newPlayer))
             {
@@ -300,8 +304,6 @@ public class NetworkManager
                 // 2. A mensagem de spawn completa, para o jogador renderizar a si mesmo.
                 string spawnMessage = newPlayer.GetSpawnMessage();
                 SendMessageToClient(spawnMessage, clientEndPoint);
-
-                _server.InterestManager.OnPlayerConnected(newPlayer);
             }
         }
         else
@@ -354,16 +356,51 @@ public class NetworkManager
     {
         if (parts.Length < 7) return;
 
-        // Atualiza o estado do jogador no servidor
-        player.State.Position = $"{parts[1]},{parts[2]},{parts[3]}";
-        player.State.RotationY = parts[4];
-        player.State.VelocityX = parts[5];
-        player.State.VelocityY = parts[6];
+        // --- (NOVA LÓGICA DE INICIALIZAÇÃO) ---
+        // Se esta for a PRIMEIRA mensagem POS_ROT do jogador, ele está oficialmente "no mundo".
+        if (player.IsPendingInitialization)
+        {
+            Console.WriteLine($"[Sync] Recebida primeira POS_ROT de {player.Username}. Iniciando sincronização de interesse.");
+            player.IsPendingInitialization = false; // Desativa a flag
+
+            // Agora que sabemos a posição inicial do jogador, podemos chamar o InterestManager.
+            _server.InterestManager.OnPlayerEnteredWorld(player);
+        }
+
+        // A lógica de atualização de estado e broadcast continua a mesma.
+        player.Position = new Vector3(
+            float.Parse(parts[1], CultureInfo.InvariantCulture),
+            float.Parse(parts[2], CultureInfo.InvariantCulture),
+            float.Parse(parts[3], CultureInfo.InvariantCulture)
+        );
 
         string messageToBroadcast = $"{parts[0]}|{player.Id}|{string.Join("|", parts.Skip(1))}";
-        BroadcastMessage(messageToBroadcast, player.Id);
+        // BroadcastMessage(messageToBroadcast, player.Id);
+        BroadcastMessageToRelevantPlayers(player.Position, messageToBroadcast);
     }
 
+    /// <summary>
+    /// Envia uma mensagem para todos os jogadores que estão dentro de um raio de visibilidade de uma posição central.
+    /// Perfeito para eventos de combate, efeitos visuais, etc.
+    /// </summary>
+    /// <param name="centerPosition">O ponto onde a ação aconteceu.</param>
+    /// <param name="message">A mensagem a ser enviada.</param>
+    /// <param name="visibilityRange">O raio de envio. Usar o mesmo do InterestManager é uma boa ideia.</param>
+    public void BroadcastMessageToRelevantPlayers(Vector3 center, string message, float range = 50f)
+    {
+        var data = Encoding.ASCII.GetBytes(message);
+        float rangeSqr = range * range;
+
+        Span<Player> snapshot = CollectionsMarshal.AsSpan(_server.ConnectedPlayers.Values.ToList());
+        foreach (ref readonly var player in snapshot)
+        {
+            var dx = player.Position.X - center.X;
+            var dy = player.Position.Y - center.Y;
+            var dz = player.Position.Z - center.Z;
+            if ((dx * dx + dy * dy + dz * dz) < rangeSqr)
+                _udpListener.Send(data, data.Length, player.EndPoint);
+        }
+    }
 
     public void BroadcastMessageToAll(string message)
     {
@@ -403,9 +440,10 @@ public class NetworkManager
         }
     }
 
+    private static readonly ArrayPool<byte> BufferPool = ArrayPool<byte>.Shared;
     public void SendMessageToClient(string message, IPEndPoint endPoint)
     {
-        byte[] data = Encoding.ASCII.GetBytes(message);
-        _udpListener.Send(data, data.Length, endPoint);
+        int len = Encoding.ASCII.GetBytes(message, 0, message.Length, SharedBuffer, 0);
+        _udpListener.Send(SharedBuffer, len, endPoint);
     }
 }

@@ -86,8 +86,8 @@ public class WorldManager
             _server.QuestManager.OnEntitySlain(killerPlayer, npc);
         }
 
-        // 5. Notifica os clientes que o NPC morreu
-        _server.NetworkManager.BroadcastMessageToAll($"ENTITY_DIED|{npc.Id}|{npc.HasLoot}");
+        string message = $"ENTITY_DIED|{npc.Id}|{npc.HasLoot}";
+        _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, message);
 
         // 6. Agenda o RESPAWN (lógica antiga de OnNpcDied)
         lock (_spawnLock)
@@ -136,8 +136,8 @@ public class WorldManager
         {
             if (_server.DeadNpcCor_pses.TryRemove(npcId, out NpcInstance npc))
             {
-                Console.WriteLine($"[WorldManager] Corpo do NPC {npc.InstanceId} desapareceu (Tempo Atual: {_server.CurrentTimeUtc}, Hora de Despawn: {npc.CorpseDespawnTime}).");
-                _server.NetworkManager.BroadcastMessageToAll($"DESTROY_NPC|{npc.InstanceId}");
+                // Console.WriteLine($"[WorldManager] Corpo do NPC {npc.InstanceId} desapareceu (Tempo Atual: {_server.CurrentTimeUtc}, Hora de Despawn: {npc.CorpseDespawnTime}).");
+                _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, $"DESTROY_NPC|{npc.InstanceId}");
             }
         }
     }
@@ -211,7 +211,7 @@ public class WorldManager
                         // Remove o NPC do mundo de forma limpa
                         if (_server.ActiveNpcs.TryRemove(newNpc.InstanceId, out _))
                         {
-                            _server.NetworkManager.BroadcastMessageToAll($"DESTROY_NPC|{newNpc.InstanceId}");
+                            _server.NetworkManager.BroadcastMessageToRelevantPlayers(newNpc.Position, $"DESTROY_NPC|{newNpc.InstanceId}");
                         }
                     }
                 }, TimeSpan.FromSeconds(duration));
@@ -223,7 +223,8 @@ public class WorldManager
     {
         string hazardId = Guid.NewGuid().ToString("N");
 
-        _server.NetworkManager.BroadcastMessageToAll($"CREATE_HAZARD|{hazardId}|{sourceAbility.ID}|{position.X.ToString(CultureInfo.InvariantCulture)},{position.Y.ToString(CultureInfo.InvariantCulture)},{position.Z.ToString(CultureInfo.InvariantCulture)}|{radius.ToString(CultureInfo.InvariantCulture)}|{duration.ToString(CultureInfo.InvariantCulture)}");
+        string createMessage = $"CREATE_HAZARD|{hazardId}|{sourceAbility.ID}|{position.X.ToString(CultureInfo.InvariantCulture)},{position.Y.ToString(CultureInfo.InvariantCulture)},{position.Z.ToString(CultureInfo.InvariantCulture)}|{radius.ToString(CultureInfo.InvariantCulture)}|{duration.ToString(CultureInfo.InvariantCulture)}";
+        _server.NetworkManager.BroadcastMessageToRelevantPlayers(position, createMessage);
 
         DateTime endTime = _server.CurrentTimeUtc.AddSeconds(duration);
 
@@ -255,7 +256,7 @@ public class WorldManager
             }
             else
             {
-                _server.NetworkManager.BroadcastMessageToAll($"DESTROY_HAZARD|{hazardId}");
+                _server.NetworkManager.BroadcastMessageToRelevantPlayers(position, $"DESTROY_HAZARD|{hazardId}");
             }
         };
 
@@ -321,7 +322,7 @@ public class WorldManager
         newNpc.IsActive = true;
 
         string spawnMessage = newNpc.GetSpawnMessage();
-        _server.NetworkManager.BroadcastMessageToAll(spawnMessage);
+        _server.NetworkManager.BroadcastMessageToRelevantPlayers(newNpc.Position, spawnMessage);
 
         // (CORREÇÃO) Retorna o NPC recém-criado.
         return newNpc;
