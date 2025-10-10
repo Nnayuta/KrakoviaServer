@@ -13,6 +13,7 @@ public class NpcAiManager
 {
     private readonly UDPServer _server;
     private readonly Dictionary<NpcAiType, INpcBehavior> _behaviors;
+    private readonly ConcurrentDictionary<string, Vector3> _lastSentPositions = new ConcurrentDictionary<string, Vector3>();
 
     public NpcAiManager(UDPServer server)
     {
@@ -26,9 +27,10 @@ public class NpcAiManager
         // Agressivos
         { NpcAiType.Wandering_Aggressive, wanderingAggressive },
         { NpcAiType.Passive_Aggressive, passiveAggressive },
-        { NpcAiType.Patrolling_Aggressive, new PatrollingAggressiveBehavior(server) },
         { NpcAiType.Stationary_Guard, new StationaryGuardBehavior(server) },
         { NpcAiType.Patrolling_Guard, new PatrollingGuardBehavior(server) },
+
+        { NpcAiType.Patrolling_Aggressive, new PatrollingAggressiveBehavior(server) },
 
         // Passivos e de Ambiente
         { NpcAiType.Ambient_Fleeing, new AmbientFleeingBehavior(server) },
@@ -100,11 +102,21 @@ public class NpcAiManager
     // --- MÉTODOS UNIVERSAIS DE MOVIMENTO ---
     // Estes métodos não pertencem a um comportamento específico, então ficam no manager.
 
+    // Em NpcAiManager.cs (ou onde estiver o UpdateNpcPosition)
+
     private void UpdateNpcPosition(NpcInstance npc, float deltaTime)
     {
         float distanceToDestination = Vector3.Distance(npc.Position, npc.Destination);
-        if (distanceToDestination < 0.1f) return;
 
+        // Se o NPC já está no destino, não há nada a fazer.
+        if (distanceToDestination < 0.1f)
+        {
+            // Garante que uma última atualização seja enviada se ele parou.
+            SyncPositionIfMoved(npc);
+            return;
+        }
+
+        // --- Lógica de Movimento (existente) ---
         float actualMoveSpeed = 5.0f * (npc.MovementSpeed / 100.0f);
         float moveAmount = actualMoveSpeed * deltaTime;
 
@@ -116,7 +128,32 @@ public class NpcAiManager
         {
             Vector3 direction = Vector3.Normalize(npc.Destination - npc.Position);
             npc.Position += direction * moveAmount;
-            _server.GridManager.UpdateEntity(npc);
+        }
+
+        // Atualiza a posição do NPC na grade espacial
+        _server.GridManager.UpdateEntity(npc);
+
+        // --- (NOVA) Lógica de Sincronização Contínua ---
+        SyncPositionIfMoved(npc);
+    }
+
+    // (NOVO) Método auxiliar para enviar a posição apenas se ela mudou o suficiente.
+    private void SyncPositionIfMoved(NpcInstance npc)
+    {
+        const float SYNC_DISTANCE_THRESHOLD_SQR = 0.1f * 0.1f; // Só envia se moveu mais de 10cm
+
+        // Pega a última posição enviada, ou a posição atual se for a primeira vez
+        Vector3 lastSentPos = _lastSentPositions.GetOrAdd(npc.Id, npc.Position);
+
+        // Se a distância for maior que o nosso limite...
+        if (Vector3.DistanceSquared(npc.Position, lastSentPos) > SYNC_DISTANCE_THRESHOLD_SQR)
+        {
+            // ...envia a NOVA posição atual para os clientes.
+            string posStr = $"{npc.Position.X.ToString(CultureInfo.InvariantCulture)},{npc.Position.Y.ToString(CultureInfo.InvariantCulture)},{npc.Position.Z.ToString(CultureInfo.InvariantCulture)}";
+            _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, $"NPC_MOVE|{npc.Id}|{posStr}");
+
+            // ...e atualiza a "última posição enviada".
+            _lastSentPositions[npc.Id] = npc.Position;
         }
     }
 

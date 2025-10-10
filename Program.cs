@@ -11,22 +11,14 @@ class Program
         {
             try
             {
-                // Console.ReadLineAsync é a chave! Ele espera por input de forma assíncrona.
                 string? commandLine = await Console.In.ReadLineAsync(token);
                 if (!string.IsNullOrEmpty(commandLine))
                 {
                     server.CommandManager.ProcessCommand(commandLine);
                 }
             }
-            catch (OperationCanceledException)
-            {
-                // Esperado no desligamento
-                break;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[Console-ERRO] Erro ao ler comando: {ex.Message}");
-            }
+            catch (OperationCanceledException) { break; }
+            catch (Exception ex) { Console.WriteLine($"[Console-ERRO] Erro ao ler comando: {ex.Message}"); }
         }
         Console.WriteLine("[Console] Listener de comandos encerrado.");
     }
@@ -46,26 +38,7 @@ $@"
         Version: {ServerConfig.GAME_VERSION}
 ");
 
-        // 1. Cria o "interruptor de emergência"
-        var cts = new CancellationTokenSource();
-
-        // 2. Configura o handler para Ctrl+C
-        Console.CancelKeyPress += (sender, e) =>
-        {
-            e.Cancel = true;
-            Console.WriteLine("\n[SERVER] Shutdown signal received. Closing servers...");
-            cts.Cancel(); // Aciona o interruptor
-        };
-
-
-        // <<< MUDANÇA 1: Comente ou delete as linhas do banco de dados em memória. >>>
-        // Console.WriteLine("Usando banco de dados em memória...");
-        // IAccountDatabase accountDatabase = new InMemoryAccountDatabase();
-        // ICharacterDatabase characterDatabase = new InMemoryCharacterDatabase();
-
-
-        // --- Opção 2: Usar o banco de dados MariaDB (para produção) ---
-        // Descomente esta seção quando estiver pronto.
+        // Cria os servidores primeiro para que possamos referenciá-los no handler de shutdown.
         Console.WriteLine("Conectando ao banco de dados MariaDB...");
         string connectionString = "Server=127.0.0.1;Database=krakovia;User=root;Password=;";
         IAccountDatabase accountDatabase = new MariaDBAccountDatabase(connectionString);
@@ -74,19 +47,54 @@ $@"
         var tcpServer = new TCPServer(ServerConfig.AUTH_SERVER_PORT, accountDatabase, characterDatabase);
         var udpServer = new UDPServer(ServerConfig.WORLD_SERVER_PORT, characterDatabase);
 
+        // --- (LÓGICA DE SHUTDOWN ATUALIZADA) ---
+        var cts = new CancellationTokenSource();
+
+        Console.CancelKeyPress += (sender, e) =>
+        {
+            e.Cancel = true; // Impede que o console feche o programa abruptamente.
+
+            // Verifica se o shutdown já foi iniciado para evitar chamadas duplas.
+            if (!cts.IsCancellationRequested)
+            {
+                Console.WriteLine("\n[SERVER] Shutdown signal received. Closing servers...");
+
+                // 1. Dispara o cancelamento para todos os loops de Task.Delay.
+                cts.Cancel();
+
+                // 2. Chama os métodos de parada explícita para desbloquear os sockets.
+                // (Presumindo que você também adicionará um método Stop() ao TCPServer)
+                tcpServer.Stop();
+                udpServer.Stop();
+            }
+        };
+        // --- FIM DA LÓGICA DE SHUTDOWN ---
+
         try
         {
             Console.WriteLine("[SERVER] Starting TCP and UDP listeners...");
-            // 3. Passa o token de cancelamento para os servidores
+
+            // Inicia todas as tarefas de longa duração.
             Task tcpTask = tcpServer.StartAsync(cts.Token);
             Task udpTask = udpServer.StartAsync(cts.Token);
-
             Task consoleTask = ConsoleCommandListener(udpServer, cts.Token);
 
-            await Task.WhenAll(tcpTask, udpTask);
+            // Aguarda a conclusão de todas as tarefas principais.
+            // Quando o cts.Cancel() for chamado, todas elas devem terminar graciosamente.
+            await Task.WhenAll(tcpTask, udpTask, consoleTask);
         }
-        catch (TaskCanceledException) { /* Exceção esperada no desligamento */ }
-        catch (Exception ex) { Console.WriteLine($"[SERVER-FATAL] Unhandled exception: {ex}"); }
-        finally { Console.WriteLine("[SERVER] All tasks cancelled. Server is shut down."); }
+        catch (OperationCanceledException)
+        {
+            // Esta exceção é normal e esperada quando o token é cancelado.
+            // Apenas garante que o programa não feche com um erro não tratado.
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[SERVER-FATAL] Unhandled exception in Main: {ex}");
+        }
+        finally
+        {
+            Console.WriteLine("[SERVER] All tasks completed. Server is shut down.");
+        }
     }
 }

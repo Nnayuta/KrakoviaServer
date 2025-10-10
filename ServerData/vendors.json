@@ -1,41 +1,19 @@
 {
     "Vendors": [
         {
-            "NpcTypeId": "NPC_BLACKSMITH_STORMHELM",
-            "VendorName": "Ferreiro Bjorn",
+            "NpcTypeId": "vendor_3c3bcbd7",
             "Items": [
                 {
-                    "ItemID": "WEP_SWORD_01",
-                    "BuyPrice": 50
+                    "ItemID": "bow_wood_01",
+                    "BuyPrice": 110
                 },
                 {
-                    "ItemID": "ARM_CHEST_PLATE_01",
-                    "BuyPrice": 120
-                }
-            ]
-        },
-        {
-            "NpcTypeId": "NPC_ALCHEMIST_ELFWOOD",
-            "VendorName": "Alquimista Elara",
-            "Items": [
-                {
-                    "ItemID": "CON_POT_HEALTH_01",
-                    "BuyPrice": 25
+                    "ItemID": "staff_wood_01",
+                    "BuyPrice": 110
                 },
                 {
-                    "ItemID": "CON_POT_MANA_01",
-                    "BuyPrice": 30
-                }
-            ]
-        },
-        {
-            "NpcTypeId": "NPC_ARENA_MASTER",
-            "VendorName": "Mestre da Arena",
-            "CurrencyType": "HonorPoints",
-            "Items": [
-                {
-                    "ItemID": "WEP_SWORD_ARENA_S1",
-                    "BuyPrice": 2000
+                    "ItemID": "sword_wood_01",
+                    "BuyPrice": 110
                 }
             ]
         }

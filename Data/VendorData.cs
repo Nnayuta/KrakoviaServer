@@ -12,7 +12,6 @@ public class VendorItemData
 public class VendorData
 {
     public string NpcTypeId { get; set; }
-    public string VendorName { get; set; }
     public string CurrencyType { get; set; } = "Gold"; // Moeda padrão
     public List<VendorItemData> Items { get; set; } = new List<VendorItemData>();
 }

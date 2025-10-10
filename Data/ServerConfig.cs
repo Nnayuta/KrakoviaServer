@@ -10,5 +10,6 @@
     public const int AUTH_SERVER_PORT = 7778;
 
     public const string SERVER_IP = "127.0.0.1";
+    public const float ANTI_LIMBO_Y_THRESHOLD = -100.0f;
 
 }

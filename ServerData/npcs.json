@@ -6,12 +6,24 @@
       "AiType": "Passive_Aggressive",
       "Stats": [
         {
-          "Stat": "Strength",
-          "Value": 8
-        },
-        {
           "Stat": "Stamina",
           "Value": 16
+        },
+        {
+          "Stat": "Strength",
+          "Value": 11
+        },
+        {
+          "Stat": "Agility",
+          "Value": 7
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 5
+        },
+        {
+          "Stat": "Armor",
+          "Value": 37
         }
       ],
       "Level": 3,
@@ -26,6 +38,7 @@
         "bear_attack_03",
         "bear_buff_01"
       ],
+      "CurrencyReward": 10,
       "ExperienceReward": 50,
       "LootTableID": "bear_common_drops"
     },
@@ -36,11 +49,23 @@
       "Stats": [
         {
           "Stat": "Stamina",
-          "Value": 10
+          "Value": 8
         },
         {
           "Stat": "Strength",
-          "Value": 1
+          "Value": 8
+        },
+        {
+          "Stat": "Agility",
+          "Value": 8
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 8
+        },
+        {
+          "Stat": "Armor",
+          "Value": 20
         }
       ],
       "Level": 1,
@@ -51,17 +76,34 @@
       "SwingTimer": 4.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
+      "CurrencyReward": 2,
       "ExperienceReward": 10,
       "LootTableID": ""
     },
     {
-      "TypeId": "7d47429f",
+      "TypeId": "dummy_npc_7d47429f",
       "Faction": "Neutral",
       "AiType": "Passive_Aggressive",
       "Stats": [
         {
           "Stat": "Stamina",
-          "Value": 1000
+          "Value": 8
+        },
+        {
+          "Stat": "Strength",
+          "Value": 8
+        },
+        {
+          "Stat": "Agility",
+          "Value": 8
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 8
+        },
+        {
+          "Stat": "Armor",
+          "Value": 20
         }
       ],
       "Level": 1,
@@ -72,6 +114,7 @@
       "SwingTimer": 4.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
+      "CurrencyReward": 2,
       "ExperienceReward": 0,
       "LootTableID": ""
     },
@@ -81,20 +124,24 @@
       "AiType": "Passive_Aggressive",
       "Stats": [
         {
-          "Stat": "Strength",
-          "Value": 50
-        },
-        {
           "Stat": "Stamina",
-          "Value": 30
+          "Value": 122
         },
         {
-          "Stat": "AttackPower",
-          "Value": 10
+          "Stat": "Strength",
+          "Value": 28
         },
         {
-          "Stat": "Health",
-          "Value": 5000
+          "Stat": "Agility",
+          "Value": 18
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 13
+        },
+        {
+          "Stat": "Armor",
+          "Value": 83
         }
       ],
       "Level": 10,
@@ -104,7 +151,10 @@
       "RespawnTimeSeconds": 120,
       "SwingTimer": 4.0,
       "AutoAttackAbilityID": "giant_cb536791",
-      "AbilityIDs": [],
+      "AbilityIDs": [
+        "giant_cb536791"
+      ],
+      "CurrencyReward": 930,
       "ExperienceReward": 500,
       "LootTableID": ""
     },
@@ -115,46 +165,23 @@
       "Stats": [
         {
           "Stat": "Stamina",
-          "Value": 500
+          "Value": 68
         },
         {
           "Stat": "Strength",
-          "Value": 250
+          "Value": 68
+        },
+        {
+          "Stat": "Agility",
+          "Value": 68
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 68
         },
         {
           "Stat": "Armor",
-          "Value": 100
-        }
-      ],
-      "Level": 60,
-      "IsBoss": false,
-      "AggroRange": 15.0,
-      "LeashRange": 30.0,
-      "RespawnTimeSeconds": 60,
-      "SwingTimer": 4.0,
-      "AutoAttackAbilityID": "sword_light_attack",
-      "AbilityIDs": [
-        "sword_heavy_attack"
-      ],
-      "ExperienceReward": 10,
-      "LootTableID": ""
-    },
-    {
-      "TypeId": "21119d26",
-      "Faction": "Friendly",
-      "AiType": "Passive_Aggressive",
-      "Stats": [
-        {
-          "Stat": "Stamina",
-          "Value": 100
-        },
-        {
-          "Stat": "Strength",
-          "Value": 100
-        },
-        {
-          "Stat": "Armor",
-          "Value": 100
+          "Value": 172
         }
       ],
       "Level": 20,
@@ -167,6 +194,7 @@
       "AbilityIDs": [
         "sword_heavy_attack"
       ],
+      "CurrencyReward": 132,
       "ExperienceReward": 10,
       "LootTableID": ""
     },
@@ -177,15 +205,23 @@
       "Stats": [
         {
           "Stat": "Stamina",
-          "Value": 100
+          "Value": 68
         },
         {
           "Stat": "Strength",
-          "Value": 100
+          "Value": 68
+        },
+        {
+          "Stat": "Agility",
+          "Value": 68
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 68
         },
         {
           "Stat": "Armor",
-          "Value": 100
+          "Value": 172
         }
       ],
       "Level": 20,
@@ -198,6 +234,45 @@
       "AbilityIDs": [
         "sword_heavy_attack"
       ],
+      "CurrencyReward": 144,
+      "ExperienceReward": 10,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "vendor_3c3bcbd7",
+      "Faction": "Friendly",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 22
+        },
+        {
+          "Stat": "Strength",
+          "Value": 22
+        },
+        {
+          "Stat": "Agility",
+          "Value": 22
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 22
+        },
+        {
+          "Stat": "Armor",
+          "Value": 55
+        }
+      ],
+      "Level": 10,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "CurrencyReward": 66,
       "ExperienceReward": 10,
       "LootTableID": ""
     },
@@ -207,26 +282,39 @@
       "AiType": "Passive_Aggressive",
       "Stats": [
         {
+          "Stat": "Stamina",
+          "Value": 6
+        },
+        {
           "Stat": "Strength",
           "Value": 10
         },
         {
-          "Stat": "Stamina",
-          "Value": 25
+          "Stat": "Agility",
+          "Value": 10
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 4
+        },
+        {
+          "Stat": "Armor",
+          "Value": 16
         }
       ],
       "Level": 1,
       "IsBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
-      "RespawnTimeSeconds": 60,
+      "RespawnTimeSeconds": 35,
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": "wolf_ability_20ce2139",
       "AbilityIDs": [
         "wolf_ability_029ab43c",
         "wolf_ability_73e22c18"
       ],
-      "ExperienceReward": 10,
+      "CurrencyReward": 2,
+      "ExperienceReward": 35,
       "LootTableID": ""
     }
   ]

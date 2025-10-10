@@ -43,6 +43,7 @@ public class WanderingAggressiveBehavior : BaseBehavior
 
     public override void OnDamaged(NpcInstance npc, ICombatEntity attacker)
     {
+        if (npc.Id == attacker.Id) return;
         if (npc.CurrentState != NpcAiState.Chasing && npc.CurrentState != NpcAiState.Attacking)
         {
             EngageTarget(npc, attacker);

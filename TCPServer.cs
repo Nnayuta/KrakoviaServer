@@ -55,6 +55,15 @@ public class TCPServer
         }
     }
 
+    // Em TCPServer.cs
+
+    public void Stop()
+    {
+        // Força o TcpListener a parar de aceitar novas conexões.
+        // Isso fará com que o AcceptTcpClientAsync lance uma exceção e saia do loop.
+        _listener.Stop();
+    }
+
 
     /// <summary>
     /// (NOVO) Uma tarefa "trabalhadora" que continuamente pega clientes da fila e os processa.

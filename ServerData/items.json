@@ -12,131 +12,235 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 0,
+    "sellPrice": 7,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
+        "Stat": "Stamina",
+        "Value": 1
+      },
+      {
         "Stat": "Agility",
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Cloth",
+    "equipmentSlot": "Feet",
+    "itemID": "cloth_boots_03",
+    "itemName": "Botas de Aprendiz",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 3,
+    "sellPrice": 10,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 18
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 1
+      },
+      {
+        "Stat": "Intellect",
         "Value": 2
       }
     ]
   },
   {
     "$type": "ServerArmorData, Assembly-CSharp",
-    "armorType": "Leather",
+    "armorType": "Cloth",
+    "equipmentSlot": "Chest",
+    "itemID": "cloth_chest_03",
+    "itemName": "Túnica de Aprendiz",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 3,
+    "sellPrice": 17,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 31
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 3
+      },
+      {
+        "Stat": "Intellect",
+        "Value": 3
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Cloth",
+    "equipmentSlot": "Head",
+    "itemID": "cloth_head_03",
+    "itemName": "Capuz de Aprendiz",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 3,
+    "sellPrice": 12,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 23
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 2
+      },
+      {
+        "Stat": "Intellect",
+        "Value": 2
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Cloth",
+    "equipmentSlot": "Legs",
+    "itemID": "cloth_legs_03",
+    "itemName": "Calças de Aprendiz",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 3,
+    "sellPrice": 17,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 31
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 3
+      },
+      {
+        "Stat": "Intellect",
+        "Value": 3
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Cloth",
     "equipmentSlot": "Feet",
     "itemID": "cloth_boots_01",
-    "itemName": "Botas de Linho",
+    "itemName": "Botas de Aprendiz Esfarrapada",
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 0,
+    "sellPrice": 7,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 4
+      },
       {
         "Stat": "Stamina",
         "Value": 1
       },
       {
-        "Stat": "Stamina",
+        "Stat": "Intellect",
         "Value": 1
       }
     ]
   },
   {
     "$type": "ServerArmorData, Assembly-CSharp",
-    "armorType": "Leather",
+    "armorType": "Cloth",
     "equipmentSlot": "Chest",
     "itemID": "cloth_chest_01",
-    "itemName": "Túnica de Linho",
+    "itemName": "Túnica de Aprendiz Esfarrapada",
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 0,
+    "sellPrice": 12,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
-        "Stat": "Intellect",
-        "Value": 1
+        "Stat": "Armor",
+        "Value": 8
       },
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 2
+      },
+      {
+        "Stat": "Intellect",
+        "Value": 2
       }
     ]
   },
   {
     "$type": "ServerArmorData, Assembly-CSharp",
-    "armorType": "Leather",
+    "armorType": "Cloth",
     "equipmentSlot": "Head",
     "itemID": "cloth_head_01",
-    "itemName": "Capuz de de Linho",
+    "itemName": "Capuz de Aprendiz Esfarrapada",
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 0,
+    "sellPrice": 7,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
-        "Stat": "Intellect",
-        "Value": 1
+        "Stat": "Armor",
+        "Value": 6
       },
       {
         "Stat": "Stamina",
+        "Value": 1
+      },
+      {
+        "Stat": "Intellect",
         "Value": 1
       }
     ]
   },
   {
     "$type": "ServerArmorData, Assembly-CSharp",
-    "armorType": "Leather",
+    "armorType": "Cloth",
     "equipmentSlot": "Legs",
     "itemID": "cloth_legs_01",
-    "itemName": "Calças de Linho",
+    "itemName": "Calças de Aprendiz Esfarrapada",
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 0,
+    "sellPrice": 12,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
-        "Stat": "Intellect",
-        "Value": 1
+        "Stat": "Armor",
+        "Value": 8
       },
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 2
+      },
+      {
+        "Stat": "Intellect",
+        "Value": 2
       }
     ]
-  },
-  {
-    "$type": "ServerJunkItemData, Assembly-CSharp",
-    "itemID": "common_bear_skin",
-    "itemName": "Pele de Urso",
-    "quality": "Common",
-    "maxStackSize": 100,
-    "requiredLevel": 1,
-    "sellPrice": 0,
-    "Durability": null,
-    "IsIndestructible": false,
-    "Stats": []
-  },
-  {
-    "$type": "ServerJunkItemData, Assembly-CSharp",
-    "itemID": "flower_blue_01",
-    "itemName": "Erva Azul",
-    "quality": "Common",
-    "maxStackSize": 100,
-    "requiredLevel": 1,
-    "sellPrice": 0,
-    "Durability": null,
-    "IsIndestructible": false,
-    "Stats": []
   },
   {
     "$type": "ServerWeaponData, Assembly-CSharp",
@@ -150,34 +254,30 @@
     "itemName": "Espada do GameMaster",
     "quality": "Legendary",
     "maxStackSize": 1,
-    "requiredLevel": 1,
-    "sellPrice": 0,
+    "requiredLevel": 20,
+    "sellPrice": 695,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
-        "Stat": "Strength",
-        "Value": 1000
-      },
-      {
-        "Stat": "Agility",
-        "Value": 1000
-      },
-      {
-        "Stat": "Intellect",
-        "Value": 1000
-      },
-      {
         "Stat": "Stamina",
-        "Value": 1000
+        "Value": 41
       },
       {
-        "Stat": "Armor",
-        "Value": 1000
+        "Stat": "Strength",
+        "Value": 51
       },
       {
-        "Stat": "Leech",
-        "Value": 1000
+        "Stat": "MasteryRating",
+        "Value": 0
+      },
+      {
+        "Stat": "HasteRating",
+        "Value": 0
+      },
+      {
+        "Stat": "CriticalStrikeRating",
+        "Value": 1
       }
     ]
   },
@@ -187,20 +287,24 @@
     "equipmentSlot": "Feet",
     "itemID": "guard_plate_boots_01",
     "itemName": "Botas de Guarda",
-    "quality": "Common",
+    "quality": "Uncommon",
     "maxStackSize": 1,
-    "requiredLevel": 1,
-    "sellPrice": 0,
+    "requiredLevel": 20,
+    "sellPrice": 155,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 1
+        "Value": 1218
       },
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 18
+      },
+      {
+        "Stat": "Strength",
+        "Value": 23
       }
     ]
   },
@@ -210,20 +314,24 @@
     "equipmentSlot": "Chest",
     "itemID": "guard_plate_chest_01",
     "itemName": "Armadura de Guarda",
-    "quality": "Common",
+    "quality": "Uncommon",
     "maxStackSize": 1,
-    "requiredLevel": 1,
-    "sellPrice": 0,
+    "requiredLevel": 20,
+    "sellPrice": 265,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 1
+        "Value": 2030
       },
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 31
+      },
+      {
+        "Stat": "Strength",
+        "Value": 39
       }
     ]
   },
@@ -232,21 +340,25 @@
     "armorType": "Plate",
     "equipmentSlot": "Cloak",
     "itemID": "guard_plate_cloak_01",
-    "itemName": "Capa do Guarda",
-    "quality": "Common",
+    "itemName": "Capa de Guarda",
+    "quality": "Uncommon",
     "maxStackSize": 1,
-    "requiredLevel": 1,
-    "sellPrice": 0,
+    "requiredLevel": 20,
+    "sellPrice": 130,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 1
+        "Value": 1015
       },
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 15
+      },
+      {
+        "Stat": "Strength",
+        "Value": 19
       }
     ]
   },
@@ -255,21 +367,25 @@
     "armorType": "Plate",
     "equipmentSlot": "Hands",
     "itemID": "guard_plate_hands_01",
-    "itemName": "Botas de Guarda",
-    "quality": "Common",
+    "itemName": "Luvas de Guarda",
+    "quality": "Uncommon",
     "maxStackSize": 1,
-    "requiredLevel": 1,
-    "sellPrice": 0,
+    "requiredLevel": 20,
+    "sellPrice": 155,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 1
+        "Value": 1218
       },
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 18
+      },
+      {
+        "Stat": "Strength",
+        "Value": 23
       }
     ]
   },
@@ -279,20 +395,24 @@
     "equipmentSlot": "Head",
     "itemID": "guard_plate_head_01",
     "itemName": "Capacete de Guarda",
-    "quality": "Common",
+    "quality": "Uncommon",
     "maxStackSize": 1,
-    "requiredLevel": 1,
-    "sellPrice": 0,
+    "requiredLevel": 20,
+    "sellPrice": 200,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 1
+        "Value": 1522
       },
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 23
+      },
+      {
+        "Stat": "Strength",
+        "Value": 29
       }
     ]
   },
@@ -301,23 +421,75 @@
     "armorType": "Plate",
     "equipmentSlot": "Legs",
     "itemID": "guard_plate_legs_01",
-    "itemName": "Perneiras do Guarda",
-    "quality": "Common",
+    "itemName": "Perneiras de Guarda",
+    "quality": "Uncommon",
     "maxStackSize": 1,
-    "requiredLevel": 1,
-    "sellPrice": 0,
+    "requiredLevel": 20,
+    "sellPrice": 265,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 2
+        "Value": 2030
       },
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 31
+      },
+      {
+        "Stat": "Strength",
+        "Value": 39
       }
     ]
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "common_hide",
+    "itemName": "Pele de Ruim",
+    "quality": "Common",
+    "maxStackSize": 100,
+    "requiredLevel": 1,
+    "sellPrice": 5,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "epic_skin",
+    "itemName": "Pele Top",
+    "quality": "Epic",
+    "maxStackSize": 100,
+    "requiredLevel": 1,
+    "sellPrice": 5,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "rare_skin",
+    "itemName": "Pele ta ficando boa confia",
+    "quality": "Rare",
+    "maxStackSize": 100,
+    "requiredLevel": 1,
+    "sellPrice": 5,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "uncommon_skin",
+    "itemName": "Pele Melhorzinha",
+    "quality": "Uncommon",
+    "maxStackSize": 100,
+    "requiredLevel": 1,
+    "sellPrice": 5,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
   },
   {
     "$type": "ServerArmorData, Assembly-CSharp",
@@ -328,16 +500,20 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 0,
+    "sellPrice": 7,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
-        "Stat": "Agility",
-        "Value": 1
+        "Stat": "Armor",
+        "Value": 9
       },
       {
         "Stat": "Stamina",
+        "Value": 1
+      },
+      {
+        "Stat": "Agility",
         "Value": 1
       }
     ]
@@ -351,17 +527,21 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 0,
+    "sellPrice": 12,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
-        "Stat": "Agility",
-        "Value": 1
+        "Stat": "Armor",
+        "Value": 16
       },
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 2
+      },
+      {
+        "Stat": "Agility",
+        "Value": 2
       }
     ]
   },
@@ -374,16 +554,20 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 0,
+    "sellPrice": 7,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
-        "Stat": "Agility",
-        "Value": 1
+        "Stat": "Armor",
+        "Value": 12
       },
       {
         "Stat": "Stamina",
+        "Value": 1
+      },
+      {
+        "Stat": "Agility",
         "Value": 1
       }
     ]
@@ -397,39 +581,59 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 0,
+    "sellPrice": 12,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
-        "Stat": "Agility",
-        "Value": 1
+        "Stat": "Armor",
+        "Value": 16
       },
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 2
+      },
+      {
+        "Stat": "Agility",
+        "Value": 2
       }
     ]
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "flower_blue_01",
+    "itemName": "Erva Azul",
+    "quality": "Common",
+    "maxStackSize": 100,
+    "requiredLevel": 1,
+    "sellPrice": 5,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
   },
   {
     "$type": "ServerArmorData, Assembly-CSharp",
     "armorType": "Plate",
     "equipmentSlot": "Feet",
     "itemID": "plate_boots_01",
-    "itemName": "Botas de Couro",
+    "itemName": "Botas de Ferro Gasto",
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 0,
+    "sellPrice": 7,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 1
+        "Value": 28
       },
       {
         "Stat": "Stamina",
+        "Value": 1
+      },
+      {
+        "Stat": "Strength",
         "Value": 1
       }
     ]
@@ -443,17 +647,21 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 0,
+    "sellPrice": 12,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 1
+        "Value": 48
       },
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 2
+      },
+      {
+        "Stat": "Strength",
+        "Value": 2
       }
     ]
   },
@@ -462,20 +670,24 @@
     "armorType": "Plate",
     "equipmentSlot": "Head",
     "itemID": "plate_head_01",
-    "itemName": "Capacete de Couro",
+    "itemName": "Capacete de Ferro Gasto",
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 0,
+    "sellPrice": 7,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 1
+        "Value": 36
       },
       {
         "Stat": "Stamina",
+        "Value": 1
+      },
+      {
+        "Stat": "Strength",
         "Value": 1
       }
     ]
@@ -485,20 +697,45 @@
     "armorType": "Plate",
     "equipmentSlot": "Legs",
     "itemID": "plate_legs_01",
-    "itemName": "Perneiras de Couro",
+    "itemName": "Perneiras de Ferro Gasto",
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 0,
+    "sellPrice": 12,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 2
+        "Value": 48
       },
       {
         "Stat": "Stamina",
+        "Value": 2
+      },
+      {
+        "Stat": "Strength",
+        "Value": 2
+      }
+    ]
+  },
+  {
+    "$type": "ServerItemData, Assembly-CSharp",
+    "itemID": "shield_iron_01",
+    "itemName": "Escudo de Ferro Gasto",
+    "quality": "Common",
+    "maxStackSize": 1,
+    "requiredLevel": 1,
+    "sellPrice": 7,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Stamina",
+        "Value": 1
+      },
+      {
+        "Stat": "Strength",
         "Value": 1
       }
     ]
@@ -516,13 +753,17 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 0,
+    "sellPrice": 7,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
+        "Stat": "Stamina",
+        "Value": 1
+      },
+      {
         "Stat": "Intellect",
-        "Value": 4
+        "Value": 1
       }
     ]
   },
@@ -532,20 +773,24 @@
     "WeaponSpeed": 0.0,
     "combatStyle": "Unarmed",
     "handType": "OneHanded",
-    "weaponType": "Sword2H",
+    "weaponType": "Sword1H",
     "equipmentSlot": "MainHand",
     "itemID": "sword_wood_01",
     "itemName": "Espada de Madeira",
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 0,
+    "sellPrice": 7,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
+        "Stat": "Stamina",
+        "Value": 1
+      },
+      {
         "Stat": "Strength",
-        "Value": 2
+        "Value": 1
       }
     ]
   }

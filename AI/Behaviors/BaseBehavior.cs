@@ -58,10 +58,9 @@ public abstract class BaseBehavior : INpcBehavior
 
     protected void SetNpcDestination(NpcInstance npc, Vector3 newDestination)
     {
+        // Apenas atualiza o estado interno do NPC. Nenhuma mensagem de rede é enviada aqui.
         if (Vector3.Distance(npc.Destination, newDestination) < 0.1f) return;
         npc.Destination = newDestination;
-        string posStr = $"{newDestination.X.ToString(CultureInfo.InvariantCulture)},{newDestination.Y.ToString(CultureInfo.InvariantCulture)},{newDestination.Z.ToString(CultureInfo.InvariantCulture)}";
-        _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, $"NPC_MOVE|{npc.InstanceId}|{posStr}");
     }
 
     protected Vector3 FindWanderPoint(NpcInstance npc)

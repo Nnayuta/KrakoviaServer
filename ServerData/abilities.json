@@ -368,7 +368,7 @@
       "CanMoveWhileCasting": false,
       "ProjectileSpeed": 0.0,
       "TargetType": "AreaOfEffectTarget",
-      "AoeRadius": 3.0,
+      "AoeRadius": 4.0,
       "ConeAngle": 0.0
     },
     {
@@ -385,8 +385,8 @@
           "Intent": "Harmful"
         }
       ],
-      "Cooldown": 4.0,
-      "Range": 4.0,
+      "Cooldown": 3.0,
+      "Range": 5.0,
       "ResourceCost": 0.0,
       "RequiresTarget": true,
       "WeaponRequirement": "MeleeWeapon",
@@ -413,8 +413,8 @@
           "Intent": "Harmful"
         }
       ],
-      "Cooldown": 2.0,
-      "Range": 4.0,
+      "Cooldown": 1.0,
+      "Range": 5.0,
       "ResourceCost": 0.0,
       "RequiresTarget": true,
       "WeaponRequirement": "MeleeWeapon",

@@ -30,28 +30,48 @@ public class NetworkManager
     /// Escuta por mensagens de jogadores de forma assíncrona até que o cancelamento seja solicitado.
     /// </summary>
     /// <param name="cancellationToken">O token para monitorar solicitações de cancelamento.</param>
+    // Em NetworkManager.cs
+
     public async Task ListenForPlayerMessagesAsync(CancellationToken cancellationToken)
     {
+        Console.WriteLine("[NetworkManager] Iniciando listener de mensagens UDP...");
         while (!cancellationToken.IsCancellationRequested)
         {
             try
             {
-                var result = await _udpListener.ReceiveAsync(cancellationToken);
-                // <<< MUDANÇA 3: Chamamos o handler de forma assíncrona, mas não esperamos por ele (fire-and-forget)
-                // para que o loop de escuta não seja bloqueado por um único processamento de mensagem.
+                // (MUDANÇA) Removemos o CancellationToken daqui.
+                // A tarefa agora só pode ser interrompida por um erro de socket.
+                var result = await _udpListener.ReceiveAsync();
+
                 _ = HandlePlayerMessageAsync(result.Buffer, result.RemoteEndPoint);
             }
-            catch (TaskCanceledException)
+            catch (ObjectDisposedException)
             {
-                Console.WriteLine("[NetworkManager] Listener loop cancelled for shutdown.");
+                // Esta exceção é esperada quando _udpListener.Close() é chamado.
+                // Significa que estamos desligando, então saímos do loop.
+                Console.WriteLine("[NetworkManager] Listener de UDP foi fechado para shutdown.");
                 break;
             }
-            catch (SocketException se) when (se.SocketErrorCode == SocketError.ConnectionReset) { /* Ignorar */ }
+            catch (SocketException ex) when (ex.SocketErrorCode == SocketError.Interrupted || ex.SocketErrorCode == SocketError.ConnectionReset)
+            {
+                // Essas são exceções normais que podem acontecer. Interrupted acontece no shutdown em Linux.
+                // ConnectionReset acontece se um cliente "some". Apenas continuamos.
+            }
             catch (Exception e)
             {
-                Console.WriteLine($"[NetworkManager] Erro inesperado ao receber mensagem: {e.Message}");
+                // Se o token foi cancelado, é um shutdown normal. Senão, é um erro real.
+                if (!cancellationToken.IsCancellationRequested)
+                {
+                    Console.WriteLine($"[NetworkManager] Erro inesperado ao receber mensagem: {e.Message}");
+                }
+                else
+                {
+                    // Se o token foi cancelado e chegamos aqui, apenas saímos.
+                    break;
+                }
             }
         }
+        Console.WriteLine("[NetworkManager] Listener de mensagens UDP finalizado.");
     }
 
     public void SendFullStateToPlayer(Player player)
@@ -184,6 +204,13 @@ public class NetworkManager
                     HandlePositionRotation(parts, player);
                     break;
 
+                case "REQUEST_OPEN_SHOP":
+                    if (parts.Length >= 2)
+                    {
+                        HandleOpenShopRequest(player, parts[1]);
+                    }
+                    break;
+
                 case "REQUEST_USE_ABILITY":
                     if (parts.Length >= 3)
                     {
@@ -309,6 +336,25 @@ public class NetworkManager
         }
     }
 
+    private void HandleOpenShopRequest(Player player, string npcId)
+    {
+        // Verifica se o NPC existe e se ele é um vendedor registrado
+        if (!_server.ActiveNpcs.TryGetValue(npcId, out var npcInstance) ||
+            !DataManager.Vendors.TryGetValue(npcInstance.BaseData.TypeId, out var vendorData))
+        {
+            // Envia uma mensagem de falha se o NPC não for um vendedor
+            SendMessageToClient("ERROR|Este NPC não é um vendedor.", player.EndPoint);
+            return;
+        }
+
+        // Serializa a lista de itens do vendedor para enviar ao cliente
+        string vendorPayloadJson = JsonConvert.SerializeObject(vendorData.Items);
+
+        // Envia a mensagem para o cliente abrir a janela da loja
+        SendMessageToClient($"OPEN_SHOP_WINDOW|{npcId}|{vendorPayloadJson}", player.EndPoint);
+        Console.WriteLine($"[Loja] Jogador {player.Username} abriu a loja do NPC {npcId}.");
+    }
+
     public async Task HandlePlayerQuitting(string clientKey, Player player)
     {
         Console.WriteLine($"Jogador {player.Username} informou que está desconectando.");
@@ -322,8 +368,9 @@ public class NetworkManager
         // 3. Continua com a lógica de remover o jogador do servidor.
         if (_server.ConnectedPlayers.TryRemove(clientKey, out _))
         {
+            _server.GridManager.RemoveEntity(player); // Remove da grade
             OnlineStatusManager.SetOffline(player.Id);
-            BroadcastMessage($"PLAYER_LEFT|{player.Id}", player.Id);
+            BroadcastMessageToRelevantPlayers(player.Position, $"PLAYER_LEFT|{player.Id}");
         }
     }
 
@@ -378,32 +425,26 @@ public class NetworkManager
 
     /// <summary>
     /// Envia uma mensagem para todos os jogadores que estão dentro de um raio de visibilidade de uma posição central.
-    /// Perfeito para eventos de combate, efeitos visuais, etc.
     /// </summary>
     /// <param name="centerPosition">O ponto onde a ação aconteceu.</param>
     /// <param name="message">A mensagem a ser enviada.</param>
-    /// <param name="visibilityRange">O raio de envio. Usar o mesmo do InterestManager é uma boa ideia.</param>
-    public void BroadcastMessageToRelevantPlayers(Vector3 centerPosition, string message, float visibilityRange = 80f)
+    /// <param name="excludePlayer"> (Opcional) O jogador que originou a ação e não deve receber a mensagem de volta.</param>
+    /// <param name="visibilityRange">O raio de envio.</param>
+    public void BroadcastMessageToRelevantPlayers(Vector3 centerPosition, string message, Player? excludePlayer = null, float visibilityRange = 80f)
     {
         byte[] data = Encoding.ASCII.GetBytes(message);
-        float visRangeSqr = visibilityRange * visibilityRange;
 
-        // A busca na grade retorna uma lista de candidatos
         var candidateEntities = _server.GridManager.GetEntitiesInRadius(centerPosition, visibilityRange);
 
-        // Filtra para apenas jogadores e envia a mensagem
-        // Usar um loop simples é muitas vezes mais rápido que LINQ para tarefas de alta frequência
         foreach (var entity in candidateEntities)
         {
-            if (entity is Player player)
+            // Garante que a entidade é um jogador e não é o jogador a ser excluído.
+            if (entity is Player player && (excludePlayer == null || player.Id != excludePlayer.Id))
             {
-                // A verificação de distância aqui é redundante se GetEntitiesInRadius já a faz.
-                // Vamos confiar no GridManager.
                 _udpListener.Send(data, data.Length, player.EndPoint);
             }
         }
     }
-
 
     public void BroadcastMessageToAll(string message)
     {

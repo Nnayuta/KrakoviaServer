@@ -40,6 +40,13 @@ public class CombatManager
 
         // Tenta adicionar todos os itens ao inventário do jogador
         bool allItemsAdded = true;
+        // Proteção contra referência nula em npc.Loot
+        if (npc.Loot == null || npc.Loot.Count == 0)
+        {
+            _server.NetworkManager.SendMessageToClient("ERROR|Nenhum loot disponível.", player.EndPoint);
+            return;
+        }
+
         foreach (var itemStack in npc.Loot)
         {
             if (!player.PlayerInventory.AddItem(itemStack.ItemID, itemStack.Quantity))
@@ -47,6 +54,10 @@ public class CombatManager
                 allItemsAdded = false;
                 _server.NetworkManager.SendMessageToClient("ERROR|Inventário cheio.", player.EndPoint);
                 break;
+            }
+            else
+            {
+                _server.NetworkManager.SendMessageToClient($"SHOW_FEEDBACK|Item+{itemStack.ItemID}", player.EndPoint);
             }
         }
 
@@ -99,6 +110,17 @@ public class CombatManager
         if (ability.RequiresTarget && target == null && !isAreaOfEffectOnGround)
         {
             if (source is Player p) _server.NetworkManager.SendMessageToClient($"ABILITY_FAILED|{abilityId}|Alvo Inválido", p.EndPoint);
+            return;
+        }
+
+        if (target != null && source.Id == target.Id &&
+    ability.Intent == AbilityIntent.Harmful &&
+    ability.TargetType != TargetType.Self &&
+    ability.TargetType != TargetType.AreaOfEffectSelf)
+        {
+            // Bloqueia silenciosamente no lado do servidor, pois isso indica um bug na IA
+            // ou uma tentativa de exploit, e não um erro do jogador.
+            Console.WriteLine($"[COMBAT-WARN] Entidade {source.Id} tentou se atacar com a habilidade '{abilityId}'. Ação bloqueada.");
             return;
         }
 
@@ -266,6 +288,8 @@ public class CombatManager
     // =================================================================================
     public void ApplySingleEffect(ICombatEntity caster, ICombatEntity target, ServerAbilityEffectData effectData, AbilityData sourceAbility)
     {
+        if (caster.Stats == null) return;
+
         if (effectData is ServerDamageEffectData damageEffect)
         {
             float rawDamage = damageEffect.BaseValue;
@@ -274,6 +298,12 @@ public class CombatManager
 
             bool isCritical = _random.NextDouble() * 100 < caster.Stats.GetStatValue(StatType.CriticalStrikeChance);
             if (isCritical) rawDamage *= 2.0f;
+
+            // --- LOG DE DEPURAÇÃO ---
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"[DAMAGE DEBUG] Caster: {caster.Id} ({caster.GetType().Name}) | Target: {target.Id} ({target.GetType().Name})");
+            Console.ResetColor();
+            // --- FIM DO LOG ---
 
             target.TakeDamage(rawDamage, caster, _server);
 
@@ -336,9 +366,9 @@ public class CombatManager
                                     .ToList();
 
         return allPossibleTargets.Where(target =>
-            target.Id != source.Id &&
+            target.Id != source.Id && // << GARANTA QUE ESTA LINHA EXISTA E ESTEJA CORRETA
             !target.IsDead &&
-            Vector3.DistanceSquared(target.Position, center) <= radiusSqr &&
+            Vector3.DistanceSquared(target.Position, center) <= radius * radius &&
             ((intent == AbilityIntent.Harmful && !AreEntitiesFriendly(source, target)) ||
              (intent == AbilityIntent.Helpful && AreEntitiesFriendly(source, target)))
         ).ToList();

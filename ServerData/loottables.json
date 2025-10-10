@@ -4,7 +4,7 @@
       "LootTableID": "bear_common_drops",
       "Entries": [
         {
-          "ItemID": "common_bear_skin",
+          "ItemID": "hide",
           "DropChance": 75.0,
           "MinQuantity": 1,
           "MaxQuantity": 2

@@ -18,8 +18,7 @@ public class PlayerLifecycleManager
     // Lista de cemitérios. No futuro, isso virá de um arquivo de dados.
     private readonly List<Vector3> _graveyardPositions = new List<Vector3>
     {
-        new Vector3(10, 1, 10), // Posição de exemplo
-        new Vector3(-50, 1, -50) // Outra posição de exemplo
+        new Vector3(124.7f, 7.46f, 425.8f), // Posição de exemplo
     };
 
     public PlayerLifecycleManager(UDPServer server)
@@ -36,8 +35,39 @@ public class PlayerLifecycleManager
             {
                 await Task.Delay(ACTION_TICK_RATE_MS, cancellationToken);
                 ProcessPlayerActions();
+                CheckForLimboPlayers();
             }
             catch (TaskCanceledException) { break; }
+        }
+    }
+
+    private void CheckForLimboPlayers()
+    {
+        // Pega uma cópia da lista de jogadores para iterar com segurança
+        var playersToCheck = _server.ConnectedPlayers.Values.ToList();
+
+        foreach (var player in playersToCheck)
+        {
+            // Verifica se a posição Y do jogador está abaixo do nosso limite
+            if (player.Position.Y < ServerConfig.ANTI_LIMBO_Y_THRESHOLD)
+            {
+                Console.WriteLine($"[Anti-Limbo] Jogador {player.Username} detectado no limbo (Pos Y: {player.Position.Y}). Resgatando...");
+
+                // Encontra o cemitério mais próximo da última posição "segura" conhecida do jogador
+                Vector3 safePosition = FindClosestGraveyard(player.Position);
+
+                // Atualiza a posição do jogador no servidor
+                player.Position = safePosition;
+
+                // Força o cliente a se teleportar para a nova posição segura
+                // Criamos uma mensagem customizada para isso, para que o cliente saiba que foi um teleporte forçado.
+                string posString = $"{safePosition.X.ToString(System.Globalization.CultureInfo.InvariantCulture)}," +
+                                   $"{safePosition.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)}," +
+                                   $"{safePosition.Z.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+
+                _server.NetworkManager.SendMessageToClient($"FORCE_TELEPORT|{posString}", player.EndPoint);
+                _server.GridManager.UpdateEntity(player);
+            }
         }
     }
 
@@ -73,7 +103,7 @@ public class PlayerLifecycleManager
         var ability = player.CurrentCastAbility;
         if (ability == null) // Checagem de segurança
         {
-            player.InterruptCasting();
+            player.InterruptCasting(false, _server.NetworkManager);
             return;
         }
 
@@ -82,7 +112,7 @@ public class PlayerLifecycleManager
         {
             // Console.WriteLine($"[Casting-Server] Casting de '{player.Username}' interrompido por movimento.");
             player.InterruptCasting(true, _server.NetworkManager);
-            _server.NetworkManager.SendMessageToClient("SHOW_FEEDBACK|Conjuração interrompida: Você se moveu.", player.EndPoint);
+            _server.NetworkManager.SendMessageToClient("SHOW_FEEDBACK|Conjuracao interrompida", player.EndPoint);
             return;
         }
 
@@ -91,9 +121,10 @@ public class PlayerLifecycleManager
 
         // Casting concluído!
         var targetId = player.CurrentCastTargetId;
+        if (targetId == null) return;
 
         // Limpa o estado de casting imediatamente (sem notificar, pois a execução vai acontecer)
-        player.InterruptCasting(false);
+        player.InterruptCasting(false, _server.NetworkManager);
 
         // --- VALIDAÇÕES FINAIS (NO MOMENTO DA CONCLUSÃO) ---
         // Se o recurso é insuficiente (pode ter sido gasto por outro efeito)
@@ -114,6 +145,7 @@ public class PlayerLifecycleManager
 
         // APLICA OS EFEITOS
         _server.CombatManager.ApplyAbilityEffects(player, ability, targetId);
+        _server.NetworkManager.BroadcastMessageToOthers(player, $"ENTITY_CAST_CANCEL|{player.Id}");
     }
 
     private void ProcessSinglePlayerRegeneration(Player player)
@@ -192,6 +224,8 @@ public class PlayerLifecycleManager
 
         // Usamos a NOVA posição de ressurreição como o centro do evento.
         _server.NetworkManager.BroadcastMessageToRelevantPlayers(respawnPosition, message);
+
+        _server.GridManager.UpdateEntity(player);
     }
 
 

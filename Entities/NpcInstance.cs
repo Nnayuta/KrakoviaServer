@@ -22,7 +22,10 @@ public class NpcInstance : ICombatEntity, IWorldEntity
             Rotation.Y.ToString("F2", CultureInfo.InvariantCulture),
             Rotation.Z.ToString("F2", CultureInfo.InvariantCulture));
 
-        return $"SPAWN_NPC|{InstanceId}|{BaseData.TypeId}|{positionStr}|{rotationStr}|{CurrentHealth.ToString(CultureInfo.InvariantCulture)}|{MaxHealth.ToString(CultureInfo.InvariantCulture)}";
+        string currentHpStr = CurrentHealth.ToString("F2", CultureInfo.InvariantCulture);
+        string maxHpStr = MaxHealth.ToString("F2", CultureInfo.InvariantCulture);
+
+        return $"SPAWN_NPC|{InstanceId}|{BaseData.TypeId}|{positionStr}|{rotationStr}|{currentHpStr}|{maxHpStr}";
     }
     #endregion
 
@@ -167,23 +170,32 @@ public class NpcInstance : ICombatEntity, IWorldEntity
 
     public void TakeDamage(float amount, ICombatEntity source, UDPServer server)
     {
+        if (source.Id == this.Id) return;
         if (IsDead) return;
-
         server.NpcAiManager.OnNpcDamaged(this, source);
 
+        float finalDamage = amount; // Começa com o dano bruto
+
+        // --- Passo 1: Redução por Armadura (lógica existente) ---
         float armorValue = this.Stats?.GetStatValue(StatType.Armor) ?? 0f;
-
-        // Calcula o valor 'K' com base no nível do atacante.
         float kConstant = CombatConstants.ARMOR_K_BASE + (CombatConstants.ARMOR_K_LEVEL_MULTIPLIER * source.Level);
-
-        // Calcula a redução de dano, garantindo que não seja divisão por zero se K for 0.
         float damageReduction = kConstant > 0 ? armorValue / (armorValue + kConstant) : 0f;
-
-        // Aplica o limite máximo de redução de dano (geralmente 75% em MMOs).
         damageReduction = Math.Min(damageReduction, CombatConstants.MAX_ARMOR_DAMAGE_REDUCTION);
+        finalDamage *= (1 - damageReduction);
 
-        // Calcula o dano final após a redução. O dano mínimo é sempre 1.
-        float finalDamage = Math.Max(1, amount * (1 - damageReduction));
+        // --- (NOVA LÓGICA) Passo 2: Modificador por Diferença de Nível ---
+        int levelDifference = source.Level - this.Level;
+
+        // Limita a diferença de nível para o cálculo, para evitar bônus/penalidades absurdos
+        levelDifference = Math.Clamp(levelDifference, -CombatConstants.MAX_LEVEL_DIFFERENCE_MOD, CombatConstants.MAX_LEVEL_DIFFERENCE_MOD);
+
+        // Calcula o modificador (ex: +2 níveis = 1.2x, -3 níveis = 0.7x)
+        float levelModifier = 1.0f + (levelDifference * CombatConstants.DAMAGE_MOD_PER_LEVEL);
+
+        finalDamage *= levelModifier;
+
+        // Garante que o dano final seja no mínimo 1
+        finalDamage = Math.Max(1, finalDamage);
 
         // =================================================================================
 
@@ -215,7 +227,25 @@ public class NpcInstance : ICombatEntity, IWorldEntity
             }
         }
 
-        server.NetworkManager.BroadcastMessageToRelevantPlayers(this.Position, $"ENTITY_HEALTH_UPDATE|{this.Id}|{this.CurrentHealth}|{this.MaxHealth}");
+        string currentHpStr = this.CurrentHealth.ToString("F2", CultureInfo.InvariantCulture);
+        string maxHpStr = this.MaxHealth.ToString("F2", CultureInfo.InvariantCulture);
+        server.NetworkManager.BroadcastMessageToRelevantPlayers(this.Position, $"ENTITY_HEALTH_UPDATE|{this.Id}|{currentHpStr}|{maxHpStr}");
+    }
+
+
+    public void ReceiveHealing(float amount, UDPServer server) // << Adicionado o parâmetro 'server'
+    {
+        if (IsDead) return;
+        this.CurrentHealth += amount;
+        if (this.CurrentHealth > this.MaxHealth)
+        {
+            this.CurrentHealth = this.MaxHealth;
+        }
+
+        string currentHpStr = this.CurrentHealth.ToString("F2", CultureInfo.InvariantCulture);
+        string maxHpStr = this.MaxHealth.ToString("F2", CultureInfo.InvariantCulture);
+
+        server.NetworkManager.BroadcastMessageToRelevantPlayers(this.Position, $"ENTITY_HEALTH_UPDATE|{this.Id}|{currentHpStr}|{maxHpStr}");
     }
 
     public void ProcessDeath(ICombatEntity killer, UDPServer server)
@@ -229,18 +259,6 @@ public class NpcInstance : ICombatEntity, IWorldEntity
         Console.WriteLine($"[MORTE] NPC {this.BaseData.TypeId} ({this.Id}) foi derrotado por {killer.Id}.");
 
         server.WorldManager.ProcessNpcDeath(this, killer);
-    }
-
-    public void ReceiveHealing(float amount, UDPServer server) // << Adicionado o parâmetro 'server'
-    {
-        if (IsDead) return;
-        this.CurrentHealth += amount;
-        if (this.CurrentHealth > this.MaxHealth)
-        {
-            this.CurrentHealth = this.MaxHealth;
-        }
-
-        server.NetworkManager.BroadcastMessageToRelevantPlayers(this.Position, $"ENTITY_HEALTH_UPDATE|{this.Id}|{this.CurrentHealth}|{this.MaxHealth}");
     }
 
     public void ChangeNpcState(NpcAiState newState, DateTime currentTime)

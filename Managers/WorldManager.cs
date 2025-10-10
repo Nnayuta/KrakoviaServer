@@ -62,9 +62,21 @@ public class WorldManager
         npc.SetCorpseDespawnTimer(120.0f, _server.CurrentTimeUtc);
 
         Player? creditPlayer = this.GetCreditPlayer(npc, killer);
-        if (creditPlayer != null && npc.BaseData.ExperienceReward > 0)
+        if (creditPlayer != null)
         {
-            _server.PlayerProgressionManager.GrantExperience(creditPlayer, npc.BaseData.ExperienceReward);
+            if (npc.BaseData.ExperienceReward > 0)
+            {
+                _server.PlayerProgressionManager.GrantExperience(creditPlayer, npc.BaseData.ExperienceReward);
+                _server.NetworkManager.SendMessageToClient($"SHOW_FEEDBACK|+{npc.BaseData.ExperienceReward} EXP", creditPlayer.EndPoint);
+            }
+
+            if (npc.BaseData.CurrencyReward > 0)
+            {
+                creditPlayer.TotalBronze += npc.BaseData.CurrencyReward;
+
+                _server.NetworkManager.SendCurrencyUpdate(creditPlayer);
+                _server.NetworkManager.SendMessageToClient($"SHOW_FEEDBACK|+{npc.BaseData.CurrencyReward} Moedas", creditPlayer.EndPoint);
+            }
         }
 
 
@@ -274,12 +286,62 @@ public class WorldManager
     }
 
     /// <summary>
+    /// (NOVO) Remove todos os NPCs ativos associados a um SpawnPoint específico.
+    /// Chamado pelo InterestManager quando uma área fica vazia por muito tempo.
+    /// </summary>
+    public void DespawnNpcsForSpawnPoint(SpawnPoint spawnPoint)
+    {
+        // Usa ToList() para criar uma cópia, pois vamos modificar a coleção original
+        var idsToDespawn = spawnPoint.ActiveNpcInstanceIds.ToList();
+
+        foreach (var npcId in idsToDespawn)
+        {
+            if (_server.ActiveNpcs.TryRemove(npcId, out var npc))
+            {
+                // Notifica os jogadores próximos (se houver) que este NPC foi destruído
+                _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, $"DESTROY_NPC|{npc.InstanceId}");
+            }
+        }
+
+        // Limpa a lista de controle do spawn point
+        spawnPoint.ActiveNpcInstanceIds.Clear();
+        // Reseta o timer de respawn para que ele não tente respawnar sozinho
+        spawnPoint.RespawnEndTime = DateTime.MinValue;
+
+        // Console.WriteLine($"[WorldManager] Área de spawn para '{spawnPoint.NpcTypeId}' em {spawnPoint.Position} foi desativada e limpa.");
+    }
+
+    /// <summary>
+    /// (NOVO) Preenche um SpawnPoint com seus NPCs.
+    /// Chamado pelo InterestManager quando um jogador entra em uma área inativa.
+    /// </summary>
+    public void RespawnNpcsForSpawnPoint(SpawnPoint spawnPoint)
+    {
+        // Se já existem NPCs, não faz nada.
+        if (spawnPoint.ActiveNpcInstanceIds.Any())
+        {
+            return;
+        }
+
+        if (DataManager.Npcs.TryGetValue(spawnPoint.NpcTypeId, out NpcData? npcData))
+        {
+            Console.WriteLine($"[WorldManager] Ativando área de spawn e ressurgindo NPCs para '{spawnPoint.NpcTypeId}'...");
+            for (int i = 0; i < spawnPoint.Quantity; i++)
+            {
+                Vector3 spawnPosition = CalculateSpawnPosition(spawnPoint);
+                SpawnSingleNpc(npcData, spawnPosition, spawnPoint);
+            }
+        }
+    }
+
+
+
+    /// <summary>
     /// Spawna todos os NPCs pela primeira vez quando o servidor inicia.
     /// </summary>
     public void InitializeSpawns()
     {
         Console.WriteLine("[WorldManager] Inicializando pontos de spawn...");
-        // Esta inicialização acontece antes do loop de IA começar, então não precisa de lock.
         foreach (var spawnPoint in DataManager.SpawnPoints)
         {
             if (DataManager.Npcs.TryGetValue(spawnPoint.NpcTypeId, out NpcData? npcData))
@@ -288,6 +350,16 @@ public class WorldManager
                 {
                     Vector3 spawnPosition = CalculateSpawnPosition(spawnPoint);
                     SpawnSingleNpc(npcData, spawnPosition, spawnPoint);
+                }
+
+                // (CORREÇÃO) Se populamos este ponto, ele deve começar como ativo.
+                // Isso sincroniza o estado inicial com a realidade do mundo.
+                if (spawnPoint.ActiveNpcInstanceIds.Any())
+                {
+                    spawnPoint.IsActive = true;
+                    // Também é bom definir o tempo de observação para evitar um despawn imediato
+                    // se nenhum jogador spawnar perto dele.
+                    spawnPoint.LastObservedTime = _server.CurrentTimeUtc;
                 }
             }
             else

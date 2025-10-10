@@ -347,7 +347,7 @@ public class Player : ICombatEntity, IWorldEntity
         CastEndTime = currentTime.AddSeconds(ability.CastTime);
         CastInitialPosition = this.Position;
 
-        Console.WriteLine($"[Casting-Server] '{Username}' iniciou casting de '{ability.ID}' em {CastInitialPosition}. Termina em: {CastEndTime}");
+        // Console.WriteLine($"[Casting-Server] '{Username}' iniciou casting de '{ability.ID}' em {CastInitialPosition}. Termina em: {CastEndTime}");
     }
 
     /// <summary>
@@ -377,23 +377,26 @@ public class Player : ICombatEntity, IWorldEntity
 
     public void TakeDamage(float amount, ICombatEntity source, UDPServer server)
     {
+        if (source.Id == this.Id) return;
         if (IsDead) return;
-
         EnterCombat(server);
-        // Pega o valor da armadura do sistema de stats.
+
+        float finalDamage = amount; // Começa com o dano bruto
+
+        // --- Passo 1: Redução por Armadura (lógica existente) ---
         float armorValue = this.Stats.GetStatValue(StatType.Armor);
-
-        // Calcula o valor 'K' com base no nível do atacante (source).
         float kConstant = CombatConstants.ARMOR_K_BASE + (CombatConstants.ARMOR_K_LEVEL_MULTIPLIER * source.Level);
-
-        // Calcula a redução de dano.
         float damageReduction = kConstant > 0 ? armorValue / (armorValue + kConstant) : 0f;
-
-        // Aplica o limite máximo de redução de dano (cap).
         damageReduction = Math.Min(damageReduction, CombatConstants.MAX_ARMOR_DAMAGE_REDUCTION);
+        finalDamage *= (1 - damageReduction);
 
-        // Calcula o dano final.
-        float finalDamage = Math.Max(1, amount * (1 - damageReduction));
+        // --- (NOVA LÓGICA) Passo 2: Modificador por Diferença de Nível ---
+        int levelDifference = source.Level - this.Level;
+        levelDifference = Math.Clamp(levelDifference, -CombatConstants.MAX_LEVEL_DIFFERENCE_MOD, CombatConstants.MAX_LEVEL_DIFFERENCE_MOD);
+        float levelModifier = 1.0f + (levelDifference * CombatConstants.DAMAGE_MOD_PER_LEVEL);
+        finalDamage *= levelModifier;
+
+        finalDamage = Math.Max(1, finalDamage);
 
         this.CurrentHealth -= finalDamage;
         if (this.CurrentHealth <= 0)
@@ -402,8 +405,10 @@ public class Player : ICombatEntity, IWorldEntity
             ProcessDeath(source, server);
         }
 
+        string currentHpStr = this.CurrentHealth.ToString("F2", CultureInfo.InvariantCulture);
+        string maxHpStr = this.MaxHealth.ToString("F2", CultureInfo.InvariantCulture);
         server.NetworkManager.SendVitalsUpdate(this);
-        server.NetworkManager.BroadcastMessageToRelevantPlayers(this.Position, $"ENTITY_HEALTH_UPDATE|{this.Id}|{this.CurrentHealth}|{this.MaxHealth}");
+        server.NetworkManager.BroadcastMessageToRelevantPlayers(this.Position, $"ENTITY_HEALTH_UPDATE|{this.Id}|{currentHpStr}|{maxHpStr}");
     }
 
     public void Respawn(Vector3 position)
@@ -425,9 +430,11 @@ public class Player : ICombatEntity, IWorldEntity
             this.CurrentHealth = this.MaxHealth;
         }
 
+        string currentHpStr = this.CurrentHealth.ToString("F2", CultureInfo.InvariantCulture);
+        string maxHpStr = this.MaxHealth.ToString("F2", CultureInfo.InvariantCulture);
 
         server?.NetworkManager.SendVitalsUpdate(this);
-        server?.NetworkManager.BroadcastMessageToRelevantPlayers(this.Position, $"ENTITY_HEALTH_UPDATE|{this.Id}|{this.CurrentHealth}|{this.MaxHealth}");
+        server?.NetworkManager.BroadcastMessageToRelevantPlayers(this.Position, $"ENTITY_HEALTH_UPDATE|{this.Id}|{currentHpStr}|{maxHpStr}");
     }
 
     public void ReceiveResource(float amount)

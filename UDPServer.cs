@@ -102,6 +102,14 @@ public class UDPServer
         );
     }
 
+    public void Stop()
+    {
+        Console.WriteLine("[SERVER] Parando serviços...");
+        // Fechar o listener UDP força qualquer chamada ReceiveAsync a sair com uma exceção,
+        // garantindo que o loop do NetworkManager termine.
+        _udpListener.Close();
+    }
+
     private async Task UpdateServerTimeAsync(CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)

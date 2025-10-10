@@ -38,6 +38,7 @@ public class NpcData
 
     // Propriedades de Recompensa
     public int ExperienceReward { get; set; }
+    public int CurrencyReward { get; set; } // <-- NOVA LINHA
     public string? LootTableID { get; set; }
 
     // Propriedade calculada, não precisa estar no JSON

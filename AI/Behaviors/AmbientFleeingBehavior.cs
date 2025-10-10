@@ -11,54 +11,58 @@ public class AmbientFleeingBehavior : BaseBehavior
 
     public override void Update(NpcInstance npc, float deltaTime)
     {
-        // --- LÓGICA DE FUGA (SEMPRE TEM PRIORIDADE) ---
-        // Se não estivermos já fugindo, verifica se devemos começar.
-        if (npc.CurrentState != NpcAiState.Fleeing)
+        // --- Hierarquia de Decisão ---
+
+        // PRIORIDADE MÁXIMA: Já estou fugindo?
+        if (npc.CurrentState == NpcAiState.Fleeing)
         {
-            Player? nearbyPlayer = FindClosestPlayer(npc, FLEE_TRIGGER_RANGE);
-            if (nearbyPlayer != null)
+            // Se estou fugindo, verifico se devo parar.
+            if ((_server.CurrentTimeUtc - npc.LastStateChangeTime).TotalSeconds > FLEE_DURATION_SECONDS ||
+                Vector3.Distance(npc.Position, npc.Destination) < 1.5f)
             {
-                StartFleeing(npc, nearbyPlayer);
-                return; // Já tomou a decisão de fugir, não faz mais nada neste tick.
+                ChangeNpcState(npc, NpcAiState.Idle);
+                SetNpcDestination(npc, npc.Position); // Garante que ele pare no lugar
+                npc.NextActionTime = _server.CurrentTimeUtc.AddSeconds(_threadRandom.Value.Next(5, 12)); // Acalma-se por um tempo
             }
+            return; // Lógica de fuga concluída, não faz mais nada.
         }
 
-        // --- LÓGICA DE VAGUEIO (WANDERING) ---
-        // Se o código chegou até aqui, significa que não há jogadores por perto.
-        // O NPC deve se comportar normalmente, andando pelo mapa.
+        // PRIORIDADE 2: Preciso começar a fugir?
+        // Isso só é verificado se não estivermos já fugindo.
+        Player? nearbyPlayer = FindClosestPlayer(npc, FLEE_TRIGGER_RANGE);
+        if (nearbyPlayer != null)
+        {
+            StartFleeing(npc, nearbyPlayer);
+            return; // Decisão de fugir tomada, não faz mais nada.
+        }
+
+        // PRIORIDADE 3 (Padrão): Comportamento normal de vagueio (Wandering)
+        // Este código só é alcançado se o NPC não estiver fugindo e não houver jogadores por perto.
         switch (npc.CurrentState)
         {
             case NpcAiState.Idle:
-                // Se estiver ocioso, decide se deve começar a andar.
+                // Se estiver ocioso e o tempo de pausa acabou, começa a andar.
                 if (_server.CurrentTimeUtc < npc.NextActionTime) return;
+
                 SetNpcDestination(npc, FindWanderPoint(npc));
                 ChangeNpcState(npc, NpcAiState.Wandering);
+                // Define por quanto tempo ele vai andar antes de reavaliar
                 npc.NextActionTime = _server.CurrentTimeUtc.AddSeconds(_threadRandom.Value.Next(4, 9));
                 break;
 
             case NpcAiState.Wandering:
-                // Se estiver andando, decide se deve parar.
+                // Se o tempo de caminhada acabou ou chegou ao destino, para e fica ocioso.
                 if (_server.CurrentTimeUtc >= npc.NextActionTime || Vector3.Distance(npc.Position, npc.Destination) < 1.5f)
                 {
                     SetNpcDestination(npc, npc.Position); // Para de se mover
                     ChangeNpcState(npc, NpcAiState.Idle);
-                    npc.NextActionTime = _server.CurrentTimeUtc.AddSeconds(_threadRandom.Value.Next(5, 11)); // Pausa antes da próxima ação
-                }
-                break;
-
-            case NpcAiState.Fleeing:
-                // Se estiver fugindo, verifica se o tempo de fuga acabou.
-                if ((_server.CurrentTimeUtc - npc.LastStateChangeTime).TotalSeconds > FLEE_DURATION_SECONDS ||
-                    Vector3.Distance(npc.Position, npc.Destination) < 1.5f)
-                {
-                    ChangeNpcState(npc, NpcAiState.Idle);
-                    npc.NextActionTime = _server.CurrentTimeUtc.AddSeconds(_threadRandom.Value.Next(5, 12)); // Acalma-se por um tempo
+                    // Define o tempo de pausa antes da próxima caminhada
+                    npc.NextActionTime = _server.CurrentTimeUtc.AddSeconds(_threadRandom.Value.Next(5, 11));
                 }
                 break;
         }
     }
 
-    // Se for atacado, também foge.
     public override void OnDamaged(NpcInstance npc, ICombatEntity attacker)
     {
         StartFleeing(npc, attacker);
@@ -66,11 +70,17 @@ public class AmbientFleeingBehavior : BaseBehavior
 
     private void StartFleeing(NpcInstance npc, ICombatEntity threat)
     {
-        // Calcula a direção oposta à ameaça
         Vector3 fleeDirection = Vector3.Normalize(npc.Position - threat.Position);
+
+        // Garante que a direção não seja um vetor zero se o jogador estiver exatamente na mesma posição
+        if (fleeDirection == Vector3.Zero)
+        {
+            fleeDirection = new Vector3((float)_threadRandom.Value.NextDouble() * 2 - 1, 0, (float)_threadRandom.Value.NextDouble() * 2 - 1);
+            fleeDirection = Vector3.Normalize(fleeDirection);
+        }
+
         Vector3 fleeDestination = npc.Position + fleeDirection * FLEE_DISTANCE;
 
-        // Esta chamada envia a mensagem "NPC_MOVE" para o cliente.
         SetNpcDestination(npc, fleeDestination);
         ChangeNpcState(npc, NpcAiState.Fleeing);
     }
