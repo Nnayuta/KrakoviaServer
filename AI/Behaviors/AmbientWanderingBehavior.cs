@@ -7,7 +7,6 @@ public class AmbientWanderingBehavior : BaseBehavior
 
     public override void Update(NpcInstance npc, float deltaTime)
     {
-        // Lógica de vagueio idêntica à do monstro agressivo, mas sem nunca checar por alvos.
         switch (npc.CurrentState)
         {
             case NpcAiState.Idle:
@@ -20,7 +19,9 @@ public class AmbientWanderingBehavior : BaseBehavior
             case NpcAiState.Wandering:
                 if (_server.CurrentTimeUtc >= npc.NextActionTime || Vector3.Distance(npc.Position, npc.Destination) < 1.5f)
                 {
-                    SetNpcDestination(npc, npc.Position);
+                    // A mesma correção aqui
+                    npc.Destination = npc.Position;
+
                     ChangeNpcState(npc, NpcAiState.Idle);
                     npc.NextActionTime = _server.CurrentTimeUtc.AddSeconds(_threadRandom.Value.Next(5, 11));
                 }

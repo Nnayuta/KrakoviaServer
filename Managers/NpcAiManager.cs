@@ -82,12 +82,22 @@ public class NpcAiManager
                 {
                     if (npc.IsDead) return;
 
-                    // Delega TODA a lógica de decisão para o objeto de comportamento do NPC.
+                    // A IA decide o que fazer (atacar, ficar parado, etc.)
                     npc.Behavior?.Update(npc, DELTA_TIME);
 
-                    // Lógica universal de movimento e verificação de "preso" permanece aqui.
-                    UpdateNpcPosition(npc, DELTA_TIME);
-                    CheckIfNpcIsStuck(npc);
+                    // --- A CORREÇÃO CRÍTICA ---
+                    // Identifique os tipos de NPC que NUNCA devem se mover da sua célula original.
+                    bool isStationary = npc.AiType == NpcAiType.Stationary_Guard ||
+                                        npc.AiType == NpcAiType.Training_Dummy;
+
+                    // Só executamos a lógica de movimento e atualização de grade para NPCs móveis.
+                    if (!isStationary)
+                    {
+                        UpdateNpcPosition(npc, DELTA_TIME);
+                        CheckIfNpcIsStuck(npc);
+                    }
+                    // Para os estacionários, NÃO FAZEMOS NADA aqui.
+                    // Eles foram colocados na grade no momento do spawn e devem ficar lá para sempre.
                 });
             }
 
@@ -99,11 +109,6 @@ public class NpcAiManager
         }
     }
 
-    // --- MÉTODOS UNIVERSAIS DE MOVIMENTO ---
-    // Estes métodos não pertencem a um comportamento específico, então ficam no manager.
-
-    // Em NpcAiManager.cs (ou onde estiver o UpdateNpcPosition)
-
     private void UpdateNpcPosition(NpcInstance npc, float deltaTime)
     {
         float distanceToDestination = Vector3.Distance(npc.Position, npc.Destination);
@@ -111,12 +116,11 @@ public class NpcAiManager
         // Se o NPC já está no destino, não há nada a fazer.
         if (distanceToDestination < 0.1f)
         {
-            // Garante que uma última atualização seja enviada se ele parou.
-            SyncPositionIfMoved(npc);
             return;
         }
 
-        // --- Lógica de Movimento (existente) ---
+        // --- LÓGICA DE MOVIMENTO (PRECISA FICAR AQUI!) ---
+        // O servidor precisa saber onde o NPC está em sua própria simulação.
         float actualMoveSpeed = 5.0f * (npc.MovementSpeed / 100.0f);
         float moveAmount = actualMoveSpeed * deltaTime;
 
@@ -130,31 +134,8 @@ public class NpcAiManager
             npc.Position += direction * moveAmount;
         }
 
-        // Atualiza a posição do NPC na grade espacial
+        // Atualiza a posição do NPC na grade espacial para detecção de interesse.
         _server.GridManager.UpdateEntity(npc);
-
-        // --- (NOVA) Lógica de Sincronização Contínua ---
-        SyncPositionIfMoved(npc);
-    }
-
-    // (NOVO) Método auxiliar para enviar a posição apenas se ela mudou o suficiente.
-    private void SyncPositionIfMoved(NpcInstance npc)
-    {
-        const float SYNC_DISTANCE_THRESHOLD_SQR = 0.1f * 0.1f; // Só envia se moveu mais de 10cm
-
-        // Pega a última posição enviada, ou a posição atual se for a primeira vez
-        Vector3 lastSentPos = _lastSentPositions.GetOrAdd(npc.Id, npc.Position);
-
-        // Se a distância for maior que o nosso limite...
-        if (Vector3.DistanceSquared(npc.Position, lastSentPos) > SYNC_DISTANCE_THRESHOLD_SQR)
-        {
-            // ...envia a NOVA posição atual para os clientes.
-            string posStr = $"{npc.Position.X.ToString(CultureInfo.InvariantCulture)},{npc.Position.Y.ToString(CultureInfo.InvariantCulture)},{npc.Position.Z.ToString(CultureInfo.InvariantCulture)}";
-            _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, $"NPC_MOVE|{npc.Id}|{posStr}");
-
-            // ...e atualiza a "última posição enviada".
-            _lastSentPositions[npc.Id] = npc.Position;
-        }
     }
 
     private void CheckIfNpcIsStuck(NpcInstance npc)

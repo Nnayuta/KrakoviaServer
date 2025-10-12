@@ -22,15 +22,4 @@ public class SpawnPoint
     [JsonIgnore]
     public DateTime RespawnEndTime { get; set; } = DateTime.MinValue;
 
-    /// <summary>
-    /// Indica se a área de spawn está ativa (jogadores por perto).
-    /// </summary>
-    [JsonIgnore]
-    public bool IsActive { get; set; } = false;
-
-    /// <summary>
-    /// Registra a última vez que um jogador foi detectado perto desta área.
-    /// </summary>
-    [JsonIgnore]
-    public DateTime LastObservedTime { get; set; } = DateTime.MinValue;
 }

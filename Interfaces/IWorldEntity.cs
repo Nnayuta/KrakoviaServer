@@ -12,6 +12,7 @@ public interface IWorldEntity
     /// A posição atual da entidade no mundo.
     /// </summary>
     Vector3 Position { get; }
+    bool IsStationary { get; }
 
     /// <summary>
     /// Gera a string de mensagem de spawn para esta entidade.

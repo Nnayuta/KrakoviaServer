@@ -71,9 +71,14 @@ public class WanderingAggressiveBehavior : BaseBehavior
     // (CORREÇÃO) Marcado como OVERRIDE
     protected override void HandleWanderingState(NpcInstance npc)
     {
+        // Se o tempo de caminhada acabou OU se já chegamos perto o suficiente do destino...
         if (_server.CurrentTimeUtc >= npc.NextActionTime || Vector3.Distance(npc.Position, npc.Destination) < 1.5f)
         {
-            SetNpcDestination(npc, npc.Position);
+            // --- A CORREÇÃO ---
+            // Em vez de definir um novo destino, apenas dizemos ao NPC que seu destino agora é onde ele está.
+            // Isso o faz parar sem enviar um novo comando de movimento.
+            npc.Destination = npc.Position;
+
             ChangeNpcState(npc, NpcAiState.Idle);
             npc.NextActionTime = _server.CurrentTimeUtc.AddSeconds(_threadRandom.Value.Next(4, 10));
         }

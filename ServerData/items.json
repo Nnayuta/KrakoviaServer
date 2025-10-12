@@ -12,17 +12,17 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 7,
+    "sellPrice": 14,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 2
       },
       {
         "Stat": "Agility",
-        "Value": 1
+        "Value": 2
       }
     ]
   },
@@ -35,17 +35,17 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 3,
-    "sellPrice": 10,
+    "sellPrice": 14,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 18
+        "Value": 39
       },
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 2
       },
       {
         "Stat": "Intellect",
@@ -62,17 +62,17 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 3,
-    "sellPrice": 17,
+    "sellPrice": 24,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 31
+        "Value": 65
       },
       {
         "Stat": "Stamina",
-        "Value": 3
+        "Value": 4
       },
       {
         "Stat": "Intellect",
@@ -89,21 +89,21 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 3,
-    "sellPrice": 12,
+    "sellPrice": 21,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 23
+        "Value": 52
       },
       {
         "Stat": "Stamina",
-        "Value": 2
+        "Value": 3
       },
       {
         "Stat": "Intellect",
-        "Value": 2
+        "Value": 3
       }
     ]
   },
@@ -116,17 +116,17 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 3,
-    "sellPrice": 17,
+    "sellPrice": 24,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 31
+        "Value": 62
       },
       {
         "Stat": "Stamina",
-        "Value": 3
+        "Value": 4
       },
       {
         "Stat": "Intellect",
@@ -143,17 +143,17 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 7,
+    "sellPrice": 10,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 4
+        "Value": 5
       },
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 2
       },
       {
         "Stat": "Intellect",
@@ -170,7 +170,7 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 12,
+    "sellPrice": 17,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
@@ -184,7 +184,7 @@
       },
       {
         "Stat": "Intellect",
-        "Value": 2
+        "Value": 3
       }
     ]
   },
@@ -197,7 +197,7 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 7,
+    "sellPrice": 14,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
@@ -207,11 +207,11 @@
       },
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 2
       },
       {
         "Stat": "Intellect",
-        "Value": 1
+        "Value": 2
       }
     ]
   },
@@ -224,7 +224,7 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 12,
+    "sellPrice": 17,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
@@ -238,7 +238,7 @@
       },
       {
         "Stat": "Intellect",
-        "Value": 2
+        "Value": 3
       }
     ]
   },
@@ -247,37 +247,37 @@
     "WeaponDamage": 0.0,
     "WeaponSpeed": 0.0,
     "combatStyle": "Unarmed",
-    "handType": "OneHanded",
-    "weaponType": "Sword1H",
+    "handType": "TwoHanded",
+    "weaponType": "Sword2H",
     "equipmentSlot": "MainHand",
     "itemID": "gm_sword_01",
     "itemName": "Espada do GameMaster",
     "quality": "Legendary",
     "maxStackSize": 1,
-    "requiredLevel": 20,
-    "sellPrice": 695,
+    "requiredLevel": 0,
+    "sellPrice": 1052410,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Stamina",
-        "Value": 41
-      },
-      {
-        "Stat": "Strength",
-        "Value": 51
-      },
-      {
-        "Stat": "MasteryRating",
-        "Value": 0
+        "Value": 37586
       },
       {
         "Stat": "HasteRating",
-        "Value": 0
+        "Value": 8457
       },
       {
         "Stat": "CriticalStrikeRating",
-        "Value": 1
+        "Value": 8457
+      },
+      {
+        "Stat": "Strength",
+        "Value": 20672
+      },
+      {
+        "Stat": "MovementSpeed",
+        "Value": 3383
       }
     ]
   },
@@ -289,22 +289,26 @@
     "itemName": "Botas de Guarda",
     "quality": "Uncommon",
     "maxStackSize": 1,
-    "requiredLevel": 20,
-    "sellPrice": 155,
+    "requiredLevel": 1,
+    "sellPrice": 130,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 1218
+        "Value": 1415
       },
       {
         "Stat": "Stamina",
-        "Value": 18
+        "Value": 10
+      },
+      {
+        "Stat": "HasteRating",
+        "Value": 5
       },
       {
         "Stat": "Strength",
-        "Value": 23
+        "Value": 6
       }
     ]
   },
@@ -316,22 +320,26 @@
     "itemName": "Armadura de Guarda",
     "quality": "Uncommon",
     "maxStackSize": 1,
-    "requiredLevel": 20,
-    "sellPrice": 265,
+    "requiredLevel": 1,
+    "sellPrice": 215,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 2030
+        "Value": 2358
       },
       {
         "Stat": "Stamina",
-        "Value": 31
+        "Value": 18
+      },
+      {
+        "Stat": "MasteryRating",
+        "Value": 8
       },
       {
         "Stat": "Strength",
-        "Value": 39
+        "Value": 9
       }
     ]
   },
@@ -343,22 +351,26 @@
     "itemName": "Capa de Guarda",
     "quality": "Uncommon",
     "maxStackSize": 1,
-    "requiredLevel": 20,
-    "sellPrice": 130,
+    "requiredLevel": 1,
+    "sellPrice": 98,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 1015
+        "Value": 1061
       },
       {
         "Stat": "Stamina",
-        "Value": 15
+        "Value": 8
+      },
+      {
+        "Stat": "HasteRating",
+        "Value": 4
       },
       {
         "Stat": "Strength",
-        "Value": 19
+        "Value": 4
       }
     ]
   },
@@ -370,22 +382,26 @@
     "itemName": "Luvas de Guarda",
     "quality": "Uncommon",
     "maxStackSize": 1,
-    "requiredLevel": 20,
-    "sellPrice": 155,
+    "requiredLevel": 1,
+    "sellPrice": 130,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 1218
+        "Value": 1415
       },
       {
         "Stat": "Stamina",
-        "Value": 18
+        "Value": 10
+      },
+      {
+        "Stat": "MasteryRating",
+        "Value": 5
       },
       {
         "Stat": "Strength",
-        "Value": 23
+        "Value": 6
       }
     ]
   },
@@ -397,22 +413,26 @@
     "itemName": "Capacete de Guarda",
     "quality": "Uncommon",
     "maxStackSize": 1,
-    "requiredLevel": 20,
-    "sellPrice": 200,
+    "requiredLevel": 1,
+    "sellPrice": 170,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 1522
+        "Value": 1887
       },
       {
         "Stat": "Stamina",
-        "Value": 23
+        "Value": 14
+      },
+      {
+        "Stat": "MasteryRating",
+        "Value": 6
       },
       {
         "Stat": "Strength",
-        "Value": 29
+        "Value": 8
       }
     ]
   },
@@ -424,22 +444,26 @@
     "itemName": "Perneiras de Guarda",
     "quality": "Uncommon",
     "maxStackSize": 1,
-    "requiredLevel": 20,
-    "sellPrice": 265,
+    "requiredLevel": 1,
+    "sellPrice": 200,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 2030
+        "Value": 2240
       },
       {
         "Stat": "Stamina",
-        "Value": 31
+        "Value": 16
+      },
+      {
+        "Stat": "MasteryRating",
+        "Value": 8
       },
       {
         "Stat": "Strength",
-        "Value": 39
+        "Value": 9
       }
     ]
   },
@@ -500,17 +524,17 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 7,
+    "sellPrice": 10,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 9
+        "Value": 10
       },
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 2
       },
       {
         "Stat": "Agility",
@@ -527,7 +551,7 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 12,
+    "sellPrice": 17,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
@@ -541,7 +565,7 @@
       },
       {
         "Stat": "Agility",
-        "Value": 2
+        "Value": 3
       }
     ]
   },
@@ -554,21 +578,21 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 7,
+    "sellPrice": 14,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 12
+        "Value": 13
       },
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 2
       },
       {
         "Stat": "Agility",
-        "Value": 1
+        "Value": 2
       }
     ]
   },
@@ -581,13 +605,13 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 12,
+    "sellPrice": 17,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 16
+        "Value": 15
       },
       {
         "Stat": "Stamina",
@@ -595,7 +619,7 @@
       },
       {
         "Stat": "Agility",
-        "Value": 2
+        "Value": 3
       }
     ]
   },
@@ -620,17 +644,17 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 7,
+    "sellPrice": 10,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 28
+        "Value": 29
       },
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 2
       },
       {
         "Stat": "Strength",
@@ -647,7 +671,7 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 12,
+    "sellPrice": 17,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
@@ -661,7 +685,7 @@
       },
       {
         "Stat": "Strength",
-        "Value": 2
+        "Value": 3
       }
     ]
   },
@@ -674,21 +698,21 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 7,
+    "sellPrice": 14,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 36
+        "Value": 38
       },
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 2
       },
       {
         "Stat": "Strength",
-        "Value": 1
+        "Value": 2
       }
     ]
   },
@@ -701,13 +725,13 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 12,
+    "sellPrice": 17,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 48
+        "Value": 46
       },
       {
         "Stat": "Stamina",
@@ -715,7 +739,7 @@
       },
       {
         "Stat": "Strength",
-        "Value": 2
+        "Value": 3
       }
     ]
   },
@@ -726,17 +750,17 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 7,
+    "sellPrice": 14,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 2
       },
       {
         "Stat": "Strength",
-        "Value": 1
+        "Value": 2
       }
     ]
   },
@@ -753,17 +777,17 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 7,
+    "sellPrice": 14,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 2
       },
       {
         "Stat": "Intellect",
-        "Value": 1
+        "Value": 2
       }
     ]
   },
@@ -780,17 +804,17 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 7,
+    "sellPrice": 14,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Stamina",
-        "Value": 1
+        "Value": 2
       },
       {
         "Stat": "Strength",
-        "Value": 1
+        "Value": 2
       }
     ]
   }

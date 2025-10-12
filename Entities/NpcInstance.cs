@@ -30,6 +30,7 @@ public class NpcInstance : ICombatEntity, IWorldEntity
     #endregion
 
     #region State & AI Properties
+    public bool IsStationary => AiType == NpcAiType.Stationary_Guard || AiType == NpcAiType.Training_Dummy;
     public string InstanceId { get; }
     public NpcData BaseData { get; private set; }
     public Vector3 Position { get; set; }
@@ -67,7 +68,8 @@ public class NpcInstance : ICombatEntity, IWorldEntity
     #region ICombatEntity Implementation
     public string Id => this.InstanceId;
     public int Level => this.BaseData.Level;
-    public bool IsDead => this.CurrentState == NpcAiState.Dead;
+    public bool IsDead { get; set; } = false;
+    public DateTime RespawnTime { get; set; } = DateTime.MaxValue;
     public CharacterStats? Stats { get; private set; }
     public float MaxHealth => Stats.GetStatValue(StatType.Health);
     public float MaxResource => Stats.GetStatValue(StatType.Mana);
@@ -251,9 +253,12 @@ public class NpcInstance : ICombatEntity, IWorldEntity
     public void ProcessDeath(ICombatEntity killer, UDPServer server)
     {
         // Prevenção contra chamadas duplas: só executa se não estiver morto.
-        if (IsDead) return;
+        if (this.IsDead) return;
 
-        // A IA é quem gerencia o estado de morte (IsDead é derivado de CurrentState).
+        // Agora, nós definimos diretamente.
+        this.IsDead = true;
+
+        // Mantemos a mudança de estado da IA para fins de animação e comportamento
         this.ChangeNpcState(NpcAiState.Dead, server.CurrentTimeUtc);
 
         Console.WriteLine($"[MORTE] NPC {this.BaseData.TypeId} ({this.Id}) foi derrotado por {killer.Id}.");

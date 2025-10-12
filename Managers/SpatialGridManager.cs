@@ -1,18 +1,16 @@
-// Managers/SpatialGridManager.cs
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
 public class SpatialGridManager
 {
-    private readonly ConcurrentDictionary<Vector2Int, HashSet<IWorldEntity>> _grid = new();
-    private readonly ConcurrentDictionary<string, Vector2Int> _entityPositions = new();
+    private readonly Dictionary<Vector2Int, HashSet<IWorldEntity>> _grid = new();
+    private readonly Dictionary<string, Vector2Int> _entityPositions = new();
     private readonly int _cellSize;
     private readonly object _gridLock = new object();
 
-    public SpatialGridManager(int cellSize = 50) // Células de 50x50 metros
+    public SpatialGridManager(int cellSize = 50)
     {
         _cellSize = cellSize;
     }
@@ -24,63 +22,64 @@ public class SpatialGridManager
         return new Vector2Int(x, z);
     }
 
-    /// <summary>
-    /// Adiciona ou atualiza a posição de uma entidade na grade.
-    /// </summary>
     public void UpdateEntity(IWorldEntity entity)
     {
+        if (entity == null) return;
         Vector2Int newCellPos = GetCellCoordinates(entity.Position);
 
         lock (_gridLock)
         {
-            // Se a entidade já existe na grade, verifica se ela mudou de célula
             if (_entityPositions.TryGetValue(entity.Id, out Vector2Int oldCellPos))
             {
-                if (oldCellPos == newCellPos) return; // Continua na mesma célula, não faz nada
+                if (oldCellPos == newCellPos) return; // Se não mudou de célula, não faz nada.
 
-                // Remove da célula antiga
+                // Se mudou de célula, remove da célula antiga
                 if (_grid.TryGetValue(oldCellPos, out var oldCell))
                 {
+                    // Console.WriteLine($"[GRID-UPDATE-REMOVE] Removendo {entity.Id} | da célula antiga {oldCellPos} para mover para {newCellPos}.");
                     oldCell.Remove(entity);
+                    if (oldCell.Count == 0) _grid.Remove(oldCellPos);
                 }
             }
 
             // Adiciona à nova célula
-            var newCell = _grid.GetOrAdd(newCellPos, _ => new HashSet<IWorldEntity>());
+            var newCell = _grid.TryGetValue(newCellPos, out var cell) ? cell : new HashSet<IWorldEntity>();
             newCell.Add(entity);
+            _grid[newCellPos] = newCell;
+
             _entityPositions[entity.Id] = newCellPos;
         }
     }
 
-    /// <summary>
-    /// Remove uma entidade da grade (ex: quando desconecta ou morre permanentemente).
-    /// </summary>
     public void RemoveEntity(IWorldEntity entity)
     {
+        if (entity == null) return;
+
+        // Console.WriteLine($"[GRID-REMOVE] Tentativa de remover a entidade {entity.Id} da grade.");
+        // var stackTrace = new System.Diagnostics.StackTrace();
+        // Console.WriteLine(stackTrace.ToString()); // Isso nos dirá QUEM chamou a função
+
         lock (_gridLock)
         {
-            if (_entityPositions.TryRemove(entity.Id, out Vector2Int cellPos))
+            if (_entityPositions.Remove(entity.Id, out Vector2Int cellPos))
             {
                 if (_grid.TryGetValue(cellPos, out var cell))
                 {
                     cell.Remove(entity);
+                    if (cell.Count == 0) _grid.Remove(cellPos);
                 }
             }
         }
     }
 
-    /// <summary>
-    /// Encontra todas as entidades em um raio ao redor de uma posição,
-    /// buscando apenas nas células relevantes.
-    /// </summary>
     public List<IWorldEntity> GetEntitiesInRadius(Vector3 center, float radius)
     {
-        var results = new List<IWorldEntity>();
+        var resultSet = new HashSet<IWorldEntity>(); // Usa HashSet para garantir unicidade
         Vector2Int centerCell = GetCellCoordinates(center);
-
-        // Calcula quantas células precisamos checar em cada direção
         int searchRadius = (int)Math.Ceiling(radius / _cellSize);
 
+        // Não precisa de lock aqui se a iteração sobre o dicionário for segura,
+        // mas vamos manter por segurança extra.
         lock (_gridLock)
         {
             for (int x = centerCell.X - searchRadius; x <= centerCell.X + searchRadius; x++)
@@ -89,17 +88,16 @@ public class SpatialGridManager
                 {
                     if (_grid.TryGetValue(new Vector2Int(x, z), out var cell))
                     {
-                        results.AddRange(cell);
+                        // Adiciona todos os itens da célula. Duplicatas são ignoradas pelo HashSet.
+                        resultSet.UnionWith(cell);
                     }
                 }
             }
         }
 
-        // Filtra os resultados pela distância exata (já que as células externas podem conter entidades fora do raio)
         float radiusSqr = radius * radius;
-        return results.Where(e => Vector3.DistanceSquared(e.Position, center) < radiusSqr).ToList();
+        return resultSet.Where(e => Vector3.DistanceSquared(e.Position, center) < radiusSqr).ToList();
     }
 
-    // Pequena struct auxiliar para as coordenadas da grade
     public readonly record struct Vector2Int(int X, int Y);
 }

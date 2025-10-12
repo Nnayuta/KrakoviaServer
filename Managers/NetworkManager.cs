@@ -400,18 +400,14 @@ public class NetworkManager
     {
         if (parts.Length < 7) return;
 
-        // --- (NOVA LÓGICA DE INICIALIZAÇÃO) ---
-        // Se esta for a PRIMEIRA mensagem POS_ROT do jogador, ele está oficialmente "no mundo".
         if (player.IsPendingInitialization)
         {
             Console.WriteLine($"[Sync] Recebida primeira POS_ROT de {player.Username}. Iniciando sincronização de interesse.");
-            player.IsPendingInitialization = false; // Desativa a flag
+            player.IsPendingInitialization = false; // Desativa a flag PERMANENTEMENTE para esta instância.
 
-            // Agora que sabemos a posição inicial do jogador, podemos chamar o InterestManager.
             _server.InterestManager.OnPlayerEnteredWorld(player);
         }
 
-        // A lógica de atualização de estado e broadcast continua a mesma.
         player.Position = new Vector3(
             float.Parse(parts[1], CultureInfo.InvariantCulture),
             float.Parse(parts[2], CultureInfo.InvariantCulture),
@@ -419,8 +415,9 @@ public class NetworkManager
         );
 
         _server.GridManager.UpdateEntity(player);
+
         string messageToBroadcast = $"{parts[0]}|{player.Id}|{string.Join("|", parts.Skip(1))}";
-        BroadcastMessageToRelevantPlayers(player.Position, messageToBroadcast);
+        BroadcastMessageToRelevantPlayers(player.Position, messageToBroadcast, player);
     }
 
     /// <summary>
@@ -430,18 +427,34 @@ public class NetworkManager
     /// <param name="message">A mensagem a ser enviada.</param>
     /// <param name="excludePlayer"> (Opcional) O jogador que originou a ação e não deve receber a mensagem de volta.</param>
     /// <param name="visibilityRange">O raio de envio.</param>
+    // Managers/NetworkManager.cs
+
     public void BroadcastMessageToRelevantPlayers(Vector3 centerPosition, string message, Player? excludePlayer = null, float visibilityRange = 80f)
     {
         byte[] data = Encoding.ASCII.GetBytes(message);
 
         var candidateEntities = _server.GridManager.GetEntitiesInRadius(centerPosition, visibilityRange);
 
-        foreach (var entity in candidateEntities)
+        // --- A CORREÇÃO DEFINITIVA ---
+
+        // 1. Pega todos os jogadores candidatos.
+        var candidatePlayers = candidateEntities.OfType<Player>();
+
+        // 2. Agrupa os jogadores pelo seu EndPoint. Como múltiplos objetos Player "fantasmas"
+        //    podem ter o mesmo EndPoint, isso nos dará grupos.
+        var groupedByEndPoint = candidatePlayers.GroupBy(p => p.EndPoint);
+
+        // 3. Itera sobre os GRUPOS. Para cada EndPoint único, pegamos apenas o primeiro
+        //    jogador encontrado e enviamos a mensagem para ele.
+        foreach (var group in groupedByEndPoint)
         {
-            // Garante que a entidade é um jogador e não é o jogador a ser excluído.
-            if (entity is Player player && (excludePlayer == null || player.Id != excludePlayer.Id))
+            IPEndPoint targetEndPoint = group.Key;
+            Player representativePlayer = group.First(); // Pega qualquer jogador do grupo como representante
+
+            // A checagem de exclusão continua a mesma
+            if (excludePlayer == null || representativePlayer.Id != excludePlayer.Id)
             {
-                _udpListener.Send(data, data.Length, player.EndPoint);
+                _udpListener.Send(data, data.Length, targetEndPoint);
             }
         }
     }

@@ -96,16 +96,12 @@ public class TCPServer
 
         try
         {
-            // (MUDANÇA CRÍTICA) O loop while(client.Connected) foi substituído.
-            // Agora, este método processa a conexão até o cliente ser fechado
-            // (após selecionar o personagem) ou um erro ocorrer.
-
-            // Usamos um CancellationTokenSource linkado para o timeout da conexão
-            using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
-
-            while (true) // O loop agora é controlado pelo ReadLineAsync e pelo timeout
+            while (client.Connected && !cancellationToken.IsCancellationRequested)
             {
+                // <<< CORREÇÃO >>> O timeout agora é criado A CADA iteração do loop
+                using var timeoutCts = new CancellationTokenSource(TimeSpan.FromMinutes(2)); // 2 minutos de inatividade
+                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
+
                 var jsonString = await reader.ReadLineAsync(linkedCts.Token);
                 if (string.IsNullOrEmpty(jsonString)) break; // Cliente desconectou
 
@@ -133,7 +129,15 @@ public class TCPServer
                 if (closeAfterRequest) break;
             }
         }
-        catch (OperationCanceledException) { Console.WriteLine($"[TCP] Timeout ou shutdown para {client.Client.RemoteEndPoint}."); }
+        catch (OperationCanceledException)
+        {
+            // Esta exceção agora só será acionada se o cliente ficar inativo por 2 minutos
+            // OU se o servidor estiver desligando.
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                Console.WriteLine($"[TCP] Cliente {client.Client.RemoteEndPoint} desconectado por inatividade.");
+            }
+        }
         catch (IOException) { /* Cliente desconectou (normal) */ }
         catch (Exception ex) { Console.WriteLine($"[TCP-ERROR] Erro no HandleClient: {ex}"); }
         finally
@@ -142,7 +146,6 @@ public class TCPServer
             client.Close();
         }
     }
-
 
     #region Handlers de Requisição (Sem alterações necessárias aqui)
 

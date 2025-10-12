@@ -56,9 +56,8 @@ public class WorldManager
 
     public void ProcessNpcDeath(NpcInstance npc, ICombatEntity? killer)
     {
-        // 1. Define o estado do NPC como morto e inativo
-        npc.ChangeNpcState(NpcAiState.Dead, _server.CurrentTimeUtc); // Método auxiliar para mudar o estado
-        npc.IsActive = false;
+        npc.IsActive = false; // Desativa a IA imediatamente
+        npc.RespawnTime = _server.CurrentTimeUtc.AddSeconds(npc.BaseData.RespawnTimeSeconds);
         npc.SetCorpseDespawnTimer(120.0f, _server.CurrentTimeUtc);
 
         Player? creditPlayer = this.GetCreditPlayer(npc, killer);
@@ -88,10 +87,7 @@ public class WorldManager
         }
 
         // 4. Move o NPC da lista de vivos para a lista de mortos
-        if (_server.ActiveNpcs.TryRemove(npc.InstanceId, out _))
-        {
-            _server.DeadNpcCor_pses.TryAdd(npc.InstanceId, npc);
-        }
+        _server.DeadNpcCor_pses.TryAdd(npc.InstanceId, npc);
 
         if (killer is Player killerPlayer)
         {
@@ -117,28 +113,10 @@ public class WorldManager
         }
     }
 
-    public void OnNpcGroupMemberDied(NpcInstance npc)
-    {
-        lock (_spawnLock)
-        {
-            var spawnPoint = FindSpawnPointForNpc(npc.InstanceId);
-            if (spawnPoint != null)
-            {
-                // Apenas remove o ID da lista do spawn point.
-                spawnPoint.ActiveNpcInstanceIds.Remove(npc.InstanceId);
-
-                if (spawnPoint.RespawnEndTime <= _server.CurrentTimeUtc)
-                {
-                    spawnPoint.RespawnEndTime = _server.CurrentTimeUtc.AddSeconds(npc.BaseData.RespawnTimeSeconds);
-                    Console.WriteLine($"[WorldManager] Respawn para o grupo {npc.BaseData.TypeId} agendado para {spawnPoint.RespawnEndTime}.");
-                }
-            }
-        }
-    }
-
     private void CleanupExpiredCorpses()
     {
-        // Pega os IDs para evitar problemas ao modificar a coleção
+        // Esta função agora APENAS envia a mensagem para o cliente destruir o GameObject do corpo.
+        // O objeto NpcInstance continua existindo no servidor, marcado como morto.
         var expiredNpcIds = _server.DeadNpcCor_pses
                                .Where(kvp => kvp.Value.CorpseDespawnTime != DateTime.MinValue && _server.CurrentTimeUtc >= kvp.Value.CorpseDespawnTime)
                                .Select(kvp => kvp.Key)
@@ -148,7 +126,7 @@ public class WorldManager
         {
             if (_server.DeadNpcCor_pses.TryRemove(npcId, out NpcInstance npc))
             {
-                // Console.WriteLine($"[WorldManager] Corpo do NPC {npc.InstanceId} desapareceu (Tempo Atual: {_server.CurrentTimeUtc}, Hora de Despawn: {npc.CorpseDespawnTime}).");
+                // Apenas notifica o cliente. Não muda nada no estado do servidor.
                 _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, $"DESTROY_NPC|{npc.InstanceId}");
             }
         }
@@ -156,35 +134,38 @@ public class WorldManager
 
     private void CheckForRespawns()
     {
-        // O loop de respawn já roda em uma única thread, então o acesso aqui é seguro.
-        // No entanto, para consistência, vamos usar o lock aqui também.
-        lock (_spawnLock)
+        // Pega todos os NPCs que estão marcados como mortos e cujo tempo de respawn já passou.
+        var npcsToRespawn = _server.ActiveNpcs.Values
+                                .Where(npc => npc.IsDead && _server.CurrentTimeUtc >= npc.RespawnTime)
+                                .ToList();
+
+        foreach (var npc in npcsToRespawn)
         {
-            var spawnsToRespawn = DataManager.SpawnPoints
-                .Where(sp => sp.ActiveNpcInstanceIds.Count < sp.Quantity &&
-                             sp.RespawnEndTime <= _server.CurrentTimeUtc && // Usa o tempo do servidor
-                             sp.RespawnEndTime != DateTime.MinValue)
-                .ToList();
+            // --- PASSO 1: Informa aos clientes para destruírem o corpo na POSIÇÃO ANTIGA ---
+            // Guardamos a posição da morte antes de mudá-la.
+            Vector3 corpsePosition = npc.Position;
+            _server.NetworkManager.BroadcastMessageToRelevantPlayers(corpsePosition, $"DESTROY_NPC|{npc.Id}");
 
-            foreach (var spawnPoint in spawnsToRespawn)
-            {
-                if (DataManager.Npcs.TryGetValue(spawnPoint.NpcTypeId, out NpcData? npcData))
-                {
-                    Console.WriteLine($"[WorldManager] Ressurgindo um NPC para o grupo '{spawnPoint.NpcTypeId}'...");
-                    Vector3 spawnPosition = CalculateSpawnPosition(spawnPoint);
-                    SpawnSingleNpc(npcData, spawnPosition, spawnPoint);
+            // --- PASSO 2: Ressuscita o NPC e o MOVE para sua posição de spawn no SERVIDOR ---
+            npc.IsDead = false;
+            npc.CurrentHealth = npc.MaxHealth;
+            npc.CurrentResource = npc.MaxResource;
+            npc.ThreatTable.Clear();
+            npc.ChangeNpcState(NpcAiState.Idle, _server.CurrentTimeUtc);
+            npc.IsActive = false;
 
-                    if (spawnPoint.ActiveNpcInstanceIds.Count < spawnPoint.Quantity)
-                    {
-                        spawnPoint.RespawnEndTime = _server.CurrentTimeUtc.AddSeconds(npcData.RespawnTimeSeconds);
-                    }
-                    else
-                    {
-                        spawnPoint.RespawnEndTime = DateTime.MinValue;
-                        Console.WriteLine($"[WorldManager] Grupo '{spawnPoint.NpcTypeId}' em {spawnPoint.Position} está completo.");
-                    }
-                }
-            }
+            // A MUDANÇA CRÍTICA: Movemos o NPC para sua casa ANTES de enviar a mensagem de spawn.
+            npc.Position = npc.SpawnPosition;
+            npc.Destination = npc.SpawnPosition;
+            _server.GridManager.UpdateEntity(npc);
+            npc.RespawnTime = DateTime.MaxValue;
+
+            // --- PASSO 3: Informa aos clientes para criarem o novo NPC na NOVA POSIÇÃO ---
+            // A mensagem agora usa a nova posição (npc.SpawnPosition).
+            string spawnMessage = npc.GetSpawnMessage();
+            _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, spawnMessage);
+
+            Console.WriteLine($"[WorldManager] NPC {npc.InstanceId} ({npc.BaseData.TypeId}) desapareceu do local da morte e reapareceu em seu spawn.");
         }
     }
 
@@ -286,62 +267,11 @@ public class WorldManager
     }
 
     /// <summary>
-    /// (NOVO) Remove todos os NPCs ativos associados a um SpawnPoint específico.
-    /// Chamado pelo InterestManager quando uma área fica vazia por muito tempo.
-    /// </summary>
-    public void DespawnNpcsForSpawnPoint(SpawnPoint spawnPoint)
-    {
-        // Usa ToList() para criar uma cópia, pois vamos modificar a coleção original
-        var idsToDespawn = spawnPoint.ActiveNpcInstanceIds.ToList();
-
-        foreach (var npcId in idsToDespawn)
-        {
-            if (_server.ActiveNpcs.TryRemove(npcId, out var npc))
-            {
-                // Notifica os jogadores próximos (se houver) que este NPC foi destruído
-                _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, $"DESTROY_NPC|{npc.InstanceId}");
-            }
-        }
-
-        // Limpa a lista de controle do spawn point
-        spawnPoint.ActiveNpcInstanceIds.Clear();
-        // Reseta o timer de respawn para que ele não tente respawnar sozinho
-        spawnPoint.RespawnEndTime = DateTime.MinValue;
-
-        // Console.WriteLine($"[WorldManager] Área de spawn para '{spawnPoint.NpcTypeId}' em {spawnPoint.Position} foi desativada e limpa.");
-    }
-
-    /// <summary>
-    /// (NOVO) Preenche um SpawnPoint com seus NPCs.
-    /// Chamado pelo InterestManager quando um jogador entra em uma área inativa.
-    /// </summary>
-    public void RespawnNpcsForSpawnPoint(SpawnPoint spawnPoint)
-    {
-        // Se já existem NPCs, não faz nada.
-        if (spawnPoint.ActiveNpcInstanceIds.Any())
-        {
-            return;
-        }
-
-        if (DataManager.Npcs.TryGetValue(spawnPoint.NpcTypeId, out NpcData? npcData))
-        {
-            Console.WriteLine($"[WorldManager] Ativando área de spawn e ressurgindo NPCs para '{spawnPoint.NpcTypeId}'...");
-            for (int i = 0; i < spawnPoint.Quantity; i++)
-            {
-                Vector3 spawnPosition = CalculateSpawnPosition(spawnPoint);
-                SpawnSingleNpc(npcData, spawnPosition, spawnPoint);
-            }
-        }
-    }
-
-
-
-    /// <summary>
     /// Spawna todos os NPCs pela primeira vez quando o servidor inicia.
     /// </summary>
     public void InitializeSpawns()
     {
-        Console.WriteLine("[WorldManager] Inicializando pontos de spawn...");
+        Console.WriteLine("[WorldManager] Inicializando e populando o mundo...");
         foreach (var spawnPoint in DataManager.SpawnPoints)
         {
             if (DataManager.Npcs.TryGetValue(spawnPoint.NpcTypeId, out NpcData? npcData))
@@ -349,54 +279,44 @@ public class WorldManager
                 for (int i = 0; i < spawnPoint.Quantity; i++)
                 {
                     Vector3 spawnPosition = CalculateSpawnPosition(spawnPoint);
+                    // Importante: Passamos o spawnPoint para que o NPC saiba sua origem.
                     SpawnSingleNpc(npcData, spawnPosition, spawnPoint);
-                }
-
-                // (CORREÇÃO) Se populamos este ponto, ele deve começar como ativo.
-                // Isso sincroniza o estado inicial com a realidade do mundo.
-                if (spawnPoint.ActiveNpcInstanceIds.Any())
-                {
-                    spawnPoint.IsActive = true;
-                    // Também é bom definir o tempo de observação para evitar um despawn imediato
-                    // se nenhum jogador spawnar perto dele.
-                    spawnPoint.LastObservedTime = _server.CurrentTimeUtc;
                 }
             }
             else
             {
-                Console.WriteLine($"[AVISO] Tipo de NPC '{spawnPoint.NpcTypeId}' em spawns.json não encontrado em npcs.json.");
+                Console.WriteLine($"[AVISO] Tipo de NPC '{spawnPoint.NpcTypeId}' em spawns.json não encontrado.");
             }
         }
-        Console.WriteLine($"[WorldManager] {_server.ActiveNpcs.Count} NPCs instanciados.");
+        Console.WriteLine($"[WorldManager] Mundo populado com {_server.ActiveNpcs.Count} NPCs (todos hibernando).");
     }
+
 
     private NpcInstance SpawnSingleNpc(NpcData npcData, Vector3 position, SpawnPoint? spawnPoint)
     {
         var newNpc = new NpcInstance(
             position,
             spawnPoint?.InitialRotation ?? Vector3.Zero,
-            spawnPoint?.AiType ?? NpcAiType.Wandering_Aggressive, // Usa um padrão se não houver spawn point
+            spawnPoint?.AiType ?? NpcAiType.Wandering_Aggressive,
             spawnPoint?.PatrolPath,
             npcData,
             _server
         );
 
         newNpc.Behavior = _server.NpcAiManager.GetBehavior(newNpc.AiType);
-
         _server.ActiveNpcs.TryAdd(newNpc.InstanceId, newNpc);
+        _server.GridManager.UpdateEntity(newNpc);
 
-        // Se houver um spawn point (não é um lacaio temporário), adiciona o ID a ele.
         if (spawnPoint != null)
         {
             spawnPoint.ActiveNpcInstanceIds.Add(newNpc.InstanceId);
         }
 
-        newNpc.IsActive = true;
+        // (MUDANÇA CRÍTICA) NPCs começam inativos por padrão.
+        newNpc.IsActive = false;
 
-        string spawnMessage = newNpc.GetSpawnMessage();
-        _server.NetworkManager.BroadcastMessageToRelevantPlayers(newNpc.Position, spawnMessage);
+        // NÃO enviamos mensagem de spawn aqui. O InterestManager/VisibilityManager fará isso.
 
-        // (CORREÇÃO) Retorna o NPC recém-criado.
         return newNpc;
     }
 

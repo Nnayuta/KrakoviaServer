@@ -23,6 +23,7 @@ public class Player : ICombatEntity, IWorldEntity
     #region IWorldEntity & Session (Sem mudanças significativas)
     public HashSet<string> KnownPlayerIds { get; } = new HashSet<string>();
     public HashSet<string> KnownNpcIds { get; } = new HashSet<string>();
+    public bool IsStationary => false;
 
     public string GetSpawnMessage()
     {

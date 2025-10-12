@@ -105,9 +105,14 @@ public class UDPServer
     public void Stop()
     {
         Console.WriteLine("[SERVER] Parando serviços...");
-        // Fechar o listener UDP força qualquer chamada ReceiveAsync a sair com uma exceção,
-        // garantindo que o loop do NetworkManager termine.
         _udpListener.Close();
+    }
+
+    public IWorldEntity? GetWorldEntityById(string id)
+    {
+        if (ConnectedPlayers.TryGetValue(id, out var player)) return player;
+        if (ActiveNpcs.TryGetValue(id, out var npc)) return npc;
+        return null;
     }
 
     private async Task UpdateServerTimeAsync(CancellationToken cancellationToken)
