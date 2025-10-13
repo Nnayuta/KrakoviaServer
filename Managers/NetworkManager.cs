@@ -15,14 +15,14 @@ public class NetworkManager
 {
     private readonly UDPServer _server;
     private readonly UdpClient _udpListener;
-    // <<< MUDANÇA 1: Adicionamos um campo para a nossa interface de banco de dados de personagens.
+    
     private readonly ICharacterDatabase _characterDb;
 
     public NetworkManager(UDPServer server, UdpClient udpListener, ICharacterDatabase characterDatabase)
     {
         _server = server;
         _udpListener = udpListener;
-        _characterDb = characterDatabase; // Armazenamos a referência.
+        _characterDb = characterDatabase;
     }
 
 
@@ -42,8 +42,7 @@ public class NetworkManager
                 // (MUDANÇA) Removemos o CancellationToken daqui.
                 // A tarefa agora só pode ser interrompida por um erro de socket.
                 var result = await _udpListener.ReceiveAsync();
-
-                _ = HandlePlayerMessageAsync(result.Buffer, result.RemoteEndPoint);
+                await HandlePlayerMessageAsync(result.Buffer, result.RemoteEndPoint);
             }
             catch (ObjectDisposedException)
             {
@@ -165,7 +164,7 @@ public class NetworkManager
 
     private async Task HandlePlayerMessageAsync(byte[] buffer, IPEndPoint clientEndPoint)
     {
-        var message = Encoding.ASCII.GetString(buffer).TrimEnd('\0');
+        var message = Encoding.UTF8.GetString(buffer).TrimEnd('\0');
         if (string.IsNullOrEmpty(message)) return;
 
         string[] parts = message.Split('|');
@@ -292,6 +291,13 @@ public class NetworkManager
                         _server.QuestManager.HandleCompleteQuestRequest(player, parts[1]);
                     }
                     break;
+                case "SEND_CHAT_MSG":
+                    if (parts.Length > 1)
+                    {
+                        string chatMessage = string.Join("|", parts.Skip(1)); // Remonta a mensagem caso ela tenha '|'
+                        _server.ChatManager.ProcessChatMessage(player, chatMessage);
+                    }
+                    break;
             }
 
             if (messageToBroadcast != null)
@@ -304,7 +310,7 @@ public class NetworkManager
 
     public void SendInitialStateToPlayer(Player player)
     {
-        SendFullStateToPlayer(player); // Envia inventário, quests, etc.
+        SendFullStateToPlayer(player);
     }
 
     private async Task HandleNewPlayerConnection(string clientKey, IPEndPoint clientEndPoint, string token)
@@ -313,12 +319,13 @@ public class NetworkManager
 
         if (AuthTokenManager.IsTokenValid(token, out AuthenticatedPlayerInfo? playerInfo) && playerInfo != null)
         {
-            var existingPlayer = _server.ConnectedPlayers.Values.FirstOrDefault(p => p.Id == playerInfo.CharacterId);
+            // Lógica para desconectar sessão antiga (está correta)
+            var existingPlayer = _server.ConnectedPlayers.Values.FirstOrDefault(p => p.CharacterId == playerInfo.CharacterId);
             if (existingPlayer != null)
             {
                 Console.WriteLine($"[Conexão Duplicada] Personagem {playerInfo.CharacterId} já estava online. Desconectando a sessão antiga.");
                 SendMessageToClient("FATAL_ERROR|Sua conta foi conectada de outro local.", existingPlayer.EndPoint);
-                _server.DisconnectPlayer(existingPlayer.EndPoint.ToString());
+                _server.DisconnectPlayer(existingPlayer.EndPoint.ToString(), "Conectado de outra localidade.");
             }
 
             Console.WriteLine($"[Conexão] Autenticado: {playerInfo.Username} | Perm: {playerInfo.PermissionLevel}, Personagem: {playerInfo.CharacterName} (Classe: {playerInfo.ClassID}, Nível: {playerInfo.Level})");
@@ -329,14 +336,20 @@ public class NetworkManager
 
             if (_server.ConnectedPlayers.TryAdd(clientKey, newPlayer))
             {
+                _server.PlayersBySessionId.TryAdd(newPlayer.SessionId, newPlayer);
                 Console.WriteLine($"Novo jogador ({newPlayer.SessionId}) conectado de {clientEndPoint}. Total: {_server.ConnectedPlayers.Count}");
-                OnlineStatusManager.SetOnline(newPlayer.Id);
+                OnlineStatusManager.SetOnline(newPlayer.CharacterId); // Usa o ID permanente para status global
 
-                // 1. Mensagem de atribuição de ID (necessária para o cliente saber "quem ele é").
-                string assignIdMessage = $"ASSIGN_ID|{newPlayer.Id}";
+                // --- [CORREÇÃO 1] ---
+                // A mensagem ASSIGN_ID precisa enviar AMBOS os IDs.
+                // O CharacterId (GUID) para o cliente saber "quem eu sou".
+                // O SessionId (int) para o cliente saber o seu próprio ID de sessão.
+                string assignIdMessage = $"ASSIGN_ID|{newPlayer.CharacterId}|{newPlayer.SessionId}";
                 SendMessageToClient(assignIdMessage, clientEndPoint);
 
-                // 2. A mensagem de spawn completa, para o jogador renderizar a si mesmo.
+                // --- [CORREÇÃO 2] ---
+                // A mensagem de spawn do PRÓPRIO jogador também precisa de ambos os IDs.
+                // O cliente usa isso para se instanciar.
                 string spawnMessage = newPlayer.GetSpawnMessage();
                 SendMessageToClient(spawnMessage, clientEndPoint);
             }
@@ -370,17 +383,18 @@ public class NetworkManager
     {
         Console.WriteLine($"Jogador {player.Username} informou que está desconectando.");
 
-        // 1. Pega a "foto" atual dos dados do jogador.
         CharacterData dataToSave = player.GetCharacterDataForSaving();
-
-        // 2. Manda a base de dados (seja em memória ou MariaDB) salvar essa "foto".
         await _characterDb.SaveAsync(dataToSave);
 
-        // 3. Continua com a lógica de remover o jogador do servidor.
         if (_server.ConnectedPlayers.TryRemove(clientKey, out _))
         {
-            _server.GridManager.RemoveEntity(player); // Remove da grade
-            OnlineStatusManager.SetOffline(player.Id);
+            // (CORREÇÃO) Ao sair, removemos dos dois dicionários
+            _server.PlayersBySessionId.TryRemove(player.SessionId, out _);
+
+            _server.GridManager.RemoveEntity(player);
+            OnlineStatusManager.SetOffline(player.CharacterId); // Usa o ID permanente
+
+            // A mensagem PLAYER_LEFT deve usar o SessionId, pois é para outros jogadores em tempo real
             BroadcastMessageToRelevantPlayers(player.Position, $"PLAYER_LEFT|{player.Id}");
         }
     }
@@ -416,9 +430,8 @@ public class NetworkManager
             Console.WriteLine($"[Sync] Recebida primeira POS_ROT de {player.Username}. Iniciando sincronização de estado e interesse.");
             player.IsPendingInitialization = false;
 
-            // (MUDANÇA) Em vez de chamar o InterestManager diretamente, chamamos nossa nova função de sincronização.
             SendInitialStateToPlayer(player);
-            _server.InterestManager.OnPlayerEnteredWorld(player); // Continua sendo importante para a lógica de "acordar" NPCs
+            _server.InterestManager.OnPlayerEnteredWorld(player);
         }
 
         player.Position = new Vector3(
@@ -444,7 +457,7 @@ public class NetworkManager
 
     public void BroadcastMessageToRelevantPlayers(Vector3 centerPosition, string message, Player? excludePlayer = null, float visibilityRange = 80f)
     {
-        byte[] data = Encoding.ASCII.GetBytes(message);
+        byte[] data = Encoding.UTF8.GetBytes(message);
 
         // 1. Pega todas as entidades próximas.
         var candidateEntities = _server.GridManager.GetEntitiesInRadius(centerPosition, visibilityRange);
@@ -473,7 +486,7 @@ public class NetworkManager
 
     public void BroadcastMessageToAll(string message)
     {
-        byte[] data = Encoding.ASCII.GetBytes(message);
+        byte[] data = Encoding.UTF8.GetBytes(message);
         foreach (var player in _server.ConnectedPlayers.Values)
         {
             _udpListener.Send(data, data.Length, player.EndPoint);
@@ -502,7 +515,7 @@ public class NetworkManager
 
     public void BroadcastMessage(string message, string senderSessionId)
     {
-        byte[] data = Encoding.ASCII.GetBytes(message);
+        byte[] data = Encoding.UTF8.GetBytes(message);
         foreach (var player in _server.ConnectedPlayers.Values.Where(p => p.GuidSessionId != senderSessionId))
         {
             _udpListener.Send(data, data.Length, player.EndPoint);
@@ -511,7 +524,7 @@ public class NetworkManager
 
     public void SendMessageToClient(string message, IPEndPoint endPoint)
     {
-        byte[] data = Encoding.ASCII.GetBytes(message);
+        byte[] data = Encoding.UTF8.GetBytes(message);
         _udpListener.Send(data, data.Length, endPoint);
     }
 

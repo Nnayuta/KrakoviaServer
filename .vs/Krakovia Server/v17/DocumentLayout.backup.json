@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\GameDev\\Krakovia Server\\Krakovia Server\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{2422534D-0534-71C1-2421-669C1C94AA24}|Krakovia Server.csproj|c:\\gamedev\\krakovia server\\krakovia server\\data\\serverconfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2422534D-0534-71C1-2421-669C1C94AA24}|Krakovia Server.csproj|solutionrelative:data\\serverconfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{2422534D-0534-71C1-2421-669C1C94AA24}|Krakovia Server.csproj|c:\\gamedev\\krakovia server\\krakovia server\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2422534D-0534-71C1-2421-669C1C94AA24}|Krakovia Server.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2422534D-0534-71C1-2421-669C1C94AA24}|Krakovia Server.csproj|c:\\gamedev\\krakovia server\\krakovia server\\data\\serverconfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2422534D-0534-71C1-2421-669C1C94AA24}|Krakovia Server.csproj|solutionrelative:data\\serverconfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,29 +18,29 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "ServerConfig.cs",
               "DocumentMoniker": "C:\\GameDev\\Krakovia Server\\Krakovia Server\\Data\\ServerConfig.cs",
               "RelativeDocumentMoniker": "Data\\ServerConfig.cs",
               "ToolTip": "C:\\GameDev\\Krakovia Server\\Krakovia Server\\Data\\ServerConfig.cs",
               "RelativeToolTip": "Data\\ServerConfig.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAzAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAsAAAAzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-10-12T23:14:04.512Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\GameDev\\Krakovia Server\\Krakovia Server\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "C:\\GameDev\\Krakovia Server\\Krakovia Server\\Program.cs*",
-              "RelativeToolTip": "Program.cs*",
+              "ToolTip": "C:\\GameDev\\Krakovia Server\\Krakovia Server\\Program.cs",
+              "RelativeToolTip": "Program.cs",
               "ViewState": "AgIAACMAAAAAAAAAAAAQwCkAAABoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-10-12T23:08:39.307Z",

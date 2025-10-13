@@ -15,6 +15,9 @@ public class UDPServer
 
     // Estado Central do Servidor
     public readonly ConcurrentDictionary<string, Player> ConnectedPlayers = new();
+    public readonly ConcurrentDictionary<int, Player> PlayersBySessionId = new();
+
+
     public readonly ConcurrentDictionary<string, NpcInstance> ActiveNpcs = new();
     public readonly ConcurrentDictionary<string, NpcInstance> DeadNpcCor_pses = new();
 
@@ -34,6 +37,9 @@ public class UDPServer
     public readonly Scheduler Scheduler;
     public readonly SpatialGridManager GridManager;
     public readonly GatherableManager GatherableManager;
+    public readonly ChatManager ChatManager;
+
+
     private readonly ICharacterDatabase _characterDb;
     private readonly UdpClient _udpListener;
     private const int TIMEOUT_SECONDS = 15;
@@ -44,32 +50,31 @@ public class UDPServer
     {
         Instance = this;
 
-        _characterDb = characterDatabase;
-        _udpListener = new UdpClient(port);
+        this._characterDb = characterDatabase;
+        this._udpListener = new UdpClient(port);
         DataManager.LoadAllData();
 
         // Instancia todos os managers
-        NetworkManager = new NetworkManager(this, _udpListener, _characterDb);
-        WorldManager = new WorldManager(this);
-        NpcAiManager = new NpcAiManager(this);
-        InterestManager = new InterestManager(this);
-        CombatManager = new CombatManager(this);
-        CommandManager = new CommandManager(this);
-        PlayerEquipmentManager = new PlayerEquipmentManager(this);
-        PlayerInventoryManager = new PlayerInventoryManager(this);
-        PlayerLifecycleManager = new PlayerLifecycleManager(this);
-        PlayerProgressionManager = new PlayerProgressionManager(this);
-        QuestManager = new QuestManager(this);
-        LootManager = new LootManager(this);
-        Scheduler = new Scheduler(this);
-        GridManager = new SpatialGridManager();
-        this.GatherableManager = new GatherableManager(this); // (NOVO) Instancia o manager
+        this.NetworkManager = new NetworkManager(this, _udpListener, _characterDb);
+        this.WorldManager = new WorldManager(this);
+        this.NpcAiManager = new NpcAiManager(this);
+        this.InterestManager = new InterestManager(this);
+        this.CombatManager = new CombatManager(this);
+        this.CommandManager = new CommandManager(this);
+        this.PlayerEquipmentManager = new PlayerEquipmentManager(this);
+        this.PlayerInventoryManager = new PlayerInventoryManager(this);
+        this.PlayerLifecycleManager = new PlayerLifecycleManager(this);
+        this.PlayerProgressionManager = new PlayerProgressionManager(this);
+        this.QuestManager = new QuestManager(this);
+        this.LootManager = new LootManager(this);
+        this.Scheduler = new Scheduler(this);
+        this.GridManager = new SpatialGridManager();
+        this.GatherableManager = new GatherableManager(this);
+        this.ChatManager = new ChatManager(this);
     }
 
     public int GetNextSessionId()
     {
-        // Interlocked.Increment é uma operação atômica, o que significa que
-        // mesmo que múltiplos jogadores conectem ao mesmo tempo, nunca teremos IDs duplicados.
         return Interlocked.Increment(ref _nextSessionId);
     }
 
@@ -181,21 +186,27 @@ public class UDPServer
     /// e notificando os outros jogadores e sistemas (como o OnlineStatusManager).
     /// </summary>
     /// <param name="clientKey">A chave do jogador no dicionário (geralmente EndPoint.ToString()).</param>
-    public void DisconnectPlayer(string clientKey)
+    public void DisconnectPlayer(string clientKey, string reason = "Conexão perdida.")
     {
-        // Tenta remover o jogador do dicionário principal.
         if (ConnectedPlayers.TryRemove(clientKey, out Player? disconnectedPlayer))
         {
             if (disconnectedPlayer != null)
             {
-                Console.WriteLine($"Jogador {disconnectedPlayer.Username} (ID: {disconnectedPlayer.Id}) foi desconectado.");
+                // (NOVO) Adiciona o motivo ao log
+                Console.WriteLine($"Jogador {disconnectedPlayer.Username} (ID Sessão: {disconnectedPlayer.SessionId}) foi desconectado. Motivo: {reason}");
 
-                // 1. Notifica o OnlineStatusManager que o personagem está offline.
-                OnlineStatusManager.SetOffline(disconnectedPlayer.Id);
+                PlayersBySessionId.TryRemove(disconnectedPlayer.SessionId, out _);
+                OnlineStatusManager.SetOffline(disconnectedPlayer.CharacterId);
 
-                // 2. Notifica todos os outros jogadores que este personagem saiu do mundo.
-                // Usamos o NetworkManager para isso, que já tem a lógica de broadcast.
-                NetworkManager.BroadcastMessage($"PLAYER_LEFT|{disconnectedPlayer.Id}", disconnectedPlayer.Id);
+                // Envia a mensagem PLAYER_LEFT para os outros.
+                // Note que aqui o player.Id é o SessionId, o que está correto para os outros clientes.
+                NetworkManager.BroadcastMessageToRelevantPlayers(disconnectedPlayer.Position, $"PLAYER_LEFT|{disconnectedPlayer.Id}");
+
+                // (NOVO) Se o motivo for específico (como login duplicado), podemos notificar o jogador desconectado.
+                if (reason.Contains("outra localidade"))
+                {
+                    NetworkManager.SendMessageToClient("FATAL_ERROR|Sua conta foi conectada de outro local.", disconnectedPlayer.EndPoint);
+                }
             }
         }
     }
@@ -251,17 +262,14 @@ public class UDPServer
 
     public Player? FindPlayerByNameOrId(string identifier)
     {
-        var players = ConnectedPlayers.Values.ToList();
 
         // (NOVO) Tenta encontrar por ID de Sessão primeiro (o mais comum para ADMs)
         if (int.TryParse(identifier, out int sessionId))
         {
-            var playerBySessionId = players.FirstOrDefault(p => p.SessionId == sessionId);
-            if (playerBySessionId != null)
-            {
-                return playerBySessionId;
-            }
+            return FindPlayerBySessionId(sessionId);
         }
+
+        var players = ConnectedPlayers.Values.ToList();
 
         // Tenta encontrar por ID do Personagem (GUID)
         var playerById = players.FirstOrDefault(p => p.CharacterId.Equals(identifier, StringComparison.OrdinalIgnoreCase));
@@ -273,6 +281,12 @@ public class UDPServer
         // Por último, tenta encontrar por Nome do Personagem
         var playerByName = players.FirstOrDefault(p => p.CharacterName.Equals(identifier, StringComparison.OrdinalIgnoreCase));
         return playerByName;
+    }
+
+    public Player? FindPlayerBySessionId(int sessionId)
+    {
+        PlayersBySessionId.TryGetValue(sessionId, out var player);
+        return player;
     }
 
 }

@@ -26,29 +26,9 @@ public class Player : ICombatEntity, IWorldEntity
     public readonly HashSet<string> KnownGatherableIds = new();
     public bool IsStationary => false;
 
-    public string GetSpawnMessage()
-    {
-        // Formato: SPAWN_PLAYER | ID | Nome | Posição | RotaçãoY | PayloadEquipamento | JSONAparência | Nível | VidaAtual | VidaMáxima
-
-        string position = this.State.Position;
-        string rotationY = this.State.RotationY;
-        string equipmentPayload = GetEquipmentPayload();
-
-        string currentHealthStr = this.CurrentHealth.ToString("F0", CultureInfo.InvariantCulture);
-        string maxHealthStr = this.MaxHealth.ToString("F0", CultureInfo.InvariantCulture);
-
-        // Serializamos todo o objeto de aparência para JSON.
-        // O cliente pode então usar isso para reconstruir a aparência visual completa.
-        string appearanceJson = JsonConvert.SerializeObject(this.Appearance);
-
-        // Console.WriteLine($"[GetSpawnMessage] Gerando mensagem de spawn para {this.CharacterName}. PermissionLevel ATUAL: {this.PermissionLevel}");
-
-        // Juntamos tudo em uma única mensagem poderosa.
-        return $"SPAWN_PLAYER|{this.Id}|{this.CharacterName}|{this.State.Position}|{this.State.RotationY}|{GetEquipmentPayload()}|{JsonConvert.SerializeObject(this.Appearance)}|{this.Level}|{currentHealthStr}|{maxHealthStr}|{this.PermissionLevel}";
-    }
-
     public string GuidSessionId { get; }
     public int SessionId { get; } // <-- O NOVO ID DE SESSÃO NUMÉRICO!
+    public string Id => this.SessionId.ToString();
     public IPEndPoint EndPoint { get; }
 
     public DateTime LastMessageTime { get; set; }
@@ -88,7 +68,22 @@ public class Player : ICombatEntity, IWorldEntity
 
     #region ICombatEntity Implementation (Atualizada)
 
-    public string Id => this.CharacterId;
+
+    public string GetSpawnMessage()
+    {
+        // Formato: SPAWN_PLAYER | ID | Nome | Posição | RotaçãoY | PayloadEquipamento | JSONAparência | Nível | VidaAtual | VidaMáxima
+
+        string position = this.State.Position;
+        string rotationY = this.State.RotationY;
+        string equipmentPayload = GetEquipmentPayload();
+
+        string currentHealthStr = this.CurrentHealth.ToString("F0", CultureInfo.InvariantCulture);
+        string maxHealthStr = this.MaxHealth.ToString("F0", CultureInfo.InvariantCulture);
+        string appearanceJson = JsonConvert.SerializeObject(this.Appearance);
+
+        // Juntamos tudo em uma única mensagem poderosa.
+        return $"SPAWN_PLAYER|{this.SessionId}|{this.CharacterId}|{this.CharacterName}|{position}|{rotationY}|{equipmentPayload}|{appearanceJson}|{this.Level}|{currentHealthStr}|{maxHealthStr}|{this.PermissionLevel}";
+    }
 
     public Vector3 Position
     {
@@ -126,7 +121,7 @@ public class Player : ICombatEntity, IWorldEntity
         GuidSessionId = Guid.NewGuid().ToString("N");
         SessionId = server.GetNextSessionId();
         EndPoint = endPoint;
-        
+
         LastMessageTime = server.CurrentTimeUtc;
         LastCombatTime = server.CurrentTimeUtc;
         NextRegenTime = server.CurrentTimeUtc;
@@ -258,23 +253,6 @@ public class Player : ICombatEntity, IWorldEntity
     public void SendFullStateToClient()
     {
         _server?.NetworkManager.SendFullStateToPlayer(this);
-        // // Se _server for nulo (como no caso do tempPlayer), este método não faz nada.
-        // if (_server == null) return;
-
-        // // Envia atualização de inventário
-        // string invPayload = string.Join("|", this.PlayerInventory.slots.Select(s => s == null ? "null" : $"{s.InstanceID},{s.ItemID},{s.Quantity}"));
-        // _server.NetworkManager.SendMessageToClient($"INVENTORY_UPDATE|{invPayload}", this.EndPoint);
-
-        // // Envia atualização de equipamento
-        // string eqPayload = string.Join("|", this.PlayerEquipment.equippedItems.Select(kvp => $"{kvp.Key},{(kvp.Value == null ? "null" : $"{kvp.Value.InstanceID},{kvp.Value.ItemID},{kvp.Value.Quantity}")}"));
-        // _server.NetworkManager.SendMessageToClient($"EQUIPMENT_UPDATE|{eqPayload}", this.EndPoint);
-
-        // _server.NetworkManager.SendInventoryUpdate(this);
-        // _server.NetworkManager.SendEquipmentUpdate(this);
-        // _server.NetworkManager.SendCurrencyUpdate(this);
-        // _server.NetworkManager.SendStatsUpdate(this);
-        // _server.NetworkManager.SendFullQuestLog(this);
-        // _server.NetworkManager.SendVitalsUpdate(this);
     }
 
     public List<string> CalculateKnownAbilities()

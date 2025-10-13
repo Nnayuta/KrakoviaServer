@@ -20,13 +20,14 @@ public class CharacterStats
         {
             _stats.Add(statType, new Stat(0));
         }
-        
+
         // Calcula os valores base dos atributos primários usando o novo sistema.
         float finalStrength = ClassStatCalculator.GetStatAtLevel(classData.BaseStrength, classData.StrengthGrowth, _level);
         float finalAgility = ClassStatCalculator.GetStatAtLevel(classData.BaseAgility, classData.AgilityGrowth, _level);
         float finalIntellect = ClassStatCalculator.GetStatAtLevel(classData.BaseIntelligence, classData.IntelligenceGrowth, _level);
         float finalStamina = ClassStatCalculator.GetStatAtLevel(classData.BaseStamina, classData.StaminaGrowth, _level);
 
+        _stats[StatType.MovementSpeed].SetBaseValue(100.0f);
         _stats[StatType.Strength].SetBaseValue(finalStrength);
         _stats[StatType.Agility].SetBaseValue(finalAgility);
         _stats[StatType.Intellect].SetBaseValue(finalIntellect);
