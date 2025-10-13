@@ -18,6 +18,46 @@ public class PlayerInventoryManager
     #region Handlers de Requisições do Cliente
 
     /// <summary>
+    /// Tenta adicionar uma lista de itens ao inventário do jogador.
+    /// Notifica o jogador sobre os itens recebidos ou se o inventário está cheio.
+    /// </summary>
+    /// <param name="player">O jogador que receberá o loot.</param>
+    /// <param name="lootItems">A lista de itens a serem concedidos.</param>
+    public void GrantLootToPlayer(Player player, List<ItemStack> lootItems)
+    {
+        if (lootItems == null || !lootItems.Any())
+        {
+            // Se não há loot, podemos enviar uma mensagem de "não encontrou nada"
+            _server.NetworkManager.SendMessageToClient("SHOW_FEEDBACK|Você não encontrou nada.", player.EndPoint);
+            return;
+        }
+
+        foreach (var itemStack in lootItems)
+        {
+            // Tenta adicionar o item usando o método que já existe no inventário do jogador.
+            if (player.PlayerInventory.AddItem(itemStack.ItemID, itemStack.Quantity))
+            {
+                // Sucesso! Envia feedback visual para o cliente.
+                var itemData = DataManager.Items[itemStack.ItemID];
+                string feedback = itemStack.Quantity > 1 ? $"+{itemStack.Quantity} {itemData.itemName}" : $"+{itemData.itemName}";
+                _server.NetworkManager.SendMessageToClient($"SHOW_FEEDBACK|{feedback}", player.EndPoint);
+            }
+            else
+            {
+                // Falha! O inventário está cheio.
+                _server.NetworkManager.SendMessageToClient("ERROR|Inventário cheio.", player.EndPoint);
+
+                // TODO: Lógica futura para enviar o item pelo correio ou dropá-lo no chão.
+                // Por enquanto, paramos de adicionar o resto.
+                break;
+            }
+        }
+
+        // Após adicionar todos os itens (ou falhar), envia uma atualização completa do inventário.
+        _server.NetworkManager.SendInventoryUpdate(player);
+    }
+
+    /// <summary>
     /// Handler principal para a movimentação de itens. Cobre arrastar e soltar,
     /// trocar, mover para slot vazio, e empilhar.
     /// </summary>

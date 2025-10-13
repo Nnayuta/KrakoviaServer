@@ -268,16 +268,12 @@
         "Value": 8457
       },
       {
-        "Stat": "CriticalStrikeRating",
+        "Stat": "MasteryRating",
         "Value": 8457
       },
       {
         "Stat": "Strength",
         "Value": 20672
-      },
-      {
-        "Stat": "MovementSpeed",
-        "Value": 3383
       }
     ]
   },
@@ -303,7 +299,7 @@
         "Value": 10
       },
       {
-        "Stat": "HasteRating",
+        "Stat": "CriticalStrikeRating",
         "Value": 5
       },
       {
@@ -334,7 +330,7 @@
         "Value": 18
       },
       {
-        "Stat": "MasteryRating",
+        "Stat": "HasteRating",
         "Value": 8
       },
       {
@@ -365,7 +361,7 @@
         "Value": 8
       },
       {
-        "Stat": "HasteRating",
+        "Stat": "MasteryRating",
         "Value": 4
       },
       {
@@ -396,7 +392,7 @@
         "Value": 10
       },
       {
-        "Stat": "MasteryRating",
+        "Stat": "HasteRating",
         "Value": 5
       },
       {
@@ -458,7 +454,7 @@
         "Value": 16
       },
       {
-        "Stat": "MasteryRating",
+        "Stat": "HasteRating",
         "Value": 8
       },
       {
@@ -742,6 +738,18 @@
         "Value": 3
       }
     ]
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "potato_glitch",
+    "itemName": "Batata da Fenda coletadas",
+    "quality": "Epic",
+    "maxStackSize": 1,
+    "requiredLevel": 1,
+    "sellPrice": 5,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
   },
   {
     "$type": "ServerItemData, Assembly-CSharp",

@@ -29,6 +29,83 @@
       "ChooseOneRewards": []
     },
     {
+      "QuestID": "01_quest_despertar_glitchado",
+      "RequiredLevel": 1,
+      "PrerequisiteQuestIDs": [],
+      "Category": "Main",
+      "Objectives": [],
+      "GuaranteedRewards": [],
+      "ChooseOneRewards": []
+    },
+    {
+      "QuestID": "02_quest_raiz_problema",
+      "RequiredLevel": 1,
+      "PrerequisiteQuestIDs": [
+        "01_quest_despertar_glitchado"
+      ],
+      "Category": "Main",
+      "Objectives": [
+        {
+          "Type": "Collect",
+          "TargetID": "",
+          "RequiredAmount": 0
+        }
+      ],
+      "GuaranteedRewards": [],
+      "ChooseOneRewards": []
+    },
+    {
+      "QuestID": "03_quest_sopa_legado",
+      "RequiredLevel": 1,
+      "PrerequisiteQuestIDs": [
+        "02_quest_raiz_problema"
+      ],
+      "Category": "Main",
+      "Objectives": [
+        {
+          "Type": "GoTo",
+          "TargetID": "",
+          "RequiredAmount": 0
+        }
+      ],
+      "GuaranteedRewards": [],
+      "ChooseOneRewards": []
+    },
+    {
+      "QuestID": "04_cheiro_de_jogo_ruim",
+      "RequiredLevel": 1,
+      "PrerequisiteQuestIDs": [
+        "03_quest_sopa_legado"
+      ],
+      "Category": "Main",
+      "Objectives": [
+        {
+          "Type": "GoTo",
+          "TargetID": "",
+          "RequiredAmount": 0
+        }
+      ],
+      "GuaranteedRewards": [],
+      "ChooseOneRewards": []
+    },
+    {
+      "QuestID": "05_desfragmentando_alcateia",
+      "RequiredLevel": 1,
+      "PrerequisiteQuestIDs": [
+        "04_cheiro_de_jogo_ruim"
+      ],
+      "Category": "Main",
+      "Objectives": [
+        {
+          "Type": "Slay",
+          "TargetID": "",
+          "RequiredAmount": 0
+        }
+      ],
+      "GuaranteedRewards": [],
+      "ChooseOneRewards": []
+    },
+    {
       "QuestID": "slay_bear_01",
       "RequiredLevel": 1,
       "PrerequisiteQuestIDs": [],

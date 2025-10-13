@@ -38,7 +38,7 @@
         "bear_attack_03",
         "bear_buff_01"
       ],
-      "CurrencyReward": 10,
+      "CurrencyReward": 14,
       "ExperienceReward": 50,
       "LootTableID": "bear_common_drops"
     },
@@ -76,7 +76,7 @@
       "SwingTimer": 4.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 2,
+      "CurrencyReward": 3,
       "ExperienceReward": 10,
       "LootTableID": ""
     },
@@ -154,7 +154,7 @@
       "AbilityIDs": [
         "giant_cb536791"
       ],
-      "CurrencyReward": 930,
+      "CurrencyReward": 870,
       "ExperienceReward": 500,
       "LootTableID": ""
     },
@@ -194,7 +194,7 @@
       "AbilityIDs": [
         "sword_heavy_attack"
       ],
-      "CurrencyReward": 132,
+      "CurrencyReward": 166,
       "ExperienceReward": 10,
       "LootTableID": ""
     },
@@ -234,8 +234,84 @@
       "AbilityIDs": [
         "sword_heavy_attack"
       ],
-      "CurrencyReward": 144,
+      "CurrencyReward": 119,
       "ExperienceReward": 10,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "npc_Dona_Cleide",
+      "Faction": "Friendly",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 12
+        },
+        {
+          "Stat": "Strength",
+          "Value": 12
+        },
+        {
+          "Stat": "Agility",
+          "Value": 12
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 12
+        },
+        {
+          "Stat": "Armor",
+          "Value": 31
+        }
+      ],
+      "Level": 5,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "CurrencyReward": 28,
+      "ExperienceReward": 0,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "npc_Valdisnei",
+      "Faction": "Friendly",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 12
+        },
+        {
+          "Stat": "Strength",
+          "Value": 12
+        },
+        {
+          "Stat": "Agility",
+          "Value": 12
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 12
+        },
+        {
+          "Stat": "Armor",
+          "Value": 31
+        }
+      ],
+      "Level": 5,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "CurrencyReward": 22,
+      "ExperienceReward": 0,
       "LootTableID": ""
     },
     {
@@ -272,7 +348,7 @@
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 66,
+      "CurrencyReward": 61,
       "ExperienceReward": 10,
       "LootTableID": ""
     },
@@ -313,7 +389,7 @@
         "wolf_ability_029ab43c",
         "wolf_ability_73e22c18"
       ],
-      "CurrencyReward": 2,
+      "CurrencyReward": 3,
       "ExperienceReward": 35,
       "LootTableID": ""
     }

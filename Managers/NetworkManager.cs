@@ -86,8 +86,6 @@ public class NetworkManager
 
     public void SendFullQuestLog(Player player)
     {
-        // A nova estrutura `AllQuests` já contém tudo que precisamos.
-        // Nós apenas pegamos todos os valores e os enviamos.
         var fullLog = player.QuestLog.AllQuests.Values.ToList();
 
         string json = JsonConvert.SerializeObject(fullLog);
@@ -267,6 +265,13 @@ public class NetworkManager
                         _server.CombatManager.HandleLootRequest(player, parts[1]);
                     }
                     break;
+                case "REQUEST_GATHER":
+                    if (parts.Length >= 2)
+                    {
+                        // Encaminha a solicitação para o GatherableManager processar.
+                        _server.GatherableManager.OnPlayerAttemptGather(player, parts[1]);
+                    }
+                    break;
                 case "REQUEST_ACCEPT_QUEST":
                     if (parts.Length >= 2)
                     {
@@ -291,9 +296,15 @@ public class NetworkManager
 
             if (messageToBroadcast != null)
             {
-                BroadcastMessage(messageToBroadcast, player.SessionId);
+                // Passa o GUID, que é o que a função espera.
+                BroadcastMessage(messageToBroadcast, player.GuidSessionId);
             }
         }
+    }
+
+    public void SendInitialStateToPlayer(Player player)
+    {
+        SendFullStateToPlayer(player); // Envia inventário, quests, etc.
     }
 
     private async Task HandleNewPlayerConnection(string clientKey, IPEndPoint clientEndPoint, string token)
@@ -402,10 +413,12 @@ public class NetworkManager
 
         if (player.IsPendingInitialization)
         {
-            Console.WriteLine($"[Sync] Recebida primeira POS_ROT de {player.Username}. Iniciando sincronização de interesse.");
-            player.IsPendingInitialization = false; // Desativa a flag PERMANENTEMENTE para esta instância.
+            Console.WriteLine($"[Sync] Recebida primeira POS_ROT de {player.Username}. Iniciando sincronização de estado e interesse.");
+            player.IsPendingInitialization = false;
 
-            _server.InterestManager.OnPlayerEnteredWorld(player);
+            // (MUDANÇA) Em vez de chamar o InterestManager diretamente, chamamos nossa nova função de sincronização.
+            SendInitialStateToPlayer(player);
+            _server.InterestManager.OnPlayerEnteredWorld(player); // Continua sendo importante para a lógica de "acordar" NPCs
         }
 
         player.Position = new Vector3(
@@ -433,28 +446,27 @@ public class NetworkManager
     {
         byte[] data = Encoding.ASCII.GetBytes(message);
 
+        // 1. Pega todas as entidades próximas.
         var candidateEntities = _server.GridManager.GetEntitiesInRadius(centerPosition, visibilityRange);
 
-        // --- A CORREÇÃO DEFINITIVA ---
+        // 2. Filtra para pegar apenas os jogadores.
+        var playersToSendTo = candidateEntities.OfType<Player>();
 
-        // 1. Pega todos os jogadores candidatos.
-        var candidatePlayers = candidateEntities.OfType<Player>();
-
-        // 2. Agrupa os jogadores pelo seu EndPoint. Como múltiplos objetos Player "fantasmas"
-        //    podem ter o mesmo EndPoint, isso nos dará grupos.
-        var groupedByEndPoint = candidatePlayers.GroupBy(p => p.EndPoint);
-
-        // 3. Itera sobre os GRUPOS. Para cada EndPoint único, pegamos apenas o primeiro
-        //    jogador encontrado e enviamos a mensagem para ele.
-        foreach (var group in groupedByEndPoint)
+        // 3. Itera diretamente sobre a lista de jogadores encontrados.
+        foreach (var player in playersToSendTo)
         {
-            IPEndPoint targetEndPoint = group.Key;
-            Player representativePlayer = group.First(); // Pega qualquer jogador do grupo como representante
-
-            // A checagem de exclusão continua a mesma
-            if (excludePlayer == null || representativePlayer.Id != excludePlayer.Id)
+            // A condição de exclusão: Não envia se o jogador da lista for o mesmo
+            // que originou a mensagem (o excludePlayer).
+            if (excludePlayer != null && player.Id == excludePlayer.Id)
             {
-                _udpListener.Send(data, data.Length, targetEndPoint);
+                continue; // Pula para o próximo jogador
+            }
+
+            // Garante que o jogador ainda está conectado.
+            // A chave do seu dicionário é o EndPoint.ToString().
+            if (_server.ConnectedPlayers.ContainsKey(player.EndPoint.ToString()))
+            {
+                _udpListener.Send(data, data.Length, player.EndPoint);
             }
         }
     }
@@ -491,7 +503,7 @@ public class NetworkManager
     public void BroadcastMessage(string message, string senderSessionId)
     {
         byte[] data = Encoding.ASCII.GetBytes(message);
-        foreach (var player in _server.ConnectedPlayers.Values.Where(p => p.SessionId != senderSessionId))
+        foreach (var player in _server.ConnectedPlayers.Values.Where(p => p.GuidSessionId != senderSessionId))
         {
             _udpListener.Send(data, data.Length, player.EndPoint);
         }
@@ -501,5 +513,34 @@ public class NetworkManager
     {
         byte[] data = Encoding.ASCII.GetBytes(message);
         _udpListener.Send(data, data.Length, endPoint);
+    }
+
+    public Vector3 ToEulerAngles(Quaternion q)
+    {
+        Vector3 angles = new();
+
+        // Roll (eixo x)
+        double sinr_cosp = 2 * (q.W * q.X + q.Y * q.Z);
+        double cosr_cosp = 1 - 2 * (q.X * q.X + q.Y * q.Y);
+        angles.X = (float)Math.Atan2(sinr_cosp, cosr_cosp);
+
+        // Pitch (eixo y)
+        double sinp = 2 * (q.W * q.Y - q.Z * q.X);
+        if (Math.Abs(sinp) >= 1)
+            angles.Y = (float)Math.CopySign(Math.PI / 2, sinp); // Use 90 graus se estiver olhando para cima/baixo
+        else
+            angles.Y = (float)Math.Asin(sinp);
+
+        // Yaw (eixo z)
+        double siny_cosp = 2 * (q.W * q.Z + q.X * q.Y);
+        double cosy_cosp = 1 - 2 * (q.Y * q.Y + q.Z * q.Z);
+        angles.Z = (float)Math.Atan2(siny_cosp, cosy_cosp);
+
+        // Converte de radianos para graus para ser compatível com o Unity
+        angles.X *= (float)(180.0 / Math.PI);
+        angles.Y *= (float)(180.0 / Math.PI);
+        angles.Z *= (float)(180.0 / Math.PI);
+
+        return angles;
     }
 }

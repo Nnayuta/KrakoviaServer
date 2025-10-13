@@ -109,18 +109,20 @@ public class NpcAiManager
         }
     }
 
+    // Em Managers/NpcAiManager.cs
+
     private void UpdateNpcPosition(NpcInstance npc, float deltaTime)
     {
         float distanceToDestination = Vector3.Distance(npc.Position, npc.Destination);
 
-        // Se o NPC já está no destino, não há nada a fazer.
+        // Se o NPC já está no destino, não há nada a fazer, exceto garantir uma última sincronização.
         if (distanceToDestination < 0.1f)
         {
+            SyncPositionIfMoved(npc); // Garante que a posição final seja enviada
             return;
         }
 
-        // --- LÓGICA DE MOVIMENTO (PRECISA FICAR AQUI!) ---
-        // O servidor precisa saber onde o NPC está em sua própria simulação.
+        // --- LÓGICA DE MOVIMENTO DO SERVIDOR ---
         float actualMoveSpeed = 5.0f * (npc.MovementSpeed / 100.0f);
         float moveAmount = actualMoveSpeed * deltaTime;
 
@@ -134,8 +136,30 @@ public class NpcAiManager
             npc.Position += direction * moveAmount;
         }
 
-        // Atualiza a posição do NPC na grade espacial para detecção de interesse.
+        // Atualiza a posição do NPC na grade espacial
         _server.GridManager.UpdateEntity(npc);
+
+        // --- LÓGICA DE SINCRONIZAÇÃO CONTÍNUA ---
+        SyncPositionIfMoved(npc);
+    }
+
+    // (NOVO OU RESTAURADO) Adicione este método auxiliar à sua classe NpcAiManager
+    private void SyncPositionIfMoved(NpcInstance npc)
+    {
+        const float SYNC_DISTANCE_THRESHOLD_SQR = 0.1f * 0.1f; // Limite de 10cm
+
+        // Pega a última posição enviada, ou a posição atual se for a primeira vez
+        Vector3 lastSentPos = _lastSentPositions.GetOrAdd(npc.Id, npc.Position);
+
+        if (Vector3.DistanceSquared(npc.Position, lastSentPos) > SYNC_DISTANCE_THRESHOLD_SQR)
+        {
+            // Envia a NOVA posição atual para os clientes relevantes
+            string posStr = $"{npc.Position.X.ToString(CultureInfo.InvariantCulture)},{npc.Position.Y.ToString(CultureInfo.InvariantCulture)},{npc.Position.Z.ToString(CultureInfo.InvariantCulture)}";
+            _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, $"NPC_MOVE|{npc.Id}|{posStr}");
+
+            // Atualiza a "última posição enviada"
+            _lastSentPositions[npc.Id] = npc.Position;
+        }
     }
 
     private void CheckIfNpcIsStuck(NpcInstance npc)

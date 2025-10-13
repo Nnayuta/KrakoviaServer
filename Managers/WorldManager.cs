@@ -142,30 +142,48 @@ public class WorldManager
         foreach (var npc in npcsToRespawn)
         {
             // --- PASSO 1: Informa aos clientes para destruírem o corpo na POSIÇÃO ANTIGA ---
-            // Guardamos a posição da morte antes de mudá-la.
             Vector3 corpsePosition = npc.Position;
             _server.NetworkManager.BroadcastMessageToRelevantPlayers(corpsePosition, $"DESTROY_NPC|{npc.Id}");
 
-            // --- PASSO 2: Ressuscita o NPC e o MOVE para sua posição de spawn no SERVIDOR ---
+            // --- PASSO 2: Ressuscita o NPC no SERVIDOR ---
             npc.IsDead = false;
             npc.CurrentHealth = npc.MaxHealth;
             npc.CurrentResource = npc.MaxResource;
             npc.ThreatTable.Clear();
             npc.ChangeNpcState(NpcAiState.Idle, _server.CurrentTimeUtc);
             npc.IsActive = false;
+            npc.RespawnTime = DateTime.MaxValue; // Previne que ele seja pego de novo neste loop
 
-            // A MUDANÇA CRÍTICA: Movemos o NPC para sua casa ANTES de enviar a mensagem de spawn.
-            npc.Position = npc.SpawnPosition;
-            npc.Destination = npc.SpawnPosition;
+            // --- PASSO 3: CALCULA A NOVA POSIÇÃO DE RESPAWN ---
+            // 3.1: Encontra o SpawnPoint original do NPC.
+            var spawnPoint = FindSpawnPointForNpc(npc.InstanceId);
+
+            Vector3 newSpawnPosition;
+
+            // 3.2: Se encontrarmos um SpawnPoint (o caso normal para monstros do mundo)...
+            if (spawnPoint != null)
+            {
+                // ...calculamos uma NOVA posição aleatória dentro da sua área de spawn.
+                newSpawnPosition = CalculateSpawnPosition(spawnPoint);
+                Console.WriteLine($"[WorldManager] NPC {npc.BaseData.TypeId} irá reaparecer em um novo local: {newSpawnPosition}");
+            }
+            else
+            {
+                // ...senão (ex: um lacaio invocado), ele reaparece em sua posição original por segurança.
+                newSpawnPosition = npc.SpawnPosition;
+                Console.WriteLine($"[WorldManager] NPC {npc.BaseData.TypeId} não tem SpawnPoint, reaparecendo no local original: {newSpawnPosition}");
+            }
+
+            // --- PASSO 4: MOVE O NPC para sua NOVA posição de spawn no SERVIDOR ---
+            npc.Position = newSpawnPosition;
+            npc.Destination = newSpawnPosition; // Importante para que a IA não tente "voltar para casa"
             _server.GridManager.UpdateEntity(npc);
-            npc.RespawnTime = DateTime.MaxValue;
 
-            // --- PASSO 3: Informa aos clientes para criarem o novo NPC na NOVA POSIÇÃO ---
-            // A mensagem agora usa a nova posição (npc.SpawnPosition).
+            // --- PASSO 5: Informa aos clientes para criarem o novo NPC na NOVA POSIÇÃO ---
             string spawnMessage = npc.GetSpawnMessage();
             _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, spawnMessage);
 
-            Console.WriteLine($"[WorldManager] NPC {npc.InstanceId} ({npc.BaseData.TypeId}) desapareceu do local da morte e reapareceu em seu spawn.");
+            Console.WriteLine($"[WorldManager] NPC {npc.InstanceId} ({npc.BaseData.TypeId}) desapareceu do local da morte e reapareceu em seu novo spawn.");
         }
     }
 

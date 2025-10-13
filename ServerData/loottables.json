@@ -10,6 +10,17 @@
           "MaxQuantity": 2
         }
       ]
+    },
+    {
+      "LootTableID": "quest_raiz_problema_collect",
+      "Entries": [
+        {
+          "ItemID": "potato_glitch",
+          "DropChance": 100.0,
+          "MinQuantity": 1,
+          "MaxQuantity": 1
+        }
+      ]
     }
   ]
 }

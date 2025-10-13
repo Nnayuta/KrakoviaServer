@@ -20,27 +20,54 @@ public static class DataManager
     public static Dictionary<string, LootTable> LootTables { get; private set; } = new();
     public static Dictionary<string, ServerQuestData> Quests { get; private set; } = new();
     public static Dictionary<string, ServerStatusEffectData> StatusEffects { get; private set; } = new();
-
     private class LootTableWrapper { public List<LootTable> LootTables { get; set; } }
     private class QuestListWrapper { public List<ServerQuestData> Quests { get; set; } }
+    public static Dictionary<string, GatherableData> Gatherables { get; private set; } = new();
+    public static List<GatherableSpawnPoint> GatherableSpawnPoints { get; private set; } = new();
 
     public static void LoadAllData()
     {
         Console.WriteLine("[DataManager] Iniciando carregamento de dados do jogo...");
 
-
-        // Ordem de carregamento
         LoadAbilities();
         LoadItems();
         LoadStatusEffects();
         LoadNpcs();
+        LoadGatherables();
         LoadClasses();
         LoadSpawnPoints();
+        // (NOVO) Carrega os spawns dos coletáveis
+        LoadGatherableSpawnPoints();
         LoadLootTables();
         LoadVendors();
         LoadQuests();
 
         Console.WriteLine("[DataManager] Carregamento de dados concluído.");
+    }
+
+    private static void LoadGatherableSpawnPoints()
+    {
+        string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ServerData", "gatherable_spawns.json");
+        try
+        {
+            if (!File.Exists(filePath))
+            {
+                Console.WriteLine($"[AVISO] Arquivo de Spawns de Coletáveis não encontrado: {filePath}");
+                return;
+            }
+            string jsonContent = File.ReadAllText(filePath);
+
+            var wrapper = JsonConvert.DeserializeObject<GatherableSpawnPointListWrapper>(jsonContent);
+            if (wrapper?.GatherableSpawnPoints != null)
+            {
+                GatherableSpawnPoints = wrapper.GatherableSpawnPoints;
+                Console.WriteLine($"[DataManager] {GatherableSpawnPoints.Count} pontos de spawn de coletáveis carregados.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ERRO FATAL] Falha ao carregar gatherable_spawns.json: {ex.Message}");
+        }
     }
 
     private static void LoadStatusEffects()
@@ -327,6 +354,32 @@ public static class DataManager
         }
     }
 
+    private static void LoadGatherables()
+    {
+        string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ServerData", "gatherables.json");
+        try
+        {
+            if (!File.Exists(filePath))
+            {
+                Console.WriteLine($"[AVISO] Arquivo de Itens Coletáveis não encontrado: {filePath}");
+                return;
+            }
+            string jsonContent = File.ReadAllText(filePath);
+
+            var wrapper = JsonConvert.DeserializeObject<GatherableListWrapper>(jsonContent);
+            if (wrapper?.Gatherables != null)
+            {
+                Gatherables = wrapper.Gatherables.ToDictionary(g => g.ID, g => g);
+                Console.WriteLine($"[DataManager] {Gatherables.Count} itens coletáveis carregados.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ERRO FATAL] Falha ao carregar gatherables.json: {ex.Message}");
+        }
+    }
+
+
     // =================================================================================
     // Classes Wrapper para a desserialização correta dos arquivos JSON
     // =================================================================================
@@ -337,4 +390,6 @@ public static class DataManager
     private class AbilityListWrapper { public List<AbilityData> Abilities { get; set; } }
     private class VendorListWrapper { public List<VendorData> Vendors { get; set; } }
     private class ItemListWrapper { public List<ServerItemData> Items { get; set; } }
+    private class GatherableSpawnPointListWrapper { public List<GatherableSpawnPoint> GatherableSpawnPoints { get; set; } }
+    private class GatherableListWrapper { public List<GatherableData> Gatherables { get; set; } }
 }

@@ -31,7 +31,7 @@ public class CharacterData
         this.Appearance = appearance;
         this.QuestLog = new PlayerQuestLog();
 
-        this.Position = "174,7,476";
+        this.Position = "-335,71,467";
 
         // Inicializa invent�rio, equipamento e barras de a��o vazios.
         // Eles ser�o preenchidos pelo CharacterDatabase se for a primeira vez.

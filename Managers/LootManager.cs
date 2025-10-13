@@ -33,7 +33,7 @@ public class LootManager
             }
         }
 
-        Console.WriteLine($"[Loot] Gerado {itemsToDrop.Count} item(s) da tabela '{lootTableId}'.");
+        // Console.WriteLine($"[Loot] Gerado {itemsToDrop.Count} item(s) da tabela '{lootTableId}'.");
         return itemsToDrop;
     }
 

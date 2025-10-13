@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 public class UDPServer
 {
+    public static UDPServer? Instance { get; private set; }
 
     public DateTime CurrentTimeUtc { get; private set; }
 
@@ -32,13 +33,17 @@ public class UDPServer
     public readonly InterestManager InterestManager;
     public readonly Scheduler Scheduler;
     public readonly SpatialGridManager GridManager;
-
+    public readonly GatherableManager GatherableManager;
     private readonly ICharacterDatabase _characterDb;
     private readonly UdpClient _udpListener;
     private const int TIMEOUT_SECONDS = 15;
 
+    private int _nextSessionId = 0;
+
     public UDPServer(int port, ICharacterDatabase characterDatabase)
     {
+        Instance = this;
+
         _characterDb = characterDatabase;
         _udpListener = new UdpClient(port);
         DataManager.LoadAllData();
@@ -58,12 +63,22 @@ public class UDPServer
         LootManager = new LootManager(this);
         Scheduler = new Scheduler(this);
         GridManager = new SpatialGridManager();
+        this.GatherableManager = new GatherableManager(this); // (NOVO) Instancia o manager
+    }
+
+    public int GetNextSessionId()
+    {
+        // Interlocked.Increment é uma operação atômica, o que significa que
+        // mesmo que múltiplos jogadores conectem ao mesmo tempo, nunca teremos IDs duplicados.
+        return Interlocked.Increment(ref _nextSessionId);
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         Console.WriteLine($"Servidor [WORLD] iniciado na porta {_udpListener.Client.LocalEndPoint}.");
         WorldManager.InitializeSpawns();
+        GatherableManager.InitializeSpawns();
+
 
         Console.WriteLine("STARTING NETWORK MANAGER");
         Task listenTask = NetworkManager.ListenForPlayerMessagesAsync(cancellationToken);
@@ -77,6 +92,10 @@ public class UDPServer
         Console.WriteLine("STARTING INTEREST MANAGER");
         Task interestAndActivationTask = InterestManager.UpdateInterestAndActivationAsync(cancellationToken);
 
+        Console.WriteLine("STARTING GATHERABLE MANAGER");
+        Task gatherableTask = GatherableManager.GatherableLoopAsync(cancellationToken);
+
+        Console.WriteLine("STARTING Scheduler");
         Task schedulerTask = Scheduler.RunAsync(cancellationToken);
 
         Console.WriteLine("STARTING PLAYER LIFECYCLE MANAGER");
@@ -98,7 +117,8 @@ public class UDPServer
             interestAndActivationTask,
             playerLifecycleTask,
             schedulerTask,
-            timeoutTask
+            timeoutTask,
+            gatherableTask
         );
     }
 
@@ -110,8 +130,11 @@ public class UDPServer
 
     public IWorldEntity? GetWorldEntityById(string id)
     {
-        if (ConnectedPlayers.TryGetValue(id, out var player)) return player;
+        var player = ConnectedPlayers.Values.FirstOrDefault(p => p.Id == id);
+        if (player != null) return player;
+
         if (ActiveNpcs.TryGetValue(id, out var npc)) return npc;
+        if (GatherableManager.ActiveGatherables.TryGetValue(id, out var gatherable)) return gatherable;
         return null;
     }
 
@@ -225,4 +248,31 @@ public class UDPServer
         }
         Console.WriteLine("[AUTOSAVE] Sistema de salvamento periódico encerrado.");
     }
+
+    public Player? FindPlayerByNameOrId(string identifier)
+    {
+        var players = ConnectedPlayers.Values.ToList();
+
+        // (NOVO) Tenta encontrar por ID de Sessão primeiro (o mais comum para ADMs)
+        if (int.TryParse(identifier, out int sessionId))
+        {
+            var playerBySessionId = players.FirstOrDefault(p => p.SessionId == sessionId);
+            if (playerBySessionId != null)
+            {
+                return playerBySessionId;
+            }
+        }
+
+        // Tenta encontrar por ID do Personagem (GUID)
+        var playerById = players.FirstOrDefault(p => p.CharacterId.Equals(identifier, StringComparison.OrdinalIgnoreCase));
+        if (playerById != null)
+        {
+            return playerById;
+        }
+
+        // Por último, tenta encontrar por Nome do Personagem
+        var playerByName = players.FirstOrDefault(p => p.CharacterName.Equals(identifier, StringComparison.OrdinalIgnoreCase));
+        return playerByName;
+    }
+
 }

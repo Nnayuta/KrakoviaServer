@@ -1,0 +1,13 @@
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\Krakovia Server.pdb
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\ServerData\abilities.json
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\ServerData\classes.json
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\ServerData\gatherables.json
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\ServerData\gatherable_spawns.json
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\ServerData\items.json
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\ServerData\loottables.json
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\ServerData\npcs.json
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\ServerData\quests.json
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\ServerData\spawns.json
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\ServerData\status_effects.json
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\ServerData\vendors.json
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\Krakovia Server

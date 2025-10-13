@@ -58,24 +58,35 @@ public abstract class BaseBehavior : INpcBehavior
 
     protected void SetNpcDestination(NpcInstance npc, Vector3 newDestination)
     {
-        // Se o novo destino é praticamente o mesmo que o destino atual, não faz nada.
+        // Apenas atualiza o estado de "intenção" do NPC no servidor.
+        // Nenhuma mensagem de rede é enviada aqui.
         if (Vector3.DistanceSquared(npc.Destination, newDestination) < 0.01f)
         {
             return;
         }
-
-        // Atualiza o destino no servidor
         npc.Destination = newDestination;
-
-        // --- A MUDANÇA CRÍTICA ---
-        // Envia o novo DESTINO para o cliente.
-        string posStr = $"{newDestination.X.ToString(CultureInfo.InvariantCulture)},{newDestination.Y.ToString(CultureInfo.InvariantCulture)},{newDestination.Z.ToString(CultureInfo.InvariantCulture)}";
-
-        // Usamos o mesmo nome de comando 'NPC_MOVE' para não ter que mudar o cliente,
-        // mas agora ele representa um DESTINO, não uma posição atual.
-        _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, $"NPC_MOVE|{npc.Id}|{posStr}");
     }
-    
+
+    // protected void SetNpcDestination(NpcInstance npc, Vector3 newDestination)
+    // {
+    //     // Se o novo destino é praticamente o mesmo que o destino atual, não faz nada.
+    //     if (Vector3.DistanceSquared(npc.Destination, newDestination) < 0.01f)
+    //     {
+    //         return;
+    //     }
+
+    //     // Atualiza o destino no servidor
+    //     npc.Destination = newDestination;
+
+    //     // --- A MUDANÇA CRÍTICA ---
+    //     // Envia o novo DESTINO para o cliente.
+    //     string posStr = $"{newDestination.X.ToString(CultureInfo.InvariantCulture)},{newDestination.Y.ToString(CultureInfo.InvariantCulture)},{newDestination.Z.ToString(CultureInfo.InvariantCulture)}";
+
+    //     // Usamos o mesmo nome de comando 'NPC_MOVE' para não ter que mudar o cliente,
+    //     // mas agora ele representa um DESTINO, não uma posição atual.
+    //     _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, $"NPC_MOVE|{npc.Id}|{posStr}");
+    // }
+
 
     protected Vector3 FindWanderPoint(NpcInstance npc)
     {

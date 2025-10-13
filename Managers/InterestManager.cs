@@ -96,48 +96,44 @@ public class InterestManager
     {
         if (player.IsPendingInitialization) return;
 
-        // Passo 1: Pega as entidades E FILTRA AS MORTAS
-        // <<< CORREÇÃO >>> ADICIONE O FILTRO .Where(...) AQUI!
+        // Passo 1: Pega TODAS as entidades visíveis (jogadores, NPCs, coletáveis)
         var entitiesThatShouldBeVisible = _server.GridManager
             .GetEntitiesInRadius(player.Position, VISIBILITY_SPAWN_RADIUS)
-            .Where(e => e.Id != player.Id && !(e is NpcInstance npc && npc.IsDead)) // Adicione esta linha .Where
+            .Where(e => e.Id != player.Id)
             .Select(e => e.Id)
             .ToHashSet();
 
-        // Passo 2: Crie um HashSet com todas as entidades que o jogador JÁ CONHECE.
+        // Passo 2: Crie um HashSet com TODAS as entidades que o jogador JÁ CONHECE
+        // (NOVO) Adicionamos a lista de coletáveis conhecidos
         var entitiesCurrentlyKnown = player.KnownPlayerIds
-            .Union(player.KnownNpcIds)
-            .ToHashSet();
+          .Union(player.KnownNpcIds)
+          .Union(player.KnownGatherableIds)
+          .ToHashSet();
 
-        // Passo 3: Calcule a diferença. Quais entidades precisam ser SPAWNADAS?
+        // Passo 3: Calcule quais entidades precisam ser SPAWNADAS
         var entitiesToSpawn = new HashSet<string>(entitiesThatShouldBeVisible);
         entitiesToSpawn.ExceptWith(entitiesCurrentlyKnown);
 
         foreach (var idToSpawn in entitiesToSpawn)
         {
-            // Encontra a entidade real para obter seus dados de spawn
             IWorldEntity? entity = _server.GetWorldEntityById(idToSpawn);
             if (entity != null)
             {
-                // O log pode ser removido se quiser, mas é útil para depurar
-                // Console.WriteLine($"[VIS-FIX] Spawning NEW entity {entity.Id} for {player.Id}");
                 _server.NetworkManager.SendMessageToClient(entity.GetSpawnMessage(), player.EndPoint);
 
-                // Atualiza o estado do jogador
+                // Atualiza o estado do jogador com o tipo correto
                 if (entity is Player) player.KnownPlayerIds.Add(idToSpawn);
-                else player.KnownNpcIds.Add(idToSpawn);
+                else if (entity is NpcInstance) player.KnownNpcIds.Add(idToSpawn);
+                else if (entity is GatherableInstance) player.KnownGatherableIds.Add(idToSpawn); // <-- Adicionado
             }
         }
 
-        // Passo 4: Calcule a outra diferença. Quais entidades precisam ser DESPAWNADAS?
+        // Passo 4: Calcule quais entidades precisam ser DESPAWNADAS
         var entitiesToDespawn = new HashSet<string>(entitiesCurrentlyKnown);
         entitiesToDespawn.ExceptWith(entitiesThatShouldBeVisible);
 
         foreach (var idToDespawn in entitiesToDespawn)
         {
-            // O log pode ser removido se quiser
-            // Console.WriteLine($"[VIS-FIX] Despawning OLD entity {idToDespawn} for {player.Id}");
-
             string despawnMessage;
             if (player.KnownPlayerIds.Remove(idToDespawn))
             {
@@ -146,6 +142,10 @@ public class InterestManager
             else if (player.KnownNpcIds.Remove(idToDespawn))
             {
                 despawnMessage = $"DESTROY_NPC|{idToDespawn}";
+            }
+            else if (player.KnownGatherableIds.Remove(idToDespawn)) // <-- Adicionado
+            {
+                despawnMessage = $"DESTROY_GATHERABLE|{idToDespawn}";
             }
             else continue;
 

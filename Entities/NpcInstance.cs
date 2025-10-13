@@ -271,6 +271,6 @@ public class NpcInstance : ICombatEntity, IWorldEntity
         if (this.CurrentState == newState) return;
         this.CurrentState = newState;
         this.LastStateChangeTime = currentTime;
-        Console.WriteLine($"[NPC STATE] NPC '{this.BaseData.TypeId}' (ID: {this.Id}) mudou para o estado {newState} em {currentTime}.");
+        // Console.WriteLine($"[NPC STATE] NPC '{this.BaseData.TypeId}' (ID: {this.Id}) mudou para o estado {newState} em {currentTime}.");
     }
 }

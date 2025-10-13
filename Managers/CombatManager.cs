@@ -194,9 +194,16 @@ public class CombatManager
     /// </summary>
     public void HandleCancelCastRequest(Player player)
     {
+        // Cancela o casting de habilidade
         if (player.IsCasting)
         {
-            player.InterruptCasting(true, _server.NetworkManager); // Passa o NetworkManager para enviar a confirmação
+            player.InterruptCasting(true, _server.NetworkManager);
+        }
+
+        // (NOVO) Cancela a coleta, se estiver acontecendo
+        if (player.CurrentGatheringTokenSource != null)
+        {
+            player.InterruptGathering();
         }
     }
 

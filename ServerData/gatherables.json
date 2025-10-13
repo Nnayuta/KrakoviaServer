@@ -1,0 +1,11 @@
+{
+  "Gatherables": [
+    {
+      "ID": "potato_glitch",
+      "DisplayName": "Batata da Fenda coletadas",
+      "GatherTimeSeconds": 3.0,
+      "RespawnTimeSeconds": 120,
+      "LootTableID": "quest_raiz_problema_collect"
+    }
+  ]
+}

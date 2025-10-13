@@ -23,6 +23,7 @@ public class Player : ICombatEntity, IWorldEntity
     #region IWorldEntity & Session (Sem mudanças significativas)
     public HashSet<string> KnownPlayerIds { get; } = new HashSet<string>();
     public HashSet<string> KnownNpcIds { get; } = new HashSet<string>();
+    public readonly HashSet<string> KnownGatherableIds = new();
     public bool IsStationary => false;
 
     public string GetSpawnMessage()
@@ -46,8 +47,10 @@ public class Player : ICombatEntity, IWorldEntity
         return $"SPAWN_PLAYER|{this.Id}|{this.CharacterName}|{this.State.Position}|{this.State.RotationY}|{GetEquipmentPayload()}|{JsonConvert.SerializeObject(this.Appearance)}|{this.Level}|{currentHealthStr}|{maxHealthStr}|{this.PermissionLevel}";
     }
 
-    public string SessionId { get; }
+    public string GuidSessionId { get; }
+    public int SessionId { get; } // <-- O NOVO ID DE SESSÃO NUMÉRICO!
     public IPEndPoint EndPoint { get; }
+
     public DateTime LastMessageTime { get; set; }
     public PlayerState State { get; }
     #endregion
@@ -81,6 +84,7 @@ public class Player : ICombatEntity, IWorldEntity
     public AbilityData? CurrentCastAbility { get; private set; }
     public string? CurrentCastTargetId { get; private set; }
     public Vector3 CastInitialPosition { get; private set; }
+    public CancellationTokenSource? CurrentGatheringTokenSource { get; set; }
 
     #region ICombatEntity Implementation (Atualizada)
 
@@ -119,8 +123,10 @@ public class Player : ICombatEntity, IWorldEntity
     {
         _server = server;
 
-        SessionId = Guid.NewGuid().ToString("N");
+        GuidSessionId = Guid.NewGuid().ToString("N");
+        SessionId = server.GetNextSessionId();
         EndPoint = endPoint;
+        
         LastMessageTime = server.CurrentTimeUtc;
         LastCombatTime = server.CurrentTimeUtc;
         NextRegenTime = server.CurrentTimeUtc;
@@ -251,23 +257,24 @@ public class Player : ICombatEntity, IWorldEntity
 
     public void SendFullStateToClient()
     {
-        // Se _server for nulo (como no caso do tempPlayer), este método não faz nada.
-        if (_server == null) return;
+        _server?.NetworkManager.SendFullStateToPlayer(this);
+        // // Se _server for nulo (como no caso do tempPlayer), este método não faz nada.
+        // if (_server == null) return;
 
-        // Envia atualização de inventário
-        string invPayload = string.Join("|", this.PlayerInventory.slots.Select(s => s == null ? "null" : $"{s.InstanceID},{s.ItemID},{s.Quantity}"));
-        _server.NetworkManager.SendMessageToClient($"INVENTORY_UPDATE|{invPayload}", this.EndPoint);
+        // // Envia atualização de inventário
+        // string invPayload = string.Join("|", this.PlayerInventory.slots.Select(s => s == null ? "null" : $"{s.InstanceID},{s.ItemID},{s.Quantity}"));
+        // _server.NetworkManager.SendMessageToClient($"INVENTORY_UPDATE|{invPayload}", this.EndPoint);
 
-        // Envia atualização de equipamento
-        string eqPayload = string.Join("|", this.PlayerEquipment.equippedItems.Select(kvp => $"{kvp.Key},{(kvp.Value == null ? "null" : $"{kvp.Value.InstanceID},{kvp.Value.ItemID},{kvp.Value.Quantity}")}"));
-        _server.NetworkManager.SendMessageToClient($"EQUIPMENT_UPDATE|{eqPayload}", this.EndPoint);
+        // // Envia atualização de equipamento
+        // string eqPayload = string.Join("|", this.PlayerEquipment.equippedItems.Select(kvp => $"{kvp.Key},{(kvp.Value == null ? "null" : $"{kvp.Value.InstanceID},{kvp.Value.ItemID},{kvp.Value.Quantity}")}"));
+        // _server.NetworkManager.SendMessageToClient($"EQUIPMENT_UPDATE|{eqPayload}", this.EndPoint);
 
-        _server.NetworkManager.SendInventoryUpdate(this);
-        _server.NetworkManager.SendEquipmentUpdate(this);
-        _server.NetworkManager.SendCurrencyUpdate(this);
-        _server.NetworkManager.SendStatsUpdate(this);
-        _server.NetworkManager.SendFullQuestLog(this);
-        _server.NetworkManager.SendVitalsUpdate(this);
+        // _server.NetworkManager.SendInventoryUpdate(this);
+        // _server.NetworkManager.SendEquipmentUpdate(this);
+        // _server.NetworkManager.SendCurrencyUpdate(this);
+        // _server.NetworkManager.SendStatsUpdate(this);
+        // _server.NetworkManager.SendFullQuestLog(this);
+        // _server.NetworkManager.SendVitalsUpdate(this);
     }
 
     public List<string> CalculateKnownAbilities()
@@ -356,7 +363,7 @@ public class Player : ICombatEntity, IWorldEntity
     /// </summary>
     /// <param name="notifyClient">Se verdadeiro, enviará uma mensagem de confirmação de cancelamento para o cliente.</param>
     /// <param name="networkManager">A referência ao NetworkManager, necessária se notifyClient for true.</param>
-    public void InterruptCasting(bool notifyClient = false, NetworkManager networkManager = null)
+    public void InterruptCasting(bool notifyClient = false, NetworkManager? networkManager = null)
     {
         if (!IsCasting) return;
 
@@ -368,11 +375,23 @@ public class Player : ICombatEntity, IWorldEntity
         CurrentCastTargetId = null;
         CastEndTime = DateTime.MinValue;
 
+        InterruptGathering();
+
         // NOVO: Envia a confirmação para o cliente se solicitado
         if (notifyClient && networkManager != null)
         {
             networkManager.SendMessageToClient("CAST_CANCELED", this.EndPoint);
             networkManager.BroadcastMessageToOthers(this, $"ENTITY_CAST_CANCEL|{this.Id}");
+        }
+    }
+
+    public void InterruptGathering()
+    {
+        if (CurrentGatheringTokenSource != null)
+        {
+            CurrentGatheringTokenSource.Cancel();
+            CurrentGatheringTokenSource.Dispose();
+            CurrentGatheringTokenSource = null;
         }
     }
 
@@ -382,6 +401,11 @@ public class Player : ICombatEntity, IWorldEntity
         if (IsDead) return;
         EnterCombat(server);
 
+        if (CurrentGatheringTokenSource != null)
+        {
+            InterruptGathering();
+        }
+
         float finalDamage = amount; // Começa com o dano bruto
 
         // --- Passo 1: Redução por Armadura (lógica existente) ---
@@ -389,7 +413,7 @@ public class Player : ICombatEntity, IWorldEntity
         float kConstant = CombatConstants.ARMOR_K_BASE + (CombatConstants.ARMOR_K_LEVEL_MULTIPLIER * source.Level);
         float damageReduction = kConstant > 0 ? armorValue / (armorValue + kConstant) : 0f;
         damageReduction = Math.Min(damageReduction, CombatConstants.MAX_ARMOR_DAMAGE_REDUCTION);
-        finalDamage *= (1 - damageReduction);
+        finalDamage *= 1 - damageReduction;
 
         // --- (NOVA LÓGICA) Passo 2: Modificador por Diferença de Nível ---
         int levelDifference = source.Level - this.Level;

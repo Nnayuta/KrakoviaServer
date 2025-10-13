@@ -38,7 +38,6 @@ $@"
         Version: {ServerConfig.GAME_VERSION}
 ");
 
-        // Cria os servidores primeiro para que possamos referenciá-los no handler de shutdown.
         Console.WriteLine("Conectando ao banco de dados MariaDB...");
         string connectionString = "Server=127.0.0.1;Database=krakovia;User=root;Password=;";
         IAccountDatabase accountDatabase = new MariaDBAccountDatabase(connectionString);
@@ -46,47 +45,40 @@ $@"
 
         var tcpServer = new TCPServer(ServerConfig.AUTH_SERVER_PORT, accountDatabase, characterDatabase);
         var udpServer = new UDPServer(ServerConfig.WORLD_SERVER_PORT, characterDatabase);
+        var webServer = new WebServer("http://localhost:8080/");
 
-        // --- (LÓGICA DE SHUTDOWN ATUALIZADA) ---
         var cts = new CancellationTokenSource();
 
         Console.CancelKeyPress += (sender, e) =>
         {
-            e.Cancel = true; // Impede que o console feche o programa abruptamente.
+            e.Cancel = true;
 
-            // Verifica se o shutdown já foi iniciado para evitar chamadas duplas.
             if (!cts.IsCancellationRequested)
             {
                 Console.WriteLine("\n[SERVER] Shutdown signal received. Closing servers...");
 
-                // 1. Dispara o cancelamento para todos os loops de Task.Delay.
                 cts.Cancel();
 
-                // 2. Chama os métodos de parada explícita para desbloquear os sockets.
-                // (Presumindo que você também adicionará um método Stop() ao TCPServer)
                 tcpServer.Stop();
                 udpServer.Stop();
+                webServer.Stop(); // (CORREÇÃO 1) Adicionado o stop do web server
             }
         };
-        // --- FIM DA LÓGICA DE SHUTDOWN ---
 
         try
         {
-            Console.WriteLine("[SERVER] Starting TCP and UDP listeners...");
+            Console.WriteLine("[SERVER] Starting TCP, UDP, and Web listeners...");
 
-            // Inicia todas as tarefas de longa duração.
             Task tcpTask = tcpServer.StartAsync(cts.Token);
             Task udpTask = udpServer.StartAsync(cts.Token);
+            Task webTask = webServer.StartAsync(cts.Token);
             Task consoleTask = ConsoleCommandListener(udpServer, cts.Token);
 
-            // Aguarda a conclusão de todas as tarefas principais.
-            // Quando o cts.Cancel() for chamado, todas elas devem terminar graciosamente.
-            await Task.WhenAll(tcpTask, udpTask, consoleTask);
+            await Task.WhenAll(tcpTask, udpTask, webTask, consoleTask);
         }
         catch (OperationCanceledException)
         {
-            // Esta exceção é normal e esperada quando o token é cancelado.
-            // Apenas garante que o programa não feche com um erro não tratado.
+            // Normal no shutdown.
         }
         catch (Exception ex)
         {
