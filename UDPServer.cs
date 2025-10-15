@@ -289,4 +289,21 @@ public class UDPServer
         return player;
     }
 
+    /// <summary>
+    /// Encontra um jogador conectado pelo seu ID de sessão (string).
+    /// </summary>
+    /// <param name="playerId">O ID de sessão do jogador a ser encontrado.</param>
+    /// <returns>O objeto Player se encontrado; caso contrário, null.</returns>
+    public Player? GetPlayerById(string playerId)
+    {
+        if (string.IsNullOrEmpty(playerId) || playerId.ToLower() == "null")
+        {
+            return null;
+        }
+
+        // Esta busca assume que seu dicionário ConnectedPlayers usa o EndPoint como chave
+        // e que a propriedade Player.Id retorna o SessionId como string.
+        return ConnectedPlayers.Values.FirstOrDefault(p => p.Id == playerId);
+    }
+
 }

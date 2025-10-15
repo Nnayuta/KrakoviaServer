@@ -107,8 +107,10 @@
     },
     {
       "QuestID": "slay_bear_01",
-      "RequiredLevel": 1,
-      "PrerequisiteQuestIDs": [],
+      "RequiredLevel": 3,
+      "PrerequisiteQuestIDs": [
+        "01_quest_despertar_glitchado"
+      ],
       "QuestGiverID": "21119d19",
       "QuestCompleterID": "21119d19",
       "Category": "Side",

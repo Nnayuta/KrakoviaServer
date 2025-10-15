@@ -83,7 +83,8 @@ public class CombatManager
         // --- 1. VALIDAÇÕES IMEDIATAS E ESSENCIAIS ---
         if (source.IsDead) return;
         if (!DataManager.Abilities.TryGetValue(abilityId, out var ability)) return;
-        if (source is Player p_casting && p_casting.IsCasting) return; // Jogador já está conjurando algo
+        if (source is Player p_casting && p_casting.IsCasting) return;
+        if (source is NpcInstance npc_casting && npc_casting.IsCasting) return;
 
         // Validações de Cooldown e Recurso
         if (source.AbilityCooldowns.TryGetValue(abilityId, out DateTime cdEnd) && _server.CurrentTimeUtc < cdEnd)
@@ -158,32 +159,45 @@ public class CombatManager
         }
 
         // --- 3. ROTEAMENTO: CASTING vs. INSTANTÂNEO ---
-        if (ability.CastTime > 0 && source is Player playerCaster) // Apenas jogadores têm casting por enquanto
+        if (ability.CastTime > 0)
         {
-            playerCaster.StartCasting(ability, targetId, _server.CurrentTimeUtc);
-
-            // NOVO: Notifica o cliente que o casting foi autorizado e pode começar
             string castTimeStr = ability.CastTime.ToString(CultureInfo.InvariantCulture);
-            _server.NetworkManager.SendMessageToClient($"CAST_STARTED|{ability.ID}|{castTimeStr}", playerCaster.EndPoint);
 
-            // --- NOVO BROADCAST ---
-            // Mensagem para os OUTROS jogadores, para eles verem a animação.
-            string broadcastMessage = $"ENTITY_CAST_START|{playerCaster.Id}|{ability.ID}|{castTimeStr}";
-            _server.NetworkManager.BroadcastMessageToOthers(playerCaster, broadcastMessage);
+            if (source is Player playerCaster)
+            {
+                playerCaster.StartCasting(ability, targetId, _server.CurrentTimeUtc);
+                _server.NetworkManager.SendMessageToClient($"CAST_STARTED|{ability.ID}|{castTimeStr}", playerCaster.EndPoint);
+            }
+            // NOVO: Lógica para NPCs
+            else if (source is NpcInstance npcCaster)
+            {
+                npcCaster.StartCasting(ability, targetId, _server.CurrentTimeUtc);
+            }
+
+            // Mensagem para TODOS os jogadores verem a animação de cast.
+            // Isso agora funciona para Players E NPCs.
+            string broadcastMessage = $"ENTITY_CAST_START|{source.Id}|{ability.ID}|{castTimeStr}";
+            _server.NetworkManager.BroadcastMessageToRelevantPlayers(source.Position, broadcastMessage);
         }
-        else // Habilidade Instantânea (ou usada por NPC)
+        else // Habilidade Instantânea
         {
-            // Aplica custos e cooldowns IMEDIATAMENTE
+            // Aplica custos e cooldowns da habilidade
             source.CurrentResource -= ability.ResourceCost;
             if (ability.Cooldown > 0)
             {
                 source.AbilityCooldowns[ability.ID] = _server.CurrentTimeUtc.AddSeconds(ability.Cooldown);
             }
 
-            // Notifica o cliente sobre a mudança de recurso (se for um jogador)
+            // <<< ADICIONE ESTA LÓGICA >>>
+            // Habilidades instantâneas (que não são auto-ataques) também devem ativar o GCD.
+            if (source is NpcInstance npc && abilityId != npc.BaseData.AutoAttackAbilityID)
+            {
+                npc.GlobalCooldownEndTime = _server.CurrentTimeUtc.AddSeconds(1.5);
+            }
+
             if (source is Player p) _server.NetworkManager.SendVitalsUpdate(p);
 
-            // Aplica os efeitos e notifica os clientes para a execução visual
+            // Aplica os efeitos
             ApplyAbilityEffects(source, ability, targetId);
         }
     }
@@ -307,9 +321,9 @@ public class CombatManager
             if (isCritical) rawDamage *= 2.0f;
 
             // --- LOG DE DEPURAÇÃO ---
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"[DAMAGE DEBUG] Caster: {caster.Id} ({caster.GetType().Name}) | Target: {target.Id} ({target.GetType().Name})");
-            Console.ResetColor();
+            // Console.ForegroundColor = ConsoleColor.Yellow;
+            // Console.WriteLine($"[DAMAGE DEBUG] Caster: {caster.Id} ({caster.GetType().Name}) | Target: {target.Id} ({target.GetType().Name})");
+            // Console.ResetColor();
             // --- FIM DO LOG ---
 
             target.TakeDamage(rawDamage, caster, _server);
@@ -521,6 +535,33 @@ public class CombatManager
         _server.WorldManager.ProcessNpcDeath(npc, lastAttacker);
     }
     #endregion
+
+    /// <summary>
+    /// Verifica se há uma linha de visão desobstruída entre duas entidades usando lógica comportamental.
+    /// </summary>
+    public bool HasLineOfSight(ICombatEntity source, ICombatEntity target)
+    {
+        // Por padrão, consideramos que a visão está limpa.
+        if (source is not NpcInstance npc || target is not Player player)
+        {
+            return true;
+        }
+
+        // A lógica de "LoS Falso":
+        // Se o estado do NPC é de perseguição, mas ele não conseguiu se mover...
+        if (npc.CurrentState == NpcAiState.Chasing && Vector3.Distance(npc.Position, npc.LastPosition) < 0.1f)
+        {
+            // ...e ele está parado há mais de meio segundo...
+            if ((_server.CurrentTimeUtc - npc.TimeAtLastPosition).TotalMilliseconds > 500)
+            {
+                // ...então inferimos que ele está bloqueado por uma parede. Sem linha de visão.
+                return false;
+            }
+        }
+
+        // Se a condição acima não for atendida, assumimos que a visão está limpa.
+        return true;
+    }
 }
 
 

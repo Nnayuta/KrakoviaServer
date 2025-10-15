@@ -1,6 +1,252 @@
 {
   "Npcs": [
     {
+      "TypeId": "bandids_0001",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 12
+        },
+        {
+          "Stat": "Strength",
+          "Value": 12
+        },
+        {
+          "Stat": "Agility",
+          "Value": 12
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 12
+        },
+        {
+          "Stat": "Armor",
+          "Value": 31
+        }
+      ],
+      "Level": 5,
+      "IsBoss": false,
+      "AggroRange": 10.0,
+      "LeashRange": 20.0,
+      "RespawnTimeSeconds": 30,
+      "SwingTimer": 4.0,
+      "AutoAttackAbilityID": "sword_warrior_autoattack",
+      "AbilityIDs": [
+        "sword_light_attack",
+        "sword_heavy_attack"
+      ],
+      "CurrencyReward": 26,
+      "ExperienceReward": 10,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "elite_bandids_0001",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 49
+        },
+        {
+          "Stat": "Strength",
+          "Value": 16
+        },
+        {
+          "Stat": "Agility",
+          "Value": 16
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 16
+        },
+        {
+          "Stat": "Armor",
+          "Value": 35
+        }
+      ],
+      "Level": 6,
+      "IsBoss": true,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": "sword_warrior_autoattack",
+      "AbilityIDs": [
+        "sword_light_attack",
+        "sword_heavy_attack"
+      ],
+      "CurrencyReward": 420,
+      "ExperienceReward": 10,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "mage_bandids_0001",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 8
+        },
+        {
+          "Stat": "Strength",
+          "Value": 7
+        },
+        {
+          "Stat": "Agility",
+          "Value": 15
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 17
+        },
+        {
+          "Stat": "Armor",
+          "Value": 18
+        }
+      ],
+      "Level": 5,
+      "IsBoss": false,
+      "AggroRange": 10.0,
+      "LeashRange": 20.0,
+      "RespawnTimeSeconds": 30,
+      "SwingTimer": 3.0,
+      "AutoAttackAbilityID": "mage_e5dfac90",
+      "AbilityIDs": [
+        "mage_644c55de",
+        "mage_54d36845"
+      ],
+      "CurrencyReward": 23,
+      "ExperienceReward": 10,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "bandids_0002",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 22
+        },
+        {
+          "Stat": "Strength",
+          "Value": 22
+        },
+        {
+          "Stat": "Agility",
+          "Value": 22
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 22
+        },
+        {
+          "Stat": "Armor",
+          "Value": 55
+        }
+      ],
+      "Level": 10,
+      "IsBoss": false,
+      "AggroRange": 10.0,
+      "LeashRange": 20.0,
+      "RespawnTimeSeconds": 30,
+      "SwingTimer": 4.0,
+      "AutoAttackAbilityID": "sword_warrior_autoattack",
+      "AbilityIDs": [
+        "sword_light_attack",
+        "sword_heavy_attack"
+      ],
+      "CurrencyReward": 49,
+      "ExperienceReward": 10,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "elite_bandids_0002",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 84
+        },
+        {
+          "Stat": "Strength",
+          "Value": 28
+        },
+        {
+          "Stat": "Agility",
+          "Value": 28
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 28
+        },
+        {
+          "Stat": "Armor",
+          "Value": 62
+        }
+      ],
+      "Level": 11,
+      "IsBoss": true,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": "sword_warrior_autoattack",
+      "AbilityIDs": [
+        "sword_light_attack",
+        "sword_heavy_attack"
+      ],
+      "CurrencyReward": 945,
+      "ExperienceReward": 10,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "mage_bandids_0002",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 15
+        },
+        {
+          "Stat": "Strength",
+          "Value": 13
+        },
+        {
+          "Stat": "Agility",
+          "Value": 26
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 31
+        },
+        {
+          "Stat": "Armor",
+          "Value": 33
+        }
+      ],
+      "Level": 10,
+      "IsBoss": false,
+      "AggroRange": 10.0,
+      "LeashRange": 20.0,
+      "RespawnTimeSeconds": 30,
+      "SwingTimer": 3.0,
+      "AutoAttackAbilityID": "mage_e5dfac90",
+      "AbilityIDs": [
+        "mage_644c55de",
+        "mage_54d36845"
+      ],
+      "CurrencyReward": 70,
+      "ExperienceReward": 10,
+      "LootTableID": ""
+    },
+    {
       "TypeId": "090d7357",
       "Faction": "Enemy",
       "AiType": "Passive_Aggressive",
@@ -38,9 +284,353 @@
         "bear_attack_03",
         "bear_buff_01"
       ],
-      "CurrencyReward": 14,
+      "CurrencyReward": 10,
       "ExperienceReward": 50,
       "LootTableID": "bear_common_drops"
+    },
+    {
+      "TypeId": "npc_Cleberton",
+      "Faction": "Friendly",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 12
+        },
+        {
+          "Stat": "Strength",
+          "Value": 12
+        },
+        {
+          "Stat": "Agility",
+          "Value": 12
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 12
+        },
+        {
+          "Stat": "Armor",
+          "Value": 31
+        }
+      ],
+      "Level": 5,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "CurrencyReward": 23,
+      "ExperienceReward": 0,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "npc_Denilson",
+      "Faction": "Friendly",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 22
+        },
+        {
+          "Stat": "Strength",
+          "Value": 22
+        },
+        {
+          "Stat": "Agility",
+          "Value": 22
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 22
+        },
+        {
+          "Stat": "Armor",
+          "Value": 55
+        }
+      ],
+      "Level": 10,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "CurrencyReward": 50,
+      "ExperienceReward": 0,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "npc_Dona_Cleide",
+      "Faction": "Friendly",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 11
+        },
+        {
+          "Stat": "Strength",
+          "Value": 11
+        },
+        {
+          "Stat": "Agility",
+          "Value": 11
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 11
+        },
+        {
+          "Stat": "Armor",
+          "Value": 28
+        }
+      ],
+      "Level": 4,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "CurrencyReward": 15,
+      "ExperienceReward": 0,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "npc_Dona_Iraci",
+      "Faction": "Friendly",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 12
+        },
+        {
+          "Stat": "Strength",
+          "Value": 12
+        },
+        {
+          "Stat": "Agility",
+          "Value": 12
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 12
+        },
+        {
+          "Stat": "Armor",
+          "Value": 31
+        }
+      ],
+      "Level": 5,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "CurrencyReward": 28,
+      "ExperienceReward": 0,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "npc_Jaque_Martelo_Fino",
+      "Faction": "Friendly",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 14
+        },
+        {
+          "Stat": "Strength",
+          "Value": 14
+        },
+        {
+          "Stat": "Agility",
+          "Value": 14
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 14
+        },
+        {
+          "Stat": "Armor",
+          "Value": 35
+        }
+      ],
+      "Level": 6,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "CurrencyReward": 28,
+      "ExperienceReward": 10,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "npc_Padre_Osvaldo",
+      "Faction": "Friendly",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 12
+        },
+        {
+          "Stat": "Strength",
+          "Value": 12
+        },
+        {
+          "Stat": "Agility",
+          "Value": 12
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 12
+        },
+        {
+          "Stat": "Armor",
+          "Value": 31
+        }
+      ],
+      "Level": 5,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [
+        "healer_priest_01"
+      ],
+      "CurrencyReward": 19,
+      "ExperienceReward": 0,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "npc_Seu_Armando_Martelada",
+      "Faction": "Friendly",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 22
+        },
+        {
+          "Stat": "Strength",
+          "Value": 22
+        },
+        {
+          "Stat": "Agility",
+          "Value": 22
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 22
+        },
+        {
+          "Stat": "Armor",
+          "Value": 55
+        }
+      ],
+      "Level": 10,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "CurrencyReward": 49,
+      "ExperienceReward": 10,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "npc_Valdisney",
+      "Faction": "Friendly",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 12
+        },
+        {
+          "Stat": "Strength",
+          "Value": 12
+        },
+        {
+          "Stat": "Agility",
+          "Value": 12
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 12
+        },
+        {
+          "Stat": "Armor",
+          "Value": 31
+        }
+      ],
+      "Level": 5,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "CurrencyReward": 23,
+      "ExperienceReward": 0,
+      "LootTableID": ""
+    },
+    {
+      "TypeId": "npc_ze_pescador",
+      "Faction": "Friendly",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 12
+        },
+        {
+          "Stat": "Strength",
+          "Value": 12
+        },
+        {
+          "Stat": "Agility",
+          "Value": 12
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 12
+        },
+        {
+          "Stat": "Armor",
+          "Value": 31
+        }
+      ],
+      "Level": 5,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "CurrencyReward": 24,
+      "ExperienceReward": 0,
+      "LootTableID": ""
     },
     {
       "TypeId": "75448138",
@@ -114,7 +704,7 @@
       "SwingTimer": 4.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 2,
+      "CurrencyReward": 3,
       "ExperienceReward": 0,
       "LootTableID": ""
     },
@@ -154,7 +744,7 @@
       "AbilityIDs": [
         "giant_cb536791"
       ],
-      "CurrencyReward": 870,
+      "CurrencyReward": 750,
       "ExperienceReward": 500,
       "LootTableID": ""
     },
@@ -194,7 +784,7 @@
       "AbilityIDs": [
         "sword_heavy_attack"
       ],
-      "CurrencyReward": 166,
+      "CurrencyReward": 151,
       "ExperienceReward": 10,
       "LootTableID": ""
     },
@@ -234,121 +824,7 @@
       "AbilityIDs": [
         "sword_heavy_attack"
       ],
-      "CurrencyReward": 119,
-      "ExperienceReward": 10,
-      "LootTableID": ""
-    },
-    {
-      "TypeId": "npc_Dona_Cleide",
-      "Faction": "Friendly",
-      "AiType": "Passive_Aggressive",
-      "Stats": [
-        {
-          "Stat": "Stamina",
-          "Value": 12
-        },
-        {
-          "Stat": "Strength",
-          "Value": 12
-        },
-        {
-          "Stat": "Agility",
-          "Value": 12
-        },
-        {
-          "Stat": "Intellect",
-          "Value": 12
-        },
-        {
-          "Stat": "Armor",
-          "Value": 31
-        }
-      ],
-      "Level": 5,
-      "IsBoss": false,
-      "AggroRange": 15.0,
-      "LeashRange": 30.0,
-      "RespawnTimeSeconds": 60,
-      "SwingTimer": 2.0,
-      "AutoAttackAbilityID": null,
-      "AbilityIDs": [],
-      "CurrencyReward": 28,
-      "ExperienceReward": 0,
-      "LootTableID": ""
-    },
-    {
-      "TypeId": "npc_Valdisnei",
-      "Faction": "Friendly",
-      "AiType": "Passive_Aggressive",
-      "Stats": [
-        {
-          "Stat": "Stamina",
-          "Value": 12
-        },
-        {
-          "Stat": "Strength",
-          "Value": 12
-        },
-        {
-          "Stat": "Agility",
-          "Value": 12
-        },
-        {
-          "Stat": "Intellect",
-          "Value": 12
-        },
-        {
-          "Stat": "Armor",
-          "Value": 31
-        }
-      ],
-      "Level": 5,
-      "IsBoss": false,
-      "AggroRange": 15.0,
-      "LeashRange": 30.0,
-      "RespawnTimeSeconds": 60,
-      "SwingTimer": 2.0,
-      "AutoAttackAbilityID": null,
-      "AbilityIDs": [],
-      "CurrencyReward": 22,
-      "ExperienceReward": 0,
-      "LootTableID": ""
-    },
-    {
-      "TypeId": "vendor_3c3bcbd7",
-      "Faction": "Friendly",
-      "AiType": "Passive_Aggressive",
-      "Stats": [
-        {
-          "Stat": "Stamina",
-          "Value": 22
-        },
-        {
-          "Stat": "Strength",
-          "Value": 22
-        },
-        {
-          "Stat": "Agility",
-          "Value": 22
-        },
-        {
-          "Stat": "Intellect",
-          "Value": 22
-        },
-        {
-          "Stat": "Armor",
-          "Value": 55
-        }
-      ],
-      "Level": 10,
-      "IsBoss": false,
-      "AggroRange": 15.0,
-      "LeashRange": 30.0,
-      "RespawnTimeSeconds": 60,
-      "SwingTimer": 2.0,
-      "AutoAttackAbilityID": null,
-      "AbilityIDs": [],
-      "CurrencyReward": 61,
+      "CurrencyReward": 120,
       "ExperienceReward": 10,
       "LootTableID": ""
     },

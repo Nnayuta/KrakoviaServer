@@ -45,7 +45,7 @@ $@"
 
         var tcpServer = new TCPServer(ServerConfig.AUTH_SERVER_PORT, accountDatabase, characterDatabase);
         var udpServer = new UDPServer(ServerConfig.WORLD_SERVER_PORT, characterDatabase);
-        var webServer = new WebServer("http://localhost:8080/");
+        var webServer = new WebServer("http://+:8080/");
 
         var cts = new CancellationTokenSource();
 

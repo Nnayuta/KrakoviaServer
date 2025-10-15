@@ -32,4 +32,15 @@ public enum NpcAiType
     Training_Dummy
 }
 
-public enum NpcAiState { Idle, Patrolling, Chasing, Attacking, ReturningToSpawn, Fleeing, Dead, Wandering }
+public enum NpcAiState
+{
+    Idle,
+    Patrolling,
+    Chasing,
+    Attacking,
+    ReturningToSpawn,
+    Fleeing,
+    Dead,
+    Wandering,
+    Casting
+}

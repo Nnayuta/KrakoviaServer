@@ -9,26 +9,6 @@ using Newtonsoft.Json;
 
 public class NpcInstance : ICombatEntity, IWorldEntity
 {
-    #region IWorldEntity Implementation
-    public string GetSpawnMessage()
-    {
-        string positionStr = string.Join(",",
-            Position.X.ToString("F2", CultureInfo.InvariantCulture),
-            Position.Y.ToString("F2", CultureInfo.InvariantCulture),
-            Position.Z.ToString("F2", CultureInfo.InvariantCulture));
-
-        string rotationStr = string.Join(",",
-            Rotation.X.ToString("F2", CultureInfo.InvariantCulture),
-            Rotation.Y.ToString("F2", CultureInfo.InvariantCulture),
-            Rotation.Z.ToString("F2", CultureInfo.InvariantCulture));
-
-        string currentHpStr = CurrentHealth.ToString("F2", CultureInfo.InvariantCulture);
-        string maxHpStr = MaxHealth.ToString("F2", CultureInfo.InvariantCulture);
-
-        return $"SPAWN_NPC|{InstanceId}|{BaseData.TypeId}|{positionStr}|{rotationStr}|{currentHpStr}|{maxHpStr}";
-    }
-    #endregion
-
     #region State & AI Properties
     public bool IsStationary => AiType == NpcAiType.Stationary_Guard || AiType == NpcAiType.Training_Dummy;
     public string InstanceId { get; }
@@ -52,6 +32,8 @@ public class NpcInstance : ICombatEntity, IWorldEntity
     public int CurrentPatrolIndex { get; set; } = 0;
     public Vector3 LastPosition { get; set; }
     public DateTime TimeAtLastPosition { get; set; }
+    public float LastKnownTargetDistance { get; set; } = float.MaxValue;
+    public DateTime TimeAtLastKnownTargetDistance { get; set; }
 
     public List<ItemStack>? Loot { get; private set; } = null; // Começa nulo
     public DateTime CorpseDespawnTime { get; private set; }
@@ -61,6 +43,16 @@ public class NpcInstance : ICombatEntity, IWorldEntity
     public bool IsInvulnerable { get; set; }
     [JsonIgnore] // Não precisa salvar esta propriedade
     public bool HasStopped { get; set; } = true; // Começa parado
+
+    /// <summary>
+    /// A última posição real do NPC no mundo do jogo, conforme reportado pelo cliente "dono".
+    /// </summary>
+    public Vector3 LastReportedClientPosition { get; set; }
+
+    /// <summary>
+    /// O momento em que a LastReportedClientPosition foi recebida.
+    /// </summary>
+    public DateTime TimeAtLastReportedClientPosition { get; set; }
 
 
     #endregion
@@ -77,6 +69,11 @@ public class NpcInstance : ICombatEntity, IWorldEntity
     public float CurrentHealth { get; set; }
     public float CurrentResource { get; set; }
     public Dictionary<string, DateTime> AbilityCooldowns { get; } = new Dictionary<string, DateTime>();
+    public bool IsCasting { get; private set; } = false;
+    public DateTime CastingEndTime { get; private set; }
+    public AbilityData? CastingAbility { get; private set; }
+    public string? CastingTargetId { get; private set; }
+
     #endregion
 
 
@@ -103,13 +100,36 @@ public class NpcInstance : ICombatEntity, IWorldEntity
 
         this.NextActionTime = currentTime;
         this.TimeAtLastPosition = currentTime;
-        this.LastStateChangeTime = currentTime;
+        this.TimeAtLastKnownTargetDistance = currentTime;
+        this.LastReportedClientPosition = position;
+        this.TimeAtLastReportedClientPosition = currentTime;
 
         InitializeStatsFromData();
 
         this.CurrentHealth = this.MaxHealth;
         this.CurrentResource = this.MaxResource;
     }
+
+    public void StartCasting(AbilityData ability, string targetId, DateTime serverCurrentTime)
+    {
+        if (IsCasting) return;
+
+        IsCasting = true;
+        CastingAbility = ability;
+        CastingTargetId = targetId;
+        CastingEndTime = serverCurrentTime.AddSeconds(ability.CastTime);
+
+        // Muda o estado da IA para Casting para que o Behavior possa reagir
+        ChangeNpcState(NpcAiState.Casting, serverCurrentTime);
+    }
+
+    public void FinishCasting()
+    {
+        IsCasting = false;
+        CastingAbility = null;
+        CastingTargetId = null;
+    }
+
 
     /// <summary>
     /// NOVO: Método chamado pelo NpcAiManager quando o loot é gerado.
@@ -273,4 +293,26 @@ public class NpcInstance : ICombatEntity, IWorldEntity
         this.LastStateChangeTime = currentTime;
         // Console.WriteLine($"[NPC STATE] NPC '{this.BaseData.TypeId}' (ID: {this.Id}) mudou para o estado {newState} em {currentTime}.");
     }
+
+
+    #region IWorldEntity Implementation
+    public string GetSpawnMessage()
+    {
+        string positionStr = string.Join(",",
+            Position.X.ToString("F2", CultureInfo.InvariantCulture),
+            Position.Y.ToString("F2", CultureInfo.InvariantCulture),
+            Position.Z.ToString("F2", CultureInfo.InvariantCulture));
+
+        string rotationStr = string.Join(",",
+            Rotation.X.ToString("F2", CultureInfo.InvariantCulture),
+            Rotation.Y.ToString("F2", CultureInfo.InvariantCulture),
+            Rotation.Z.ToString("F2", CultureInfo.InvariantCulture));
+
+        string currentHpStr = CurrentHealth.ToString("F2", CultureInfo.InvariantCulture);
+        string maxHpStr = MaxHealth.ToString("F2", CultureInfo.InvariantCulture);
+
+        int Stationary = IsStationary ? 1 : 0;
+        return $"SPAWN_NPC|{InstanceId}|{BaseData.TypeId}|{positionStr}|{rotationStr}|{currentHpStr}|{maxHpStr}|{Stationary}";
+    }
+    #endregion
 }
