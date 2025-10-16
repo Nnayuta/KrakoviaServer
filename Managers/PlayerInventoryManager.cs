@@ -108,6 +108,56 @@ public class PlayerInventoryManager
         _server.NetworkManager.SendInventoryUpdate(player);
     }
 
+    public void HandleUseItemRequest(Player player, int inventorySlot)
+    {
+        if (!IsValidSlot(player.PlayerInventory, inventorySlot)) return;
+
+        ItemStack? itemStack = player.PlayerInventory.slots[inventorySlot];
+        if (itemStack == null)
+        {
+            Console.WriteLine($"[UseItem] FALHA: {player.Username} tentou usar um slot vazio ({inventorySlot}).");
+            return;
+        }
+
+        if (!DataManager.Items.TryGetValue(itemStack.ItemID, out var itemData) ||
+            itemData is not ServerConsumableItemData consumableData)
+        {
+            Console.WriteLine($"[UseItem] FALHA: {player.Username} tentou usar o item '{itemStack.ItemID}' que não é consumível.");
+            return;
+        }
+
+        Console.WriteLine($"[UseItem] {player.Username} está usando o item '{consumableData.itemName}'.");
+
+        // --- Aplicação dos Efeitos ---
+
+        if (consumableData.InstantHealthGain > 0)
+        {
+            player.ReceiveHealing(consumableData.InstantHealthGain, _server);
+        }
+
+        if (consumableData.InstantResourceGain > 0)
+        {
+            player.CurrentResource = Math.Min(player.MaxResource, player.CurrentResource + consumableData.InstantResourceGain);
+        }
+
+        // CORREÇÃO: Apenas esta chamada é necessária.
+        // O jogador é tanto o conjurador (caster) quanto o alvo (target).
+        if (!string.IsNullOrEmpty(consumableData.StatusEffectToApplyID))
+        {
+            player.StatusEffectController.ApplyEffect(consumableData.StatusEffectToApplyID, player);
+        }
+
+        // --- Consumo do Item ---
+        player.PlayerInventory.RemoveItemFromSlot(inventorySlot, 1);
+
+        // --- Feedback para o Cliente ---
+        // A notificação de stats/vitals já é tratada dentro do StatusEffectController
+        // e dos métodos ReceiveHealing. Só precisamos atualizar o inventário.
+        _server.NetworkManager.SendInventoryUpdate(player);
+        _server.NetworkManager.SendVitalsUpdate(player); // É bom garantir a atualização dos vitals também.
+    }
+
+
     /// <summary>
     /// Handler para requisições de compra de itens de um NPC.
     /// </summary>

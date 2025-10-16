@@ -60,6 +60,7 @@ public class Player : ICombatEntity, IWorldEntity
     public bool IsInCombat => _server != null && (_server.CurrentTimeUtc - LastCombatTime).TotalSeconds < OUT_OF_COMBAT_SECONDS;
 
     public CharacterStats Stats { get; private set; }
+    public StatusEffectController StatusEffectController { get; private set; } // <-- NOVA PROPRIEDADE
     public bool IsCasting { get; private set; }
     public DateTime CastEndTime { get; private set; }
     public AbilityData? CurrentCastAbility { get; private set; }
@@ -154,6 +155,7 @@ public class Player : ICombatEntity, IWorldEntity
         this.QuestLog.SetOwner(this);
 
         this.PlayerEquipment.OnEquipmentChanged += OnEquipmentChanged;
+        this.StatusEffectController = new StatusEffectController(this, server); // <-- INICIALIZAÇÃO
 
         InitializeCharacter();
     }

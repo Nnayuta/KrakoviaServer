@@ -1,6 +1,114 @@
 {
   "StatusEffects": [
     {
+      "EffectID": "0_elixir_forca_pequeno_buff",
+      "Duration": 30.0,
+      "IsBuff": true,
+      "StatModifiers": [
+        {
+          "targetStat": "Strength",
+          "value": 3.0,
+          "type": "Flat"
+        }
+      ]
+    },
+    {
+      "EffectID": "1_elixir_forca_buff",
+      "Duration": 45.0,
+      "IsBuff": true,
+      "StatModifiers": [
+        {
+          "targetStat": "Strength",
+          "value": 5.0,
+          "type": "Flat"
+        }
+      ]
+    },
+    {
+      "EffectID": "2_elixir_forca_maior_buff",
+      "Duration": 60.0,
+      "IsBuff": true,
+      "StatModifiers": [
+        {
+          "targetStat": "Strength",
+          "value": 8.0,
+          "type": "Flat"
+        }
+      ]
+    },
+    {
+      "EffectID": "0_elixir_vigor_pequeno_buff",
+      "Duration": 30.0,
+      "IsBuff": true,
+      "StatModifiers": [
+        {
+          "targetStat": "Stamina",
+          "value": 3.0,
+          "type": "Flat"
+        }
+      ]
+    },
+    {
+      "EffectID": "1_elixir_vigor_buff",
+      "Duration": 45.0,
+      "IsBuff": true,
+      "StatModifiers": [
+        {
+          "targetStat": "Stamina",
+          "value": 5.0,
+          "type": "Flat"
+        }
+      ]
+    },
+    {
+      "EffectID": "2_elixir_vigor_maior_buff",
+      "Duration": 60.0,
+      "IsBuff": true,
+      "StatModifiers": [
+        {
+          "targetStat": "Stamina",
+          "value": 8.0,
+          "type": "Flat"
+        }
+      ]
+    },
+    {
+      "EffectID": "0_potion_velocidade_pequena_buff",
+      "Duration": 20.0,
+      "IsBuff": true,
+      "StatModifiers": [
+        {
+          "targetStat": "MovementSpeed",
+          "value": 10.0,
+          "type": "PercentAdd"
+        }
+      ]
+    },
+    {
+      "EffectID": "1_potion_velocidade_buff",
+      "Duration": 30.0,
+      "IsBuff": true,
+      "StatModifiers": [
+        {
+          "targetStat": "MovementSpeed",
+          "value": 15.0,
+          "type": "PercentAdd"
+        }
+      ]
+    },
+    {
+      "EffectID": "2_potion_velocidade_maior_buff",
+      "Duration": 45.0,
+      "IsBuff": true,
+      "StatModifiers": [
+        {
+          "targetStat": "MovementSpeed",
+          "value": 20.0,
+          "type": "PercentAdd"
+        }
+      ]
+    },
+    {
       "EffectID": "stamina_boost",
       "Duration": 100.0,
       "IsBuff": true,

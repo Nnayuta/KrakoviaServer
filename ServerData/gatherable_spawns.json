@@ -4,9 +4,9 @@
       "GatherableTypeID": "potato_glitch",
       "SpawnRadius": 0.5,
       "Position": {
-        "X": -165.49,
-        "Y": 84.48,
-        "Z": 394.66
+        "X": 308.51,
+        "Y": 87.18,
+        "Z": 855.72
       },
       "Rotation": {
         "X": 0.0,
@@ -18,9 +18,9 @@
       "GatherableTypeID": "potato_glitch",
       "SpawnRadius": 0.5,
       "Position": {
-        "X": -179.88,
-        "Y": 83.61,
-        "Z": 386.18
+        "X": 308.16,
+        "Y": 85.67,
+        "Z": 840.89
       },
       "Rotation": {
         "X": 0.0,
@@ -32,9 +32,9 @@
       "GatherableTypeID": "potato_glitch",
       "SpawnRadius": 0.5,
       "Position": {
-        "X": -196.51,
-        "Y": 82.86,
-        "Z": 368.46
+        "X": 311.21,
+        "Y": 88.1,
+        "Z": 847.69
       },
       "Rotation": {
         "X": 0.0,
@@ -46,9 +46,9 @@
       "GatherableTypeID": "potato_glitch",
       "SpawnRadius": 0.5,
       "Position": {
-        "X": -185.9,
-        "Y": 79.32,
-        "Z": 392.85
+        "X": 319.42,
+        "Y": 85.52,
+        "Z": 888.88
       },
       "Rotation": {
         "X": 0.0,
@@ -60,9 +60,9 @@
       "GatherableTypeID": "potato_glitch",
       "SpawnRadius": 0.5,
       "Position": {
-        "X": -190.79,
-        "Y": 85.27,
-        "Z": 353.02
+        "X": 308.51,
+        "Y": 88.84,
+        "Z": 864.43
       },
       "Rotation": {
         "X": 0.0,
@@ -74,9 +74,9 @@
       "GatherableTypeID": "potato_glitch",
       "SpawnRadius": 0.5,
       "Position": {
-        "X": -191.14,
-        "Y": 83.76,
-        "Z": 338.19
+        "X": 324.87,
+        "Y": 85.52,
+        "Z": 893.88
       },
       "Rotation": {
         "X": 0.0,
@@ -88,9 +88,9 @@
       "GatherableTypeID": "potato_glitch",
       "SpawnRadius": 0.5,
       "Position": {
-        "X": -179.43,
-        "Y": 81.74,
-        "Z": 391.18
+        "X": 319.87,
+        "Y": 83.65,
+        "Z": 893.88
       },
       "Rotation": {
         "X": 0.0,
@@ -102,9 +102,9 @@
       "GatherableTypeID": "potato_glitch",
       "SpawnRadius": 0.5,
       "Position": {
-        "X": -199.78,
-        "Y": 80.61,
-        "Z": 378.7
+        "X": 302.79,
+        "Y": 84.77,
+        "Z": 871.16
       },
       "Rotation": {
         "X": 0.0,
@@ -116,9 +116,9 @@
       "GatherableTypeID": "potato_glitch",
       "SpawnRadius": 0.5,
       "Position": {
-        "X": -174.43,
-        "Y": 83.61,
-        "Z": 391.18
+        "X": 299.52,
+        "Y": 82.52,
+        "Z": 881.4
       },
       "Rotation": {
         "X": 0.0,
@@ -130,9 +130,9 @@
       "GatherableTypeID": "potato_glitch",
       "SpawnRadius": 0.5,
       "Position": {
-        "X": -190.79,
-        "Y": 86.93,
-        "Z": 361.73
+        "X": 313.4,
+        "Y": 81.23,
+        "Z": 895.55
       },
       "Rotation": {
         "X": 0.0,
@@ -144,9 +144,9 @@
       "GatherableTypeID": "potato_glitch",
       "SpawnRadius": 0.5,
       "Position": {
-        "X": -188.09,
-        "Y": 86.19,
-        "Z": 344.99
+        "X": 333.81,
+        "Y": 86.39,
+        "Z": 897.36
       },
       "Rotation": {
         "X": 0.0,

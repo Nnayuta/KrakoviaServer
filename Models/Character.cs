@@ -22,7 +22,6 @@ public class Character
     public long CurrentExperience { get; set; } = 0;
     public CharacterAppearance Appearance { get; set; } = new CharacterAppearance();
 
-    // Guarda apenas os IDs dos itens equipados para a tela de seleção
     public Dictionary<EquipmentSlot, string> EquippedItems { get; set; } = new Dictionary<EquipmentSlot, string>();
 
     public Character()

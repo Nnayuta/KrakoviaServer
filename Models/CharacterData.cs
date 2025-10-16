@@ -1,5 +1,7 @@
 // Servidor/Models/CharacterData.cs
 using System.Collections.Generic;
+using System.Globalization;
+using System.Numerics;
 
 /// <summary>
 /// Armazena os dados persistentes de um �nico personagem no servidor.
@@ -12,6 +14,7 @@ public class CharacterData
     public long CurrentExperience { get; set; }
     public long TotalBronze { get; set; }
     public string Position { get; set; }
+    public Vector3 PositionVec { get; set; }
     public int InventorySize { get; set; }
 
     public Inventory PlayerInventory { get; set; }
@@ -31,7 +34,13 @@ public class CharacterData
         this.Appearance = appearance;
         this.QuestLog = new PlayerQuestLog();
 
-        this.Position = "-335,71,467";
+        this.Position = "160,70,944";
+        string[] splitPos = this.Position.Split(',');
+
+        this.PositionVec = new Vector3(
+            float.Parse(splitPos[0], CultureInfo.InvariantCulture),
+            float.Parse(splitPos[1], CultureInfo.InvariantCulture),
+            float.Parse(splitPos[2], CultureInfo.InvariantCulture));
 
         // Inicializa invent�rio, equipamento e barras de a��o vazios.
         // Eles ser�o preenchidos pelo CharacterDatabase se for a primeira vez.

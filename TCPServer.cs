@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Numerics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -283,6 +284,8 @@ public class TCPServer
             var (_, _, _, knownAbilities) = CharacterStateGenerator.GenerateInitialState(selectedCharacter.ClassID, selectedCharacter.Level);
             string accessToken = AuthTokenManager.GenerateToken(loggedInAccount, selectedCharacter);
 
+            var splitPos = characterData.Position.Split(",");
+
             var response = new SelectCharacterResponse
             {
                 Command = "select_character_response",
@@ -296,7 +299,8 @@ public class TCPServer
                 KnownAbilityIDs = knownAbilities,
                 Inventory = characterData.PlayerInventory.slots.Select(s => s == null ? null : new ItemStackSummary { InstanceID = s.InstanceID, ItemID = s.ItemID, Quantity = s.Quantity }).ToList(),
                 Equipment = characterData.PlayerEquipment.equippedItems.Where(kvp => kvp.Value != null).ToDictionary(kvp => kvp.Key, kvp => new ItemStackSummary { InstanceID = kvp.Value!.InstanceID, ItemID = kvp.Value.ItemID, Quantity = kvp.Value.Quantity }),
-                ActionBar = characterData.PlayerActionBar
+                ActionBar = characterData.PlayerActionBar,
+                Position = characterData.PositionVec
             };
 
             await SendResponseAsync(stream, response);

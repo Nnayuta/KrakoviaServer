@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using System; // Necessário para [System.Serializable]
+using System;
+using System.Numerics; // Necessário para [System.Serializable]
 
 // --- ESTRUTURA BASE ---
 public class BaseRequest { public string Command { get; set; } }
@@ -49,4 +50,5 @@ public class SelectCharacterResponse : BaseResponse
     public List<ItemStackSummary?> Inventory; // << Adicione o '?'
     public Dictionary<EquipmentSlot, ItemStackSummary> Equipment;
     public ActionBarData ActionBar;
+    public Vector3 Position;
 }

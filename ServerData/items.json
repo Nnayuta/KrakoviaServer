@@ -243,6 +243,261 @@
     ]
   },
   {
+    "$type": "ServerConsumableData, Assembly-CSharp",
+    "InstantHealthGain": 0,
+    "InstantResourceGain": 0,
+    "StatusEffectID": "0_elixir_forca_pequeno_buff",
+    "itemID": "0_elixir_forca_pequeno",
+    "itemName": "Elixir de Força Pequeno",
+    "quality": "Common",
+    "maxStackSize": 100,
+    "requiredLevel": 1,
+    "sellPrice": 20,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerConsumableData, Assembly-CSharp",
+    "InstantHealthGain": 0,
+    "InstantResourceGain": 0,
+    "StatusEffectID": "1_elixir_forca_buff",
+    "itemID": "1_elixir_forca",
+    "itemName": "Elixir de Força",
+    "quality": "Uncommon",
+    "maxStackSize": 100,
+    "requiredLevel": 6,
+    "sellPrice": 54,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerConsumableData, Assembly-CSharp",
+    "InstantHealthGain": 0,
+    "InstantResourceGain": 0,
+    "StatusEffectID": "2_elixir_forca_maior_buff",
+    "itemID": "2_elixir_forca_maior",
+    "itemName": "Elixir Maior de Força",
+    "quality": "Uncommon",
+    "maxStackSize": 100,
+    "requiredLevel": 11,
+    "sellPrice": 101,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerConsumableData, Assembly-CSharp",
+    "InstantHealthGain": 0,
+    "InstantResourceGain": 0,
+    "StatusEffectID": "0_elixir_vigor_pequeno_buff",
+    "itemID": "0_elixir_vigor_pequeno",
+    "itemName": "Elixir de Vigor Pequeno",
+    "quality": "Common",
+    "maxStackSize": 100,
+    "requiredLevel": 1,
+    "sellPrice": 20,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerConsumableData, Assembly-CSharp",
+    "InstantHealthGain": 0,
+    "InstantResourceGain": 0,
+    "StatusEffectID": "1_elixir_vigor_buff",
+    "itemID": "1_elixir_vigor",
+    "itemName": "Elixir de Vigor",
+    "quality": "Uncommon",
+    "maxStackSize": 100,
+    "requiredLevel": 6,
+    "sellPrice": 54,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerConsumableData, Assembly-CSharp",
+    "InstantHealthGain": 0,
+    "InstantResourceGain": 0,
+    "StatusEffectID": "2_elixir_vigor_maior_buff",
+    "itemID": "2_elixir_vigor_maior",
+    "itemName": "Elixir Maior de Vigor",
+    "quality": "Uncommon",
+    "maxStackSize": 100,
+    "requiredLevel": 11,
+    "sellPrice": 101,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerConsumableData, Assembly-CSharp",
+    "InstantHealthGain": 100,
+    "InstantResourceGain": 0,
+    "StatusEffectID": null,
+    "itemID": "potion_vida",
+    "itemName": "Poção de Vida",
+    "quality": "Uncommon",
+    "maxStackSize": 100,
+    "requiredLevel": 5,
+    "sellPrice": 31,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerConsumableData, Assembly-CSharp",
+    "InstantHealthGain": 250,
+    "InstantResourceGain": 0,
+    "StatusEffectID": null,
+    "itemID": "potion_vida_maior",
+    "itemName": "Poção Maior de Vida",
+    "quality": "Rare",
+    "maxStackSize": 100,
+    "requiredLevel": 11,
+    "sellPrice": 105,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerConsumableData, Assembly-CSharp",
+    "InstantHealthGain": 50,
+    "InstantResourceGain": 0,
+    "StatusEffectID": null,
+    "itemID": "potion_vida_pequena",
+    "itemName": "Poção Pequena de Vida",
+    "quality": "Common",
+    "maxStackSize": 100,
+    "requiredLevel": 1,
+    "sellPrice": 27,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerConsumableData, Assembly-CSharp",
+    "InstantHealthGain": 250,
+    "InstantResourceGain": 0,
+    "StatusEffectID": null,
+    "itemID": "potion_vida_superior",
+    "itemName": "Poção Superior de Vida",
+    "quality": "Epic",
+    "maxStackSize": 100,
+    "requiredLevel": 15,
+    "sellPrice": 117,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerConsumableData, Assembly-CSharp",
+    "InstantHealthGain": 0,
+    "InstantResourceGain": 75,
+    "StatusEffectID": null,
+    "itemID": "potion_mana",
+    "itemName": "Poção de Mana",
+    "quality": "Common",
+    "maxStackSize": 100,
+    "requiredLevel": 6,
+    "sellPrice": 54,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerConsumableData, Assembly-CSharp",
+    "InstantHealthGain": 0,
+    "InstantResourceGain": 150,
+    "StatusEffectID": null,
+    "itemID": "potion_mana_maior",
+    "itemName": "Poção Maior de Mana",
+    "quality": "Common",
+    "maxStackSize": 100,
+    "requiredLevel": 11,
+    "sellPrice": 94,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerConsumableData, Assembly-CSharp",
+    "InstantHealthGain": 0,
+    "InstantResourceGain": 30,
+    "StatusEffectID": null,
+    "itemID": "potion_mana_pequena",
+    "itemName": "Poção Pequena de Mana",
+    "quality": "Common",
+    "maxStackSize": 100,
+    "requiredLevel": 1,
+    "sellPrice": 27,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerConsumableData, Assembly-CSharp",
+    "InstantHealthGain": 0,
+    "InstantResourceGain": 150,
+    "StatusEffectID": null,
+    "itemID": "potion_mana_superior",
+    "itemName": "Poção Superior de Mana",
+    "quality": "Common",
+    "maxStackSize": 100,
+    "requiredLevel": 15,
+    "sellPrice": 135,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerConsumableData, Assembly-CSharp",
+    "InstantHealthGain": 0,
+    "InstantResourceGain": 0,
+    "StatusEffectID": "0_potion_velocidade_pequena_buff",
+    "itemID": "0_potion_velocidade_pequena",
+    "itemName": "Poção de Velocidade Pequena",
+    "quality": "Common",
+    "maxStackSize": 100,
+    "requiredLevel": 1,
+    "sellPrice": 34,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerConsumableData, Assembly-CSharp",
+    "InstantHealthGain": 0,
+    "InstantResourceGain": 0,
+    "StatusEffectID": "1_potion_velocidade_buff",
+    "itemID": "1_potion_velocidade",
+    "itemName": "Elixir de Vigor",
+    "quality": "Uncommon",
+    "maxStackSize": 100,
+    "requiredLevel": 6,
+    "sellPrice": 78,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerConsumableData, Assembly-CSharp",
+    "InstantHealthGain": 0,
+    "InstantResourceGain": 0,
+    "StatusEffectID": "2_potion_velocidade_maior_buff",
+    "itemID": "2_potion_velocidade_maior",
+    "itemName": "Elixir Maior de Vigor",
+    "quality": "Uncommon",
+    "maxStackSize": 100,
+    "requiredLevel": 11,
+    "sellPrice": 124,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
     "$type": "ServerWeaponData, Assembly-CSharp",
     "WeaponDamage": 0.0,
     "WeaponSpeed": 0.0,
@@ -264,16 +519,20 @@
         "Value": 266
       },
       {
-        "Stat": "CriticalStrikeRating",
+        "Stat": "MasteryRating",
         "Value": 60
       },
       {
-        "Stat": "MasteryRating",
+        "Stat": "HasteRating",
         "Value": 60
       },
       {
         "Stat": "Strength",
         "Value": 146
+      },
+      {
+        "Stat": "Avoidance",
+        "Value": 24
       }
     ]
   },
@@ -305,6 +564,10 @@
       {
         "Stat": "Strength",
         "Value": 2
+      },
+      {
+        "Stat": "MovementSpeed",
+        "Value": 1
       }
     ]
   },
@@ -336,6 +599,10 @@
       {
         "Stat": "Strength",
         "Value": 4
+      },
+      {
+        "Stat": "Leech",
+        "Value": 1
       }
     ]
   },
@@ -398,10 +665,6 @@
       {
         "Stat": "Strength",
         "Value": 2
-      },
-      {
-        "Stat": "MovementSpeed",
-        "Value": 1
       }
     ]
   },
@@ -568,16 +831,12 @@
         "Value": 4
       },
       {
-        "Stat": "CriticalStrikeRating",
+        "Stat": "HasteRating",
         "Value": 2
       },
       {
         "Stat": "Agility",
         "Value": 2
-      },
-      {
-        "Stat": "MovementSpeed",
-        "Value": 1
       }
     ]
   },
@@ -634,16 +893,12 @@
         "Value": 4
       },
       {
-        "Stat": "HasteRating",
+        "Stat": "MasteryRating",
         "Value": 2
       },
       {
         "Stat": "Agility",
         "Value": 2
-      },
-      {
-        "Stat": "Leech",
-        "Value": 1
       }
     ]
   },
@@ -675,10 +930,6 @@
       {
         "Stat": "Agility",
         "Value": 3
-      },
-      {
-        "Stat": "Leech",
-        "Value": 1
       }
     ]
   },
@@ -735,12 +986,16 @@
         "Value": 8
       },
       {
-        "Stat": "HasteRating",
+        "Stat": "CriticalStrikeRating",
         "Value": 3
       },
       {
         "Stat": "Agility",
         "Value": 4
+      },
+      {
+        "Stat": "MovementSpeed",
+        "Value": 1
       }
     ]
   },
@@ -766,7 +1021,7 @@
         "Value": 9
       },
       {
-        "Stat": "MasteryRating",
+        "Stat": "HasteRating",
         "Value": 4
       },
       {
@@ -917,7 +1172,7 @@
         "Value": 2
       },
       {
-        "Stat": "MasteryRating",
+        "Stat": "CriticalStrikeRating",
         "Value": 1
       },
       {
@@ -948,7 +1203,7 @@
         "Value": 4
       },
       {
-        "Stat": "MasteryRating",
+        "Stat": "HasteRating",
         "Value": 2
       },
       {
@@ -1010,7 +1265,7 @@
         "Value": 4
       },
       {
-        "Stat": "CriticalStrikeRating",
+        "Stat": "HasteRating",
         "Value": 2
       },
       {
@@ -1072,7 +1327,7 @@
         "Value": 10
       },
       {
-        "Stat": "HasteRating",
+        "Stat": "CriticalStrikeRating",
         "Value": 4
       },
       {
@@ -1103,7 +1358,7 @@
         "Value": 8
       },
       {
-        "Stat": "CriticalStrikeRating",
+        "Stat": "MasteryRating",
         "Value": 3
       },
       {
@@ -1165,16 +1420,20 @@
         "Value": 8
       },
       {
-        "Stat": "HasteRating",
+        "Stat": "MasteryRating",
         "Value": 2
       },
       {
-        "Stat": "MasteryRating",
+        "Stat": "CriticalStrikeRating",
         "Value": 2
       },
       {
         "Stat": "Strength",
         "Value": 4
+      },
+      {
+        "Stat": "Avoidance",
+        "Value": 1
       }
     ]
   },
@@ -1204,12 +1463,16 @@
         "Value": 3
       },
       {
-        "Stat": "CriticalStrikeRating",
+        "Stat": "MasteryRating",
         "Value": 3
       },
       {
         "Stat": "Strength",
         "Value": 7
+      },
+      {
+        "Stat": "Avoidance",
+        "Value": 1
       }
     ]
   },
@@ -1235,20 +1498,16 @@
         "Value": 10
       },
       {
-        "Stat": "MasteryRating",
+        "Stat": "CriticalStrikeRating",
         "Value": 2
       },
       {
-        "Stat": "HasteRating",
+        "Stat": "MasteryRating",
         "Value": 3
       },
       {
         "Stat": "Strength",
         "Value": 6
-      },
-      {
-        "Stat": "Avoidance",
-        "Value": 1
       }
     ]
   },

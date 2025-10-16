@@ -15,6 +15,7 @@ public interface ICombatEntity
     float CurrentResource { get; set; }
     float MaxResource { get; }
     float MovementSpeed { get; }
+    StatusEffectController StatusEffectController { get; }
     Dictionary<string, DateTime> AbilityCooldowns { get; }
     void TakeDamage(float amount, ICombatEntity source, UDPServer server);
     void ReceiveHealing(float amount, UDPServer server);

@@ -18,7 +18,7 @@ public class PlayerLifecycleManager
     // Lista de cemitérios. No futuro, isso virá de um arquivo de dados.
     private readonly List<Vector3> _graveyardPositions = new List<Vector3>
     {
-        new Vector3(-335f, 71f, 467f), // Posição de exemplo
+        new Vector3(160f, 70f, 944f), // Posição de exemplo
     };
 
     public PlayerLifecycleManager(UDPServer server)

@@ -66,6 +66,8 @@ public class NpcInstance : ICombatEntity, IWorldEntity
     public bool IsDead { get; set; } = false;
     public DateTime RespawnTime { get; set; } = DateTime.MaxValue;
     public CharacterStats? Stats { get; private set; }
+    public StatusEffectController StatusEffectController { get; private set; }
+
     public float MaxHealth => Stats.GetStatValue(StatType.Health);
     public float MaxResource => Stats.GetStatValue(StatType.Mana);
     public float MovementSpeed => Stats.GetStatValue(StatType.MovementSpeed);
@@ -108,6 +110,7 @@ public class NpcInstance : ICombatEntity, IWorldEntity
         this.LastReportedClientPosition = position;
         this.TimeAtLastReportedClientPosition = currentTime;
 
+        this.StatusEffectController = new StatusEffectController(this, server);
         InitializeStatsFromData();
 
         this.CurrentHealth = this.MaxHealth;

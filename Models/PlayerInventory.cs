@@ -76,6 +76,29 @@ public class Inventory
         }
     }
 
+    public bool RemoveItemFromSlot(int slotIndex, int quantity)
+    {
+        if (slotIndex < 0 || slotIndex >= slots.Count || slots[slotIndex] == null)
+        {
+            return false; // Slot inválido ou vazio
+        }
+
+        var itemStack = slots[slotIndex]!; // Usamos '!' para dizer ao compilador que não é nulo aqui.
+        if (itemStack.Quantity < quantity)
+        {
+            return false; // Não há itens suficientes para remover
+        }
+
+        itemStack.Quantity -= quantity;
+
+        if (itemStack.Quantity <= 0)
+        {
+            slots[slotIndex] = null; // Remove o item completamente se o stack acabar
+        }
+
+        return true;
+    }
+
     public int? FindEmptySlot()
     {
         for (int i = 0; i < slots.Count; i++)
@@ -95,13 +118,10 @@ public class Inventory
         int spaceAvailable = 0;
         foreach (var slot in slots)
         {
-            // Espaço em stacks existentes
-            // ESTA LINHA TAMBÉM FUNCIONA AGORA!
             if (slot != null && slot.ItemID == itemID && itemData.isStackable)
             {
                 spaceAvailable += itemData.maxStackSize - slot.Quantity;
             }
-            // Espaço em slots vazios
             else if (slot == null)
             {
                 spaceAvailable += itemData.maxStackSize;

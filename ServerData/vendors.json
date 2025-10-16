@@ -1,6 +1,47 @@
 {
   "Vendors": [
     {
+      "NpcTypeId": "npc_Dona_Cleide",
+      "Items": [
+        {
+          "ItemID": "0_elixir_forca_pequeno",
+          "BuyPrice": 50
+        },
+        {
+          "ItemID": "1_elixir_forca",
+          "BuyPrice": 135
+        },
+        {
+          "ItemID": "2_elixir_forca_maior",
+          "BuyPrice": 252
+        },
+        {
+          "ItemID": "0_elixir_vigor_pequeno",
+          "BuyPrice": 50
+        },
+        {
+          "ItemID": "1_elixir_vigor",
+          "BuyPrice": 135
+        },
+        {
+          "ItemID": "2_elixir_vigor_maior",
+          "BuyPrice": 252
+        },
+        {
+          "ItemID": "0_potion_velocidade_pequena",
+          "BuyPrice": 85
+        },
+        {
+          "ItemID": "1_potion_velocidade",
+          "BuyPrice": 195
+        },
+        {
+          "ItemID": "2_potion_velocidade_maior",
+          "BuyPrice": 310
+        }
+      ]
+    },
+    {
       "NpcTypeId": "npc_Jaque_Martelo_Fino",
       "Items": [
         {
@@ -18,6 +59,55 @@
         {
           "ItemID": "gm_sword_01",
           "BuyPrice": 18625
+        }
+      ]
+    },
+    {
+      "NpcTypeId": "npc_Padre_Osvaldo",
+      "Items": [
+        {
+          "ItemID": "potion_vida_pequena",
+          "BuyPrice": 68
+        },
+        {
+          "ItemID": "potion_vida",
+          "BuyPrice": 78
+        },
+        {
+          "ItemID": "potion_vida",
+          "BuyPrice": 78
+        },
+        {
+          "ItemID": "potion_vida_superior",
+          "BuyPrice": 292
+        },
+        {
+          "ItemID": "potion_mana_pequena",
+          "BuyPrice": 68
+        },
+        {
+          "ItemID": "potion_mana",
+          "BuyPrice": 135
+        },
+        {
+          "ItemID": "potion_mana_maior",
+          "BuyPrice": 235
+        },
+        {
+          "ItemID": "potion_mana_superior",
+          "BuyPrice": 338
+        },
+        {
+          "ItemID": "0_potion_velocidade_pequena",
+          "BuyPrice": 85
+        },
+        {
+          "ItemID": "1_potion_velocidade",
+          "BuyPrice": 195
+        },
+        {
+          "ItemID": "2_potion_velocidade_maior",
+          "BuyPrice": 310
         }
       ]
     },

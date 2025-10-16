@@ -367,7 +367,7 @@ public class CombatManager
         else if (effectData is ServerApplyStatusEffectData applyStatusEffect)
         {
             Console.WriteLine($"[COMBAT] Aplicando Status Effect '{applyStatusEffect.StatusEffectID}' de {caster.Id} para {target.Id}");
-            // TODO: Chamar target.StatusEffectController.Apply(...)
+            target.StatusEffectController.ApplyEffect(applyStatusEffect.StatusEffectID, caster);
         }
         else if (effectData is ServerSummonNpcEffectData summonEffect)
         {
@@ -638,6 +638,8 @@ public class WorldPositionTarget : ICombatEntity
 
     public int SessionId => 0;
     public string InstanceId => Id;
+
+    public StatusEffectController StatusEffectController => throw new NotImplementedException();
 
     // Métodos que não fazem nada para um alvo no chão
     public void TakeDamage(float amount, ICombatEntity source, UDPServer server) { }

@@ -37,7 +37,7 @@
         "sword_light_attack",
         "sword_heavy_attack"
       ],
-      "CurrencyReward": 21,
+      "CurrencyReward": 24,
       "ExperienceReward": 10,
       "LootTableID": "bandids_0001"
     },
@@ -119,7 +119,7 @@
         "mage_644c55de",
         "mage_54d36845"
       ],
-      "CurrencyReward": 23,
+      "CurrencyReward": 20,
       "ExperienceReward": 10,
       "LootTableID": null
     },
@@ -160,7 +160,7 @@
         "sword_light_attack",
         "sword_heavy_attack"
       ],
-      "CurrencyReward": 57,
+      "CurrencyReward": 60,
       "ExperienceReward": 10,
       "LootTableID": "bandids_0002"
     },
@@ -201,7 +201,7 @@
         "sword_light_attack",
         "sword_heavy_attack"
       ],
-      "CurrencyReward": 945,
+      "CurrencyReward": 840,
       "ExperienceReward": 10,
       "LootTableID": "bandids_0002_elite"
     },
@@ -242,7 +242,7 @@
         "mage_644c55de",
         "mage_54d36845"
       ],
-      "CurrencyReward": 50,
+      "CurrencyReward": 56,
       "ExperienceReward": 10,
       "LootTableID": null
     },
@@ -283,7 +283,7 @@
         "bear_attack_02",
         "bear_attack_03"
       ],
-      "CurrencyReward": 76,
+      "CurrencyReward": 96,
       "ExperienceReward": 50,
       "LootTableID": "bear_common_drops"
     },
@@ -325,7 +325,7 @@
         "bear_attack_03",
         "bear_buff_01"
       ],
-      "CurrencyReward": 1305,
+      "CurrencyReward": 1650,
       "ExperienceReward": 50,
       "LootTableID": "bear_common_drops"
     },
@@ -363,7 +363,7 @@
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 20,
+      "CurrencyReward": 28,
       "ExperienceReward": 0,
       "LootTableID": null
     },
@@ -401,7 +401,7 @@
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 62,
+      "CurrencyReward": 58,
       "ExperienceReward": 0,
       "LootTableID": null
     },
@@ -439,7 +439,7 @@
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 15,
+      "CurrencyReward": 16,
       "ExperienceReward": 0,
       "LootTableID": null
     },
@@ -477,7 +477,7 @@
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 20,
+      "CurrencyReward": 27,
       "ExperienceReward": 0,
       "LootTableID": null
     },
@@ -515,7 +515,7 @@
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 32,
+      "CurrencyReward": 30,
       "ExperienceReward": 10,
       "LootTableID": null
     },
@@ -555,7 +555,7 @@
       "AbilityIDs": [
         "healer_priest_01"
       ],
-      "CurrencyReward": 21,
+      "CurrencyReward": 22,
       "ExperienceReward": 0,
       "LootTableID": null
     },
@@ -593,7 +593,7 @@
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 50,
+      "CurrencyReward": 69,
       "ExperienceReward": 10,
       "LootTableID": null
     },
@@ -631,7 +631,7 @@
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 27,
+      "CurrencyReward": 23,
       "ExperienceReward": 0,
       "LootTableID": null
     },
@@ -707,7 +707,7 @@
       "SwingTimer": 4.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 3,
+      "CurrencyReward": 2,
       "ExperienceReward": 10,
       "LootTableID": null
     },
@@ -783,7 +783,7 @@
       "SwingTimer": 4.0,
       "AutoAttackAbilityID": "giant_cb536791",
       "AbilityIDs": [],
-      "CurrencyReward": 1320,
+      "CurrencyReward": 1440,
       "ExperienceReward": 500,
       "LootTableID": null
     },
@@ -823,7 +823,7 @@
       "AbilityIDs": [
         "sword_heavy_attack"
       ],
-      "CurrencyReward": 165,
+      "CurrencyReward": 169,
       "ExperienceReward": 10,
       "LootTableID": null
     },
@@ -863,7 +863,7 @@
       "AbilityIDs": [
         "sword_heavy_attack"
       ],
-      "CurrencyReward": 134,
+      "CurrencyReward": 123,
       "ExperienceReward": 10,
       "LootTableID": null
     },
@@ -901,7 +901,7 @@
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": "sword_warrior_autoattack",
       "AbilityIDs": [],
-      "CurrencyReward": 630,
+      "CurrencyReward": 675,
       "ExperienceReward": 10,
       "LootTableID": "skeleton_drop_elite"
     },
@@ -939,7 +939,7 @@
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": "sword_warrior_autoattack",
       "AbilityIDs": [],
-      "CurrencyReward": 1050,
+      "CurrencyReward": 945,
       "ExperienceReward": 10,
       "LootTableID": "skeleton_drop_10_elite"
     },
@@ -977,7 +977,7 @@
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": "sword_warrior_autoattack",
       "AbilityIDs": [],
-      "CurrencyReward": 34,
+      "CurrencyReward": 25,
       "ExperienceReward": 10,
       "LootTableID": "skeleton_drop"
     },
@@ -1015,7 +1015,7 @@
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": "sword_warrior_autoattack",
       "AbilityIDs": [],
-      "CurrencyReward": 61,
+      "CurrencyReward": 78,
       "ExperienceReward": 10,
       "LootTableID": "skeleton_drop_10"
     },
@@ -1056,7 +1056,7 @@
         "wolf_ability_029ab43c",
         "wolf_ability_73e22c18"
       ],
-      "CurrencyReward": 90,
+      "CurrencyReward": 120,
       "ExperienceReward": 35,
       "LootTableID": null
     },
@@ -1097,7 +1097,7 @@
         "wolf_ability_029ab43c",
         "wolf_ability_73e22c18"
       ],
-      "CurrencyReward": 525,
+      "CurrencyReward": 480,
       "ExperienceReward": 35,
       "LootTableID": null
     },
@@ -1179,7 +1179,7 @@
         "wolf_ability_029ab43c",
         "wolf_ability_73e22c18"
       ],
-      "CurrencyReward": 34,
+      "CurrencyReward": 25,
       "ExperienceReward": 35,
       "LootTableID": null
     }

@@ -65,6 +65,12 @@ public class ServerArmorData : ServerEquipmentData
 
 public class ServerConsumableData : ServerItemData
 {
-    public int healthToRestore { get; set; }
-    public int resourceToRestore { get; set; }
+    // Efeitos Instantâneos (para poções, etc.)
+    public int InstantHealthGain { get; set; }
+    public int InstantResourceGain { get; set; }
+
+    // Efeito de Status Aplicado (para comidas, elixires, etc.)
+    // Armazena o ID do StatusEffect a ser buscado e aplicado pelo servidor.
+    // Ex: "buff_well_fed", "elixir_of_fortitude"
+    public string StatusEffectID { get; set; }
 }

@@ -137,6 +137,7 @@ public class NetworkManager
         SendStatsUpdate(player);
         SendFullQuestLog(player);
         SendVitalsUpdate(player);
+        player.StatusEffectController.SendFullEffectListToClient();
     }
 
     public void SendFullQuestLog(Player player)
@@ -398,6 +399,12 @@ public class NetworkManager
                     {
                         string chatMessage = string.Join("|", parts.Skip(1)); // Remonta a mensagem caso ela tenha '|'
                         _server.ChatManager.ProcessChatMessage(player, chatMessage);
+                    }
+                    break;
+                case "REQUEST_USE_ITEM": // Formato: REQUEST_USE_ITEM|inventorySlot
+                    if (parts.Length >= 2 && int.TryParse(parts[1], out int useSlot))
+                    {
+                        _server.PlayerInventoryManager.HandleUseItemRequest(player, useSlot);
                     }
                     break;
             }

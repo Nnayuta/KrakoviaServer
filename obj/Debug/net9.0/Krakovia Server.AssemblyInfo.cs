@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Krakovia Server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7956c8d061c0df0b562c37a451bf1e800731e132")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2100d0d9251cfcc0f40bbd3889f35bb6e065b49f")]
 [assembly: System.Reflection.AssemblyProductAttribute("Krakovia Server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Krakovia Server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

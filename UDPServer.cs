@@ -160,11 +160,19 @@ public class UDPServer
         {
             CurrentTimeUtc = DateTime.UtcNow;
 
-            // >>> PASSO 3 - INTEGRAÇÃO <<<
-            // Depois de atualizar o tempo, processamos e enviamos todas as mensagens
-            // que foram enfileiradas desde o último tick.
+            var players = ConnectedPlayers.Values.ToList();
+            foreach (var player in players)
+            {
+                player.StatusEffectController.Update();
+            }
+
+            var npcs = ActiveNpcs.Values.ToList();
+            foreach (var npc in npcs)
+            {
+                npc.StatusEffectController.Update();
+            }
+
             NetworkManager.DispatchQueuedMessages();
-            // >>> FIM DA INTEGRAÇÃO <<<
 
             try
             {
