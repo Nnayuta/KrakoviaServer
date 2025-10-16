@@ -27,7 +27,8 @@ public class Player : ICombatEntity, IWorldEntity
     public bool IsStationary => false;
 
     public string GuidSessionId { get; }
-    public int SessionId { get; } // <-- O NOVO ID DE SESSÃO NUMÉRICO!
+    public int SessionId { get; }
+    public string InstanceId => this.CharacterId;
     public string Id => this.SessionId.ToString();
     public IPEndPoint EndPoint { get; }
 
@@ -68,22 +69,27 @@ public class Player : ICombatEntity, IWorldEntity
 
     #region ICombatEntity Implementation (Atualizada)
 
+    private readonly Queue<byte[]> _outgoingMessages = new Queue<byte[]>();
+    private readonly object _queueLock = new object();
 
-    public string GetSpawnMessage()
+    public void EnqueueMessage(byte[] data)
     {
-        // Formato: SPAWN_PLAYER | ID | Nome | Posição | RotaçãoY | PayloadEquipamento | JSONAparência | Nível | VidaAtual | VidaMáxima
-
-        string position = this.State.Position;
-        string rotationY = this.State.RotationY;
-        string equipmentPayload = GetEquipmentPayload();
-
-        string currentHealthStr = this.CurrentHealth.ToString("F0", CultureInfo.InvariantCulture);
-        string maxHealthStr = this.MaxHealth.ToString("F0", CultureInfo.InvariantCulture);
-        string appearanceJson = JsonConvert.SerializeObject(this.Appearance);
-
-        // Juntamos tudo em uma única mensagem poderosa.
-        return $"SPAWN_PLAYER|{this.SessionId}|{this.CharacterId}|{this.CharacterName}|{position}|{rotationY}|{equipmentPayload}|{appearanceJson}|{this.Level}|{currentHealthStr}|{maxHealthStr}|{this.PermissionLevel}";
+        lock (_queueLock)
+        {
+            _outgoingMessages.Enqueue(data);
+        }
     }
+
+    public Queue<byte[]> GetMessageQueue()
+    {
+        return _outgoingMessages;
+    }
+
+    public object GetQueueLock()
+    {
+        return _queueLock;
+    }
+
 
     public Vector3 Position
     {
@@ -358,7 +364,7 @@ public class Player : ICombatEntity, IWorldEntity
         // NOVO: Envia a confirmação para o cliente se solicitado
         if (notifyClient && networkManager != null)
         {
-            networkManager.SendMessageToClient("CAST_CANCELED", this.EndPoint);
+            networkManager.SendMessageToPlayer(this, "CAST_CANCELED");
             networkManager.BroadcastMessageToOthers(this, $"ENTITY_CAST_CANCEL|{this.Id}");
         }
     }
@@ -502,5 +508,21 @@ public class Player : ICombatEntity, IWorldEntity
             Level = this.Level,
             QuestLog = this.QuestLog
         };
+    }
+
+    public string GetSpawnMessage()
+    {
+        // Formato: SPAWN_PLAYER | ID | Nome | Posição | RotaçãoY | PayloadEquipamento | JSONAparência | Nível | VidaAtual | VidaMáxima
+
+        string position = this.State.Position;
+        string rotationY = this.State.RotationY;
+        string equipmentPayload = GetEquipmentPayload();
+
+        string currentHealthStr = this.CurrentHealth.ToString("F0", CultureInfo.InvariantCulture);
+        string maxHealthStr = this.MaxHealth.ToString("F0", CultureInfo.InvariantCulture);
+        string appearanceJson = JsonConvert.SerializeObject(this.Appearance);
+
+        // Juntamos tudo em uma única mensagem poderosa.
+        return $"SPAWN_PLAYER|{this.SessionId}|{this.CharacterId}|{this.CharacterName}|{position}|{rotationY}|{equipmentPayload}|{appearanceJson}|{this.Level}|{currentHealthStr}|{maxHealthStr}|{this.PermissionLevel}";
     }
 }

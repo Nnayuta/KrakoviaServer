@@ -11,6 +11,7 @@ public class NpcInstance : ICombatEntity, IWorldEntity
 {
     #region State & AI Properties
     public bool IsStationary => AiType == NpcAiType.Stationary_Guard || AiType == NpcAiType.Training_Dummy;
+    public int SessionId { get; private set; }
     public string InstanceId { get; }
     public NpcData BaseData { get; private set; }
     public Vector3 Position { get; set; }
@@ -18,6 +19,8 @@ public class NpcInstance : ICombatEntity, IWorldEntity
     public DateTime LastDamageTime { get; set; }
     public NpcAiType AiType { get; private set; }
     public Vector3 Rotation { get; set; }
+    [JsonIgnore] // Não precisa salvar
+    public AiUpdateTier UpdateTier { get; set; } = AiUpdateTier.Slow;
 
     public Vector3 Destination { get; set; }
     public List<Vector3>? PatrolPath { get; }
@@ -84,6 +87,7 @@ public class NpcInstance : ICombatEntity, IWorldEntity
     {
         DateTime currentTime = server.CurrentTimeUtc;
 
+        this.SessionId = server.GetNextNpcSessionId();
         this.InstanceId = Guid.NewGuid().ToString("N");
         this.BaseData = baseData;
         this.SpawnPosition = position;
@@ -251,7 +255,7 @@ public class NpcInstance : ICombatEntity, IWorldEntity
 
         string currentHpStr = this.CurrentHealth.ToString("F2", CultureInfo.InvariantCulture);
         string maxHpStr = this.MaxHealth.ToString("F2", CultureInfo.InvariantCulture);
-        server.NetworkManager.BroadcastMessageToRelevantPlayers(this.Position, $"ENTITY_HEALTH_UPDATE|{this.Id}|{currentHpStr}|{maxHpStr}");
+        server.NetworkManager.BroadcastMessageToRelevantPlayers(this.Position, $"ENTITY_HEALTH_UPDATE|{this.SessionId}|{currentHpStr}|{maxHpStr}");
     }
 
 
@@ -311,8 +315,8 @@ public class NpcInstance : ICombatEntity, IWorldEntity
         string currentHpStr = CurrentHealth.ToString("F2", CultureInfo.InvariantCulture);
         string maxHpStr = MaxHealth.ToString("F2", CultureInfo.InvariantCulture);
 
-        int Stationary = IsStationary ? 1 : 0;
-        return $"SPAWN_NPC|{InstanceId}|{BaseData.TypeId}|{positionStr}|{rotationStr}|{currentHpStr}|{maxHpStr}|{Stationary}";
+        string Stationary = IsStationary ? "1" : "0";
+        return $"SPAWN_NPC|{SessionId}|{InstanceId}|{BaseData.TypeId}|{positionStr}|{rotationStr}|{currentHpStr}|{maxHpStr}|{Stationary}";
     }
     #endregion
 }

@@ -34,16 +34,14 @@ public class CombatManager
         // Validações
         if (!npc.IsDead) return; // Só pode pegar loot de corpos
         if (!npc.HasLoot) return; // Não há loot para pegar
-        if (Vector3.Distance(player.Position, npc.Position) > 5.0f) return;
-
-        // TODO: Adicionar lógica para verificar quem tem direito ao loot (quem matou, grupo, etc.)
+        if (Vector3Helper.Distance2D(player.Position, npc.Position) > 5.0f) return;
 
         // Tenta adicionar todos os itens ao inventário do jogador
         bool allItemsAdded = true;
         // Proteção contra referência nula em npc.Loot
         if (npc.Loot == null || npc.Loot.Count == 0)
         {
-            _server.NetworkManager.SendMessageToClient("ERROR|Nenhum loot disponível.", player.EndPoint);
+            _server.NetworkManager.SendMessageToPlayer(player, "ERROR|Nenhum loot disponível.");
             return;
         }
 
@@ -52,12 +50,12 @@ public class CombatManager
             if (!player.PlayerInventory.AddItem(itemStack.ItemID, itemStack.Quantity))
             {
                 allItemsAdded = false;
-                _server.NetworkManager.SendMessageToClient("ERROR|Inventário cheio.", player.EndPoint);
+                _server.NetworkManager.SendMessageToPlayer(player, "ERROR|Inventário cheio.");
                 break;
             }
             else
             {
-                _server.NetworkManager.SendMessageToClient($"SHOW_FEEDBACK|Item+{itemStack.ItemID}", player.EndPoint);
+                _server.NetworkManager.SendMessageToPlayer(player, $"SHOW_FEEDBACK|Item+{itemStack.ItemID}");
             }
         }
 
@@ -68,7 +66,7 @@ public class CombatManager
 
             // Notifica o cliente que a janela de loot deve ser fechada (ou o corpo para de brilhar)
             // e que seu inventário foi atualizado.
-            _server.NetworkManager.SendMessageToClient("LOOT_SUCCESSFUL", player.EndPoint);
+            _server.NetworkManager.SendMessageToPlayer(player, "LOOT_SUCCESSFUL");
             player.SendFullStateToClient();
         }
     }
@@ -89,28 +87,47 @@ public class CombatManager
         // Validações de Cooldown e Recurso
         if (source.AbilityCooldowns.TryGetValue(abilityId, out DateTime cdEnd) && _server.CurrentTimeUtc < cdEnd)
         {
-            if (source is Player p) _server.NetworkManager.SendMessageToClient($"ABILITY_FAILED|{abilityId}|Em Cooldown", p.EndPoint);
+            if (source is Player player) _server.NetworkManager.SendMessageToPlayer(player, $"ABILITY_FAILED|{abilityId}|AbilityCooldown");
             return;
         }
         if (source.CurrentResource < ability.ResourceCost)
         {
-            if (source is Player p) _server.NetworkManager.SendMessageToClient($"ABILITY_FAILED|{abilityId}|Recurso Insuficiente", p.EndPoint);
+            if (source is Player player) _server.NetworkManager.SendMessageToPlayer(player, $"ABILITY_FAILED|{abilityId}|LowResource");
             return;
         }
         if (!CheckWeaponRequirement(source, ability))
         {
-            if (source is Player p) _server.NetworkManager.SendMessageToClient($"ABILITY_FAILED|{abilityId}|Requer Arma Específica", p.EndPoint);
+            if (source is Player player) _server.NetworkManager.SendMessageToPlayer(player, $"ABILITY_FAILED|{abilityId}|ActionNotAllowed");
             return;
         }
 
         // --- 2. VALIDAÇÃO DE ALVO ---
         bool isAreaOfEffectOnGround = targetId.StartsWith("ground:");
         ICombatEntity? target = isAreaOfEffectOnGround ? null : FindEntityById(targetId);
+        if (!isAreaOfEffectOnGround) // Só fazemos essas checagens se o alvo não for o chão
+        {
+            if (target == null)
+            {
+                if (source is Player player) _server.NetworkManager.SendMessageToPlayer(player, $"ABILITY_FAILED|{abilityId}|InvalidTarget");
+                return;
+            }
+
+            if (target.IsDead)
+            {
+                // Se a habilidade for de ajuda (ex: Ressuscitar), ela PODE ter um alvo morto.
+                // Adicionamos essa exceção para permitir feitiços de ressurreição.
+                if (ability.Intent != AbilityIntent.Helpful)
+                {
+                    if (source is Player player) _server.NetworkManager.SendMessageToPlayer(player, $"ABILITY_FAILED|{abilityId}|InvalidTarget");
+                    return;
+                }
+            }
+        }
 
         // A habilidade requer um alvo, mas nenhum foi fornecido ou encontrado
         if (ability.RequiresTarget && target == null && !isAreaOfEffectOnGround)
         {
-            if (source is Player p) _server.NetworkManager.SendMessageToClient($"ABILITY_FAILED|{abilityId}|Alvo Inválido", p.EndPoint);
+            if (source is Player player) _server.NetworkManager.SendMessageToPlayer(player, $"ABILITY_FAILED|{abilityId}|InvalidTarget");
             return;
         }
 
@@ -130,24 +147,24 @@ public class CombatManager
         {
             if (ability.Intent == AbilityIntent.Harmful && AreEntitiesFriendly(source, target))
             {
-                if (source is Player p) _server.NetworkManager.SendMessageToClient($"ABILITY_FAILED|{abilityId}|Alvo Inválido", p.EndPoint);
+                if (source is Player player) _server.NetworkManager.SendMessageToPlayer(player, $"ABILITY_FAILED|{abilityId}|InvalidTarget");
                 return;
             }
             if (ability.Intent == AbilityIntent.Helpful && !AreEntitiesFriendly(source, target))
             {
-                if (source is Player p) _server.NetworkManager.SendMessageToClient($"ABILITY_FAILED|{abilityId}|Alvo Inválido", p.EndPoint);
+                if (source is Player player) _server.NetworkManager.SendMessageToPlayer(player, $"ABILITY_FAILED|{abilityId}|InvalidTarget");
                 return;
             }
         }
 
         // Validação de alcance
         float distanceCheck = isAreaOfEffectOnGround
-            ? Vector3.Distance(source.Position, ParseVector3FromTargetId(targetId))
-            : (target != null ? Vector3.Distance(source.Position, target.Position) : 0);
+               ? Vector3Helper.Distance2D(source.Position, ParseVector3FromTargetId(targetId))
+               : (target != null ? Vector3Helper.Distance2D(source.Position, target.Position) : 0);
 
         if (ability.Range > 0 && distanceCheck > ability.Range)
         {
-            if (source is Player p) _server.NetworkManager.SendMessageToClient($"ABILITY_FAILED|{abilityId}|Fora de Alcance", p.EndPoint);
+            if (source is Player player) _server.NetworkManager.SendMessageToPlayer(player, $"ABILITY_FAILED|{abilityId}|OutOfRange");
             return;
         }
 
@@ -166,7 +183,7 @@ public class CombatManager
             if (source is Player playerCaster)
             {
                 playerCaster.StartCasting(ability, targetId, _server.CurrentTimeUtc);
-                _server.NetworkManager.SendMessageToClient($"CAST_STARTED|{ability.ID}|{castTimeStr}", playerCaster.EndPoint);
+                _server.NetworkManager.SendMessageToPlayer(playerCaster, $"CAST_STARTED|{ability.ID}|{castTimeStr}");
             }
             // NOVO: Lógica para NPCs
             else if (source is NpcInstance npcCaster)
@@ -329,7 +346,7 @@ public class CombatManager
             target.TakeDamage(rawDamage, caster, _server);
 
             var eventType = isCritical ? CombatEventType.CriticalDamage : CombatEventType.PhysicalDamage;
-            string message = $"COMBAT_EVENT|{target.Id}|{eventType}|{(int)rawDamage}|{isCritical}";
+            string message = $"COMBAT_EVENT|{target.SessionId}|{eventType}|{(int)rawDamage}|{isCritical}";
             _server.NetworkManager.BroadcastMessageToRelevantPlayers(target.Position, message);
         }
         else if (effectData is ServerHealEffectData healEffect)
@@ -344,7 +361,7 @@ public class CombatManager
 
             var eventType = isCritical ? CombatEventType.CriticalHeal : CombatEventType.Heal;
 
-            string message = $"COMBAT_EVENT|{target.Id}|{eventType}|{(int)rawHeal}|{isCritical}";
+            string message = $"COMBAT_EVENT|{target.SessionId}|{eventType}|{(int)rawHeal}|{isCritical}";
             _server.NetworkManager.BroadcastMessageToRelevantPlayers(target.Position, message);
         }
         else if (effectData is ServerApplyStatusEffectData applyStatusEffect)
@@ -387,9 +404,10 @@ public class CombatManager
                                     .ToList();
 
         return allPossibleTargets.Where(target =>
-            target.Id != source.Id && // << GARANTA QUE ESTA LINHA EXISTA E ESTEJA CORRETA
+            target.Id != source.Id &&
             !target.IsDead &&
-            Vector3.DistanceSquared(target.Position, center) <= radius * radius &&
+            // <<< MUDANÇA >>> Usa o helper para comparar a distância quadrada no plano XZ.
+            Vector3Helper.Distance2DSquared(target.Position, center) <= radiusSqr &&
             ((intent == AbilityIntent.Harmful && !AreEntitiesFriendly(source, target)) ||
              (intent == AbilityIntent.Helpful && AreEntitiesFriendly(source, target)))
         ).ToList();
@@ -457,13 +475,12 @@ public class CombatManager
 
         foreach (var target in allPossibleTargets)
         {
-            // Ignora a si mesmo, alvos mortos, etc.
             if (target.Id == source.Id || target.IsDead) continue;
 
-            // --- 1. Verificação de Distância ---
-            if (Vector3.DistanceSquared(sourcePosition, target.Position) > coneRangeSqr)
+            // <<< MUDANÇA >>> Usa o helper para a verificação de distância no plano XZ.
+            if (Vector3Helper.Distance2DSquared(sourcePosition, target.Position) > coneRangeSqr)
             {
-                continue; // Alvo está longe demais, fora do comprimento do cone.
+                continue;
             }
 
             // --- 2. Verificação de Ângulo ---
@@ -522,11 +539,46 @@ public class CombatManager
         return false;
     }
 
+    // Em CombatManager.cs
+
+    // SUBSTITUA SEU MÉTODO FindEntityById ATUAL POR ESTE NOVO:
     private ICombatEntity? FindEntityById(string id)
     {
         if (string.IsNullOrEmpty(id) || id.ToLower() == "null") return null;
-        if (_server.ActiveNpcs.TryGetValue(id, out var npc)) return npc;
-        return _server.ConnectedPlayers.Values.FirstOrDefault(p => p.Id == id);
+
+        // --- PASSO 1: Tenta interpretar como um SessionId (inteiro) ---
+        if (int.TryParse(id, out int sessionId))
+        {
+            // É um jogador?
+            if (_server.PlayersBySessionId.TryGetValue(sessionId, out Player? player))
+            {
+                return player;
+            }
+
+            // É um NPC? (Vamos precisar de um novo dicionário no servidor)
+            // Por enquanto, vamos iterar. Ver otimização abaixo.
+            if (_server.NpcsBySessionId.TryGetValue(sessionId, out NpcInstance? npcBySessionId))
+            {
+                return npcBySessionId;
+            }
+        }
+
+        // --- PASSO 2: Se não for um inteiro, trata como uma string (GUID/InstanceId) ---
+
+        // É um NPC (pelo InstanceId/GUID)?
+        if (_server.ActiveNpcs.TryGetValue(id, out var npcByInstanceId))
+        {
+            return npcByInstanceId;
+        }
+
+        // É um jogador (pelo CharacterId/GUID)?
+        var playerByCharacterId = _server.ConnectedPlayers.Values.FirstOrDefault(p => p.CharacterId == id);
+        if (playerByCharacterId != null)
+        {
+            return playerByCharacterId;
+        }
+
+        return null;
     }
 
     // Este método parece ser chamado de fora, então o mantemos público.
@@ -549,12 +601,10 @@ public class CombatManager
 
         // A lógica de "LoS Falso":
         // Se o estado do NPC é de perseguição, mas ele não conseguiu se mover...
-        if (npc.CurrentState == NpcAiState.Chasing && Vector3.Distance(npc.Position, npc.LastPosition) < 0.1f)
+        if (npc.CurrentState == NpcAiState.Chasing && Vector3Helper.Distance2D(npc.Position, npc.LastPosition) < 0.1f)
         {
-            // ...e ele está parado há mais de meio segundo...
             if ((_server.CurrentTimeUtc - npc.TimeAtLastPosition).TotalMilliseconds > 500)
             {
-                // ...então inferimos que ele está bloqueado por uma parede. Sem linha de visão.
                 return false;
             }
         }
@@ -585,6 +635,9 @@ public class WorldPositionTarget : ICombatEntity
     public float MaxResource => 0;
     public float MovementSpeed => 0;
     public Dictionary<string, DateTime> AbilityCooldowns { get; } = new Dictionary<string, DateTime>();
+
+    public int SessionId => 0;
+    public string InstanceId => Id;
 
     // Métodos que não fazem nada para um alvo no chão
     public void TakeDamage(float amount, ICombatEntity source, UDPServer server) { }

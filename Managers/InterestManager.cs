@@ -119,7 +119,7 @@ public class InterestManager
             IWorldEntity? entity = _server.GetWorldEntityById(idToSpawn);
             if (entity != null)
             {
-                _server.NetworkManager.SendMessageToClient(entity.GetSpawnMessage(), player.EndPoint);
+                _server.NetworkManager.SendMessageToPlayer(player, entity.GetSpawnMessage());
 
                 // Atualiza o estado do jogador com o tipo correto
                 if (entity is Player) player.KnownPlayerIds.Add(idToSpawn);
@@ -149,7 +149,7 @@ public class InterestManager
             }
             else continue;
 
-            _server.NetworkManager.SendMessageToClient(despawnMessage, player.EndPoint);
+            _server.NetworkManager.SendMessageToPlayer(player, despawnMessage);
         }
     }
 

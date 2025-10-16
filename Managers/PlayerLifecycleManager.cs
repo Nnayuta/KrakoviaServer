@@ -65,7 +65,7 @@ public class PlayerLifecycleManager
                                    $"{safePosition.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)}," +
                                    $"{safePosition.Z.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
 
-                _server.NetworkManager.SendMessageToClient($"FORCE_TELEPORT|{posString}", player.EndPoint);
+                _server.NetworkManager.SendMessageToPlayer(player, $"FORCE_TELEPORT|{posString}");
                 _server.GridManager.UpdateEntity(player);
             }
         }
@@ -112,7 +112,7 @@ public class PlayerLifecycleManager
         {
             // Console.WriteLine($"[Casting-Server] Casting de '{player.Username}' interrompido por movimento.");
             player.InterruptCasting(true, _server.NetworkManager);
-            _server.NetworkManager.SendMessageToClient("SHOW_FEEDBACK|Conjuracao interrompida", player.EndPoint);
+            _server.NetworkManager.SendMessageToPlayer(player, "SHOW_FEEDBACK|Conjuracao interrompida");
             return;
         }
 
@@ -130,7 +130,7 @@ public class PlayerLifecycleManager
         // Se o recurso é insuficiente (pode ter sido gasto por outro efeito)
         if (player.CurrentResource < ability.ResourceCost)
         {
-            _server.NetworkManager.SendMessageToClient($"ABILITY_FAILED|{ability.ID}|Recurso Insuficiente", player.EndPoint);
+            _server.NetworkManager.SendMessageToPlayer(player, $"ABILITY_FAILED|{ability.ID}|LowResource");
             return;
         }
 
@@ -217,7 +217,7 @@ public class PlayerLifecycleManager
 
         // 3. Notifica o próprio cliente sobre o sucesso (continua igual)
         string posString = $"{respawnPosition.X.ToString(CultureInfo.InvariantCulture)},{respawnPosition.Y.ToString(CultureInfo.InvariantCulture)},{respawnPosition.Z.ToString(CultureInfo.InvariantCulture)}";
-        _server.NetworkManager.SendMessageToClient($"RESPAWN_SUCCESSFUL|{posString}|{player.CurrentHealth}|{player.MaxHealth}", player.EndPoint);
+        _server.NetworkManager.SendMessageToPlayer(player, $"RESPAWN_SUCCESSFUL|{posString}|{player.CurrentHealth}|{player.MaxHealth}");
 
         // 4. (CORREÇÃO) Notifica os jogadores PRÓXIMOS que esta entidade voltou à vida
         string message = $"ENTITY_RESURRECTED|{player.Id}|{player.CurrentHealth}|{player.MaxHealth}";

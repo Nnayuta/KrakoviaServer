@@ -28,7 +28,7 @@ public class PlayerInventoryManager
         if (lootItems == null || !lootItems.Any())
         {
             // Se não há loot, podemos enviar uma mensagem de "não encontrou nada"
-            _server.NetworkManager.SendMessageToClient("SHOW_FEEDBACK|Você não encontrou nada.", player.EndPoint);
+            _server.NetworkManager.SendMessageToPlayer(player, "SHOW_FEEDBACK|Você não encontrou nada.");
             return;
         }
 
@@ -40,12 +40,12 @@ public class PlayerInventoryManager
                 // Sucesso! Envia feedback visual para o cliente.
                 var itemData = DataManager.Items[itemStack.ItemID];
                 string feedback = itemStack.Quantity > 1 ? $"+{itemStack.Quantity} {itemData.itemName}" : $"+{itemData.itemName}";
-                _server.NetworkManager.SendMessageToClient($"SHOW_FEEDBACK|{feedback}", player.EndPoint);
+                _server.NetworkManager.SendMessageToPlayer(player, $"SHOW_FEEDBACK|{feedback}");
             }
             else
             {
                 // Falha! O inventário está cheio.
-                _server.NetworkManager.SendMessageToClient("ERROR|Inventário cheio.", player.EndPoint);
+                _server.NetworkManager.SendMessageToPlayer(player, "ERROR|Inventário cheio.");
 
                 // TODO: Lógica futura para enviar o item pelo correio ou dropá-lo no chão.
                 // Por enquanto, paramos de adicionar o resto.
@@ -156,7 +156,7 @@ public class PlayerInventoryManager
         _server.NetworkManager.SendInventoryUpdate(player);
 
         // Futuramente, você enviará uma atualização de moeda
-        _server.NetworkManager.SendMessageToClient($"CURRENCY_UPDATE|{player.TotalBronze}", player.EndPoint);
+        _server.NetworkManager.SendMessageToPlayer(player, $"CURRENCY_UPDATE|{player.TotalBronze}");
     }
 
     /// <summary>
@@ -186,7 +186,7 @@ public class PlayerInventoryManager
 
         Console.WriteLine($"[Loja] {player.Username} vendeu {sellQuantity}x {itemData.itemName}. Saldo restante: {new Currency(player.TotalBronze)}");
         _server.NetworkManager.SendInventoryUpdate(player);
-        _server.NetworkManager.SendMessageToClient($"CURRENCY_UPDATE|{player.TotalBronze}", player.EndPoint);
+        _server.NetworkManager.SendMessageToPlayer(player, $"CURRENCY_UPDATE|{player.TotalBronze}");
     }
 
     #endregion

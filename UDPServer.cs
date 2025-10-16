@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,6 +20,7 @@ public class UDPServer
 
 
     public readonly ConcurrentDictionary<string, NpcInstance> ActiveNpcs = new();
+    public readonly ConcurrentDictionary<int, NpcInstance> NpcsBySessionId = new();
     public readonly ConcurrentDictionary<string, NpcInstance> DeadNpcCor_pses = new();
 
     // Managers
@@ -45,13 +47,15 @@ public class UDPServer
     private const int TIMEOUT_SECONDS = 15;
 
     private int _nextSessionId = 0;
+    private int _nextNpcSessionId = 0;
 
     public UDPServer(int port, ICharacterDatabase characterDatabase)
     {
         Instance = this;
 
         this._characterDb = characterDatabase;
-        this._udpListener = new UdpClient(port);
+        IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), port);
+        this._udpListener = new UdpClient(serverEndPoint);
         DataManager.LoadAllData();
 
         // Instancia todos os managers
@@ -78,6 +82,11 @@ public class UDPServer
         return Interlocked.Increment(ref _nextSessionId);
     }
 
+    public int GetNextNpcSessionId()
+    {
+        return Interlocked.Increment(ref _nextNpcSessionId);
+    }
+
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         Console.WriteLine($"Servidor [WORLD] iniciado na porta {_udpListener.Client.LocalEndPoint}.");
@@ -92,7 +101,8 @@ public class UDPServer
         Task worldTask = WorldManager.WorldManagement_LoopAsync(cancellationToken);
 
         Console.WriteLine("STARTING NPCAI MANAGER");
-        Task aiTask = NpcAiManager.NpcAI_LoopAsync(cancellationToken);
+        Task fastAiTask = NpcAiManager.NpcAI_FastLoopAsync(cancellationToken);
+        Task slowAiTask = NpcAiManager.NpcAI_SlowLoopAsync(cancellationToken);
 
         Console.WriteLine("STARTING INTEREST MANAGER");
         Task interestAndActivationTask = InterestManager.UpdateInterestAndActivationAsync(cancellationToken);
@@ -118,7 +128,8 @@ public class UDPServer
             timeUpdateTask,
             listenTask,
             worldTask,
-            aiTask,
+            fastAiTask,
+            slowAiTask,
             interestAndActivationTask,
             playerLifecycleTask,
             schedulerTask,
@@ -148,9 +159,16 @@ public class UDPServer
         while (!cancellationToken.IsCancellationRequested)
         {
             CurrentTimeUtc = DateTime.UtcNow;
+
+            // >>> PASSO 3 - INTEGRAÇÃO <<<
+            // Depois de atualizar o tempo, processamos e enviamos todas as mensagens
+            // que foram enfileiradas desde o último tick.
+            NetworkManager.DispatchQueuedMessages();
+            // >>> FIM DA INTEGRAÇÃO <<<
+
             try
             {
-                // Atualiza o tempo em uma frequência alta (ex: 20 vezes por segundo)
+                // Atualiza o tempo e despacha mensagens a cada 50ms (20hz)
                 await Task.Delay(50, cancellationToken);
             }
             catch (TaskCanceledException) { break; }
@@ -205,7 +223,7 @@ public class UDPServer
                 // (NOVO) Se o motivo for específico (como login duplicado), podemos notificar o jogador desconectado.
                 if (reason.Contains("outra localidade"))
                 {
-                    NetworkManager.SendMessageToClient("FATAL_ERROR|Sua conta foi conectada de outro local.", disconnectedPlayer.EndPoint);
+                    NetworkManager.SendMessageToPlayer(disconnectedPlayer, "FATAL_ERROR|Sua conta foi conectada de outro local.");
                 }
             }
         }

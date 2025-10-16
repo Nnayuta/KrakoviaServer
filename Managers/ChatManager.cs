@@ -100,11 +100,11 @@ public class ChatManager
 
         // Envia a mensagem para o alvo
         string messageToTarget = $"CHAT_MSG|WHISPER_RECV|{sender.CharacterName}|{message}";
-        _server.NetworkManager.SendMessageToClient(messageToTarget, targetPlayer.EndPoint);
+        _server.NetworkManager.SendMessageToPlayer(targetPlayer, messageToTarget);
 
         // Envia uma confirmação para o remetente (para ele ver o que enviou)
         string messageToSender = $"CHAT_MSG|WHISPER_SENT|{targetPlayer.CharacterName}|{message}";
-        _server.NetworkManager.SendMessageToClient(messageToSender, sender.EndPoint);
+        _server.NetworkManager.SendMessageToPlayer(sender, messageToSender);
 
         Console.WriteLine($"[CHAT-WHISPER] {sender.CharacterName} -> {targetPlayer.CharacterName}: {message}");
     }
@@ -113,6 +113,6 @@ public class ChatManager
     public void SendSystemMessageToPlayer(Player player, string message)
     {
         string formattedMessage = $"CHAT_MSG|SYSTEM|Servidor|{message}";
-        _server.NetworkManager.SendMessageToClient(formattedMessage, player.EndPoint);
+        _server.NetworkManager.SendMessageToPlayer(player, formattedMessage);
     }
 }

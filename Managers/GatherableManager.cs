@@ -76,20 +76,20 @@ public class GatherableManager
     {
         if (!ActiveGatherables.TryGetValue(instanceId, out var item) || item.IsDepleted)
         {
-            _server.NetworkManager.SendMessageToClient("GATHER_FAILED|Já foi coletado.", player.EndPoint);
+            _server.NetworkManager.SendMessageToPlayer(player, "GATHER_FAILED|Já foi coletado.");
             return;
         }
 
         if (Vector3.Distance(player.Position, item.Position) > 5.0f)
         {
-            _server.NetworkManager.SendMessageToClient("GATHER_FAILED|Muito longe.", player.EndPoint);
+            _server.NetworkManager.SendMessageToPlayer(player, "GATHER_FAILED|Muito longe.");
             return;
         }
 
         // Se o jogador já estiver coletando algo, não permite iniciar outra.
         if (player.CurrentGatheringTokenSource != null)
         {
-            _server.NetworkManager.SendMessageToClient("GATHER_FAILED|Você já está ocupado.", player.EndPoint);
+            _server.NetworkManager.SendMessageToPlayer(player, "GATHER_FAILED|Você já está ocupado.");
             return;
         }
 
@@ -135,7 +135,7 @@ public class GatherableManager
                 var lootItems = _server.LootManager.GenerateLootForNpc(item.BaseData.LootTableID);
                 _server.PlayerInventoryManager.GrantLootToPlayer(player, lootItems);
 
-                _server.NetworkManager.SendMessageToClient("GATHER_COMPLETE", player.EndPoint);
+                _server.NetworkManager.SendMessageToPlayer(player, "GATHER_COMPLETE");
                 _server.GridManager.RemoveEntity(item);
                 string message = $"DESTROY_GATHERABLE|{item.InstanceId}";
                 _server.NetworkManager.BroadcastMessageToRelevantPlayers(item.Position, message);
@@ -143,7 +143,7 @@ public class GatherableManager
             catch (OperationCanceledException)
             {
                 // --- COLETA CANCELADA (PELO JOGADOR OU MOVIMENTO) ---
-                _server.NetworkManager.SendMessageToClient("GATHER_FAILED|Acao cancelada.", player.EndPoint);
+                _server.NetworkManager.SendMessageToPlayer(player, "GATHER_FAILED|Acao cancelada.");
             }
             finally
             {
@@ -154,7 +154,7 @@ public class GatherableManager
         }, cancellationToken);
 
         // Informa ao cliente para iniciar a barra de progresso (isso acontece imediatamente)
-        _server.NetworkManager.SendMessageToClient($"GATHER_STARTED|{item.BaseData.GatherTimeSeconds}", player.EndPoint);
+        _server.NetworkManager.SendMessageToPlayer(player, $"GATHER_STARTED|{item.BaseData.GatherTimeSeconds}");
     }
 
     private Vector3 CalculateSpawnPosition(GatherableSpawnPoint spawnPoint)

@@ -66,7 +66,7 @@ public class WorldManager
             if (npc.BaseData.ExperienceReward > 0)
             {
                 _server.PlayerProgressionManager.GrantExperience(creditPlayer, npc.BaseData.ExperienceReward);
-                _server.NetworkManager.SendMessageToClient($"SHOW_FEEDBACK|+{npc.BaseData.ExperienceReward} EXP", creditPlayer.EndPoint);
+                _server.NetworkManager.SendMessageToPlayer(creditPlayer, $"SHOW_FEEDBACK|+{npc.BaseData.ExperienceReward} EXP");
             }
 
             if (npc.BaseData.CurrencyReward > 0)
@@ -74,7 +74,7 @@ public class WorldManager
                 creditPlayer.TotalBronze += npc.BaseData.CurrencyReward;
 
                 _server.NetworkManager.SendCurrencyUpdate(creditPlayer);
-                _server.NetworkManager.SendMessageToClient($"SHOW_FEEDBACK|+{npc.BaseData.CurrencyReward} Moedas", creditPlayer.EndPoint);
+                _server.NetworkManager.SendMessageToPlayer(creditPlayer, $"SHOW_FEEDBACK|+{npc.BaseData.CurrencyReward} Moedas");
             }
         }
 
@@ -94,7 +94,7 @@ public class WorldManager
             _server.QuestManager.OnEntitySlain(killerPlayer, npc);
         }
 
-        string message = $"ENTITY_DIED|{npc.Id}|{npc.HasLoot}";
+        string message = $"ENTITY_DIED|{npc.SessionId}|{npc.HasLoot}";
         _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, message);
 
         // 6. Agenda o RESPAWN (lógica antiga de OnNpcDied)
@@ -127,7 +127,7 @@ public class WorldManager
             if (_server.DeadNpcCor_pses.TryRemove(npcId, out NpcInstance npc))
             {
                 // Apenas notifica o cliente. Não muda nada no estado do servidor.
-                _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, $"DESTROY_NPC|{npc.InstanceId}");
+                _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, $"DESTROY_NPC|{npc.SessionId}");
             }
         }
     }
@@ -143,7 +143,7 @@ public class WorldManager
         {
             // --- PASSO 1: Informa aos clientes para destruírem o corpo na POSIÇÃO ANTIGA ---
             Vector3 corpsePosition = npc.Position;
-            _server.NetworkManager.BroadcastMessageToRelevantPlayers(corpsePosition, $"DESTROY_NPC|{npc.Id}");
+            _server.NetworkManager.BroadcastMessageToRelevantPlayers(corpsePosition, $"DESTROY_NPC|{npc.SessionId}");
 
             // --- PASSO 2: Ressuscita o NPC no SERVIDOR ---
             npc.IsDead = false;
@@ -324,6 +324,7 @@ public class WorldManager
         newNpc.Behavior = _server.NpcAiManager.GetBehavior(newNpc.AiType);
         _server.ActiveNpcs.TryAdd(newNpc.InstanceId, newNpc);
         _server.GridManager.UpdateEntity(newNpc);
+        _server.NpcsBySessionId.TryAdd(newNpc.SessionId, newNpc);
 
         if (spawnPoint != null)
         {

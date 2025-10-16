@@ -67,27 +67,6 @@ public abstract class BaseBehavior : INpcBehavior
         npc.Destination = newDestination;
     }
 
-    // protected void SetNpcDestination(NpcInstance npc, Vector3 newDestination)
-    // {
-    //     // Se o novo destino é praticamente o mesmo que o destino atual, não faz nada.
-    //     if (Vector3.DistanceSquared(npc.Destination, newDestination) < 0.01f)
-    //     {
-    //         return;
-    //     }
-
-    //     // Atualiza o destino no servidor
-    //     npc.Destination = newDestination;
-
-    //     // --- A MUDANÇA CRÍTICA ---
-    //     // Envia o novo DESTINO para o cliente.
-    //     string posStr = $"{newDestination.X.ToString(CultureInfo.InvariantCulture)},{newDestination.Y.ToString(CultureInfo.InvariantCulture)},{newDestination.Z.ToString(CultureInfo.InvariantCulture)}";
-
-    //     // Usamos o mesmo nome de comando 'NPC_MOVE' para não ter que mudar o cliente,
-    //     // mas agora ele representa um DESTINO, não uma posição atual.
-    //     _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, $"NPC_MOVE|{npc.Id}|{posStr}");
-    // }
-
-
     protected Vector3 FindWanderPoint(NpcInstance npc)
     {
         float wanderRadius = 15f;
@@ -101,5 +80,31 @@ public abstract class BaseBehavior : INpcBehavior
         }
         potentialPoint.Y = npc.SpawnPosition.Y;
         return potentialPoint;
+    }
+
+    protected ICombatEntity? FindClosestEnemy(NpcInstance npc, float range)
+    {
+        var nearbyEntities = _server.GridManager.GetEntitiesInRadius(npc.Position, range);
+
+        // A "mágica" está aqui. Procuramos por qualquer entidade de combate...
+        return nearbyEntities
+            .OfType<ICombatEntity>()
+            // ...que não seja ela mesma, não esteja morta, e NÃO SEJA AMIGÁVEL.
+            .Where(target => target.Id != npc.Id && !target.IsDead && !AreEntitiesFriendly(npc, target))
+            .OrderBy(target => Vector3.DistanceSquared(npc.Position, target.Position))
+            .FirstOrDefault();
+    }
+
+    // Adicione este método aqui também, se ainda não estiver.
+    // Ele será usado pelo FindClosestEnemy.
+    protected bool AreEntitiesFriendly(ICombatEntity entityA, ICombatEntity entityB)
+    {
+        if (entityA is Player && entityB is Player) return true;
+        // Um guarda Friendly/Neutral é amigável a um Player
+        if (entityA is Player && entityB is NpcInstance npc) return npc.BaseData.Faction != NpcFaction.Enemy;
+        if (entityA is NpcInstance npc2 && entityB is Player) return npc2.BaseData.Faction != NpcFaction.Enemy;
+        // Dois NPCs são amigáveis se tiverem a mesma facção
+        if (entityA is NpcInstance n1 && entityB is NpcInstance n2) return n1.BaseData.Faction == n2.BaseData.Faction;
+        return false;
     }
 }

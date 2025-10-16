@@ -15,7 +15,7 @@ public static class DataManager
     public static Dictionary<string, ServerClassData> Classes { get; private set; } = new();
     public static Dictionary<string, ServerItemData> Items { get; private set; } = new();
     public static Dictionary<string, VendorData> Vendors { get; private set; } = new();
-    public static Dictionary<string, LootTable> LootTables { get; private set; } = new();
+    public static Dictionary<string, ServerLootTable> LootTables { get; private set; } = new();
     public static Dictionary<string, ServerQuestData> Quests { get; private set; } = new();
     public static Dictionary<string, ServerStatusEffectData> StatusEffects { get; private set; } = new();
     public static Dictionary<string, GatherableData> Gatherables { get; private set; } = new();
@@ -39,7 +39,7 @@ public static class DataManager
         LoadDataToDictionary<StatusEffectListWrapper, ServerStatusEffectData, string>("status_effects.json", "Status Effects", w => w.StatusEffects, e => e.EffectID, dict => StatusEffects = dict);
         LoadDataToDictionary<GatherableListWrapper, GatherableData, string>("gatherables.json", "Coletáveis", w => w.Gatherables, g => g.ID, dict => Gatherables = dict);
         LoadDataToDictionary<ClassListWrapper, ServerClassData, string>("classes.json", "Classes", w => w.Classes, c => c.ClassID, dict => Classes = dict);
-        LoadDataToDictionary<LootTableWrapper, LootTable, string>("loottables.json", "Tabelas de Loot", w => w.LootTables, lt => lt.LootTableID, dict => LootTables = dict);
+        LoadDataToDictionary<LootTableWrapper, ServerLootTable, string>("loottables.json", "Tabelas de Loot", w => w.LootTables, lt => lt.LootTableID, dict => LootTables = dict);
         LoadDataToDictionary<VendorListWrapper, VendorData, string>("vendors.json", "Vendedores", w => w.Vendors, v => v.NpcTypeId, dict => Vendors = dict);
         LoadDataToDictionary<QuestListWrapper, ServerQuestData, string>("quests.json", "Quests", w => w.Quests, q => q.QuestID, dict => Quests = dict);
 
@@ -207,7 +207,7 @@ public static class DataManager
 
     #region Classes Wrapper
     // As classes wrapper permanecem as mesmas, pois definem a estrutura dos seus arquivos JSON.
-    private class LootTableWrapper { public List<LootTable> LootTables { get; set; } }
+    private class LootTableWrapper { public List<ServerLootTable> LootTables { get; set; } }
     private class QuestListWrapper { public List<ServerQuestData> Quests { get; set; } }
     private class StatusEffectListWrapper { public List<ServerStatusEffectData> StatusEffects { get; set; } }
     private class ClassListWrapper { public List<ServerClassData> Classes { get; set; } }

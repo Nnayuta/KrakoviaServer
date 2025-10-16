@@ -14,7 +14,7 @@ public class PlayerProgressionManager
 
         // Envia a atualização de XP para o cliente
         string xpUpdateMessage = $"XP_UPDATE|{player.CurrentExperience}|{ExperienceManager.GetExperienceForLevel(player.Level)}";
-        _server.NetworkManager.SendMessageToClient(xpUpdateMessage, player.EndPoint);
+        _server.NetworkManager.SendMessageToPlayer(player, xpUpdateMessage);
 
         // Verifica se o jogador subiu de nível (em um loop para suportar múltiplos níveis de uma vez)
         while (player.Level < ExperienceManager.MAX_LEVEL && player.CurrentExperience >= ExperienceManager.GetExperienceForLevel(player.Level))
@@ -47,7 +47,7 @@ public class PlayerProgressionManager
         // --- NOTIFICAÇÕES PARA O CLIENTE ---
         // Notifica sobre o level up
         string levelUpMessage = $"LEVEL_UP|{player.Level}|{player.CurrentExperience}|{ExperienceManager.GetExperienceForLevel(player.Level)}";
-        _server.NetworkManager.SendMessageToClient(levelUpMessage, player.EndPoint);
+        _server.NetworkManager.SendMessageToPlayer(player, levelUpMessage);
 
         // Envia o estado completo (incluindo novos stats e vida máxima)
         _server.NetworkManager.SendFullStateToPlayer(player);

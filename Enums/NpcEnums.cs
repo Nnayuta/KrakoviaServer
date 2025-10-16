@@ -1,6 +1,12 @@
 // Enums/NpcEnums.cs
 public enum NpcFaction { Enemy, Neutral, Friendly }
 
+public enum AiUpdateTier
+{
+    Slow, // Para NPCs fora de combate (100ms)
+    Fast  // Para NPCs em combate (33ms)
+}
+
 public enum NpcAiType
 {
     // Agressivos

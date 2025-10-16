@@ -41,7 +41,7 @@
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 39
+        "Value": 36
       },
       {
         "Stat": "Stamina",
@@ -62,17 +62,17 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 3,
-    "sellPrice": 24,
+    "sellPrice": 21,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 65
+        "Value": 60
       },
       {
         "Stat": "Stamina",
-        "Value": 4
+        "Value": 3
       },
       {
         "Stat": "Intellect",
@@ -89,17 +89,17 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 3,
-    "sellPrice": 21,
+    "sellPrice": 17,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 52
+        "Value": 48
       },
       {
         "Stat": "Stamina",
-        "Value": 3
+        "Value": 2
       },
       {
         "Stat": "Intellect",
@@ -116,17 +116,17 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 3,
-    "sellPrice": 24,
+    "sellPrice": 21,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 62
+        "Value": 57
       },
       {
         "Stat": "Stamina",
-        "Value": 4
+        "Value": 3
       },
       {
         "Stat": "Intellect",
@@ -255,25 +255,25 @@
     "quality": "Legendary",
     "maxStackSize": 1,
     "requiredLevel": 0,
-    "sellPrice": 1052410,
+    "sellPrice": 7450,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Stamina",
-        "Value": 37586
+        "Value": 266
       },
       {
         "Stat": "CriticalStrikeRating",
-        "Value": 8457
+        "Value": 60
       },
       {
         "Stat": "MasteryRating",
-        "Value": 8457
+        "Value": 60
       },
       {
         "Stat": "Strength",
-        "Value": 20672
+        "Value": 146
       }
     ]
   },
@@ -286,25 +286,25 @@
     "quality": "Uncommon",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 130,
+    "sellPrice": 49,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 1415
+        "Value": 1218
       },
       {
         "Stat": "Stamina",
-        "Value": 10
+        "Value": 4
       },
       {
-        "Stat": "MasteryRating",
-        "Value": 5
+        "Stat": "CriticalStrikeRating",
+        "Value": 2
       },
       {
         "Stat": "Strength",
-        "Value": 6
+        "Value": 2
       }
     ]
   },
@@ -317,25 +317,25 @@
     "quality": "Uncommon",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 215,
+    "sellPrice": 85,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 2358
+        "Value": 2030
       },
       {
         "Stat": "Stamina",
-        "Value": 18
+        "Value": 7
       },
       {
-        "Stat": "HasteRating",
-        "Value": 8
+        "Stat": "MasteryRating",
+        "Value": 3
       },
       {
         "Stat": "Strength",
-        "Value": 9
+        "Value": 4
       }
     ]
   },
@@ -348,25 +348,25 @@
     "quality": "Uncommon",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 98,
+    "sellPrice": 36,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 1061
+        "Value": 914
       },
       {
         "Stat": "Stamina",
-        "Value": 8
+        "Value": 3
       },
       {
-        "Stat": "CriticalStrikeRating",
-        "Value": 4
+        "Stat": "HasteRating",
+        "Value": 1
       },
       {
         "Stat": "Strength",
-        "Value": 4
+        "Value": 2
       }
     ]
   },
@@ -379,25 +379,29 @@
     "quality": "Uncommon",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 130,
+    "sellPrice": 49,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 1415
+        "Value": 1218
       },
       {
         "Stat": "Stamina",
-        "Value": 10
+        "Value": 4
       },
       {
-        "Stat": "HasteRating",
-        "Value": 5
+        "Stat": "CriticalStrikeRating",
+        "Value": 2
       },
       {
         "Stat": "Strength",
-        "Value": 6
+        "Value": 2
+      },
+      {
+        "Stat": "MovementSpeed",
+        "Value": 1
       }
     ]
   },
@@ -410,25 +414,25 @@
     "quality": "Uncommon",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 170,
+    "sellPrice": 67,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 1887
+        "Value": 1624
       },
       {
         "Stat": "Stamina",
-        "Value": 14
-      },
-      {
-        "Stat": "HasteRating",
         "Value": 6
       },
       {
+        "Stat": "HasteRating",
+        "Value": 2
+      },
+      {
         "Stat": "Strength",
-        "Value": 8
+        "Value": 3
       }
     ]
   },
@@ -441,25 +445,25 @@
     "quality": "Uncommon",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 200,
+    "sellPrice": 79,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 2240
+        "Value": 1929
       },
       {
         "Stat": "Stamina",
-        "Value": 16
+        "Value": 6
       },
       {
-        "Stat": "MasteryRating",
-        "Value": 8
+        "Stat": "CriticalStrikeRating",
+        "Value": 3
       },
       {
         "Stat": "Strength",
-        "Value": 9
+        "Value": 4
       }
     ]
   },
@@ -468,9 +472,9 @@
     "itemID": "common_hide",
     "itemName": "Pele de Ruim",
     "quality": "Common",
-    "maxStackSize": 100,
+    "maxStackSize": 9999,
     "requiredLevel": 1,
-    "sellPrice": 5,
+    "sellPrice": 3,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": []
@@ -480,9 +484,9 @@
     "itemID": "epic_skin",
     "itemName": "Pele Top",
     "quality": "Epic",
-    "maxStackSize": 100,
+    "maxStackSize": 9999,
     "requiredLevel": 1,
-    "sellPrice": 5,
+    "sellPrice": 4,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": []
@@ -492,9 +496,9 @@
     "itemID": "rare_skin",
     "itemName": "Pele ta ficando boa confia",
     "quality": "Rare",
-    "maxStackSize": 100,
+    "maxStackSize": 9999,
     "requiredLevel": 1,
-    "sellPrice": 5,
+    "sellPrice": 4,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": []
@@ -504,12 +508,272 @@
     "itemID": "uncommon_skin",
     "itemName": "Pele Melhorzinha",
     "quality": "Uncommon",
-    "maxStackSize": 100,
+    "maxStackSize": 9999,
     "requiredLevel": 1,
-    "sellPrice": 5,
+    "sellPrice": 3,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": []
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Leather",
+    "equipmentSlot": "Feet",
+    "itemID": "leather_bandids_lvl5_boots_01",
+    "itemName": "Botas de Bandidos",
+    "quality": "Uncommon",
+    "maxStackSize": 1,
+    "requiredLevel": 5,
+    "sellPrice": 30,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 150
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 2
+      },
+      {
+        "Stat": "MasteryRating",
+        "Value": 1
+      },
+      {
+        "Stat": "Agility",
+        "Value": 2
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Leather",
+    "equipmentSlot": "Chest",
+    "itemID": "leather_bandids_lvl5_chest_01",
+    "itemName": "Peitoral de Bandidos",
+    "quality": "Uncommon",
+    "maxStackSize": 1,
+    "requiredLevel": 5,
+    "sellPrice": 49,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 249
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 4
+      },
+      {
+        "Stat": "CriticalStrikeRating",
+        "Value": 2
+      },
+      {
+        "Stat": "Agility",
+        "Value": 2
+      },
+      {
+        "Stat": "MovementSpeed",
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Leather",
+    "equipmentSlot": "Head",
+    "itemID": "leather_bandids_lvl5_head_01",
+    "itemName": "Capacete de Bandidos",
+    "quality": "Uncommon",
+    "maxStackSize": 1,
+    "requiredLevel": 5,
+    "sellPrice": 42,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 200
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 4
+      },
+      {
+        "Stat": "HasteRating",
+        "Value": 1
+      },
+      {
+        "Stat": "Agility",
+        "Value": 2
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Leather",
+    "equipmentSlot": "Legs",
+    "itemID": "leather_bandids_lvl5_legs_01",
+    "itemName": "Perneiras de Bandidos",
+    "quality": "Uncommon",
+    "maxStackSize": 1,
+    "requiredLevel": 5,
+    "sellPrice": 49,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 237
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 4
+      },
+      {
+        "Stat": "HasteRating",
+        "Value": 2
+      },
+      {
+        "Stat": "Agility",
+        "Value": 2
+      },
+      {
+        "Stat": "Leech",
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Leather",
+    "equipmentSlot": "Feet",
+    "itemID": "leather_bandids_lvl10_boots_01",
+    "itemName": "Botas de Bandidos",
+    "quality": "Uncommon",
+    "maxStackSize": 1,
+    "requiredLevel": 10,
+    "sellPrice": 67,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 591
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 6
+      },
+      {
+        "Stat": "HasteRating",
+        "Value": 2
+      },
+      {
+        "Stat": "Agility",
+        "Value": 3
+      },
+      {
+        "Stat": "Leech",
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Leather",
+    "equipmentSlot": "Chest",
+    "itemID": "leather_bandids_lvl10_chest_01",
+    "itemName": "Peitoral de Bandidos",
+    "quality": "Uncommon",
+    "maxStackSize": 1,
+    "requiredLevel": 10,
+    "sellPrice": 115,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 985
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 10
+      },
+      {
+        "Stat": "CriticalStrikeRating",
+        "Value": 4
+      },
+      {
+        "Stat": "Agility",
+        "Value": 5
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Leather",
+    "equipmentSlot": "Head",
+    "itemID": "leather_bandids_lvl10_head_01",
+    "itemName": "Capacete de Bandidos",
+    "quality": "Uncommon",
+    "maxStackSize": 1,
+    "requiredLevel": 10,
+    "sellPrice": 91,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 788
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 8
+      },
+      {
+        "Stat": "HasteRating",
+        "Value": 3
+      },
+      {
+        "Stat": "Agility",
+        "Value": 4
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Leather",
+    "equipmentSlot": "Legs",
+    "itemID": "leather_bandids_lvl10_legs_01",
+    "itemName": "Perneiras de Bandidos",
+    "quality": "Uncommon",
+    "maxStackSize": 1,
+    "requiredLevel": 10,
+    "sellPrice": 110,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 936
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 9
+      },
+      {
+        "Stat": "MasteryRating",
+        "Value": 4
+      },
+      {
+        "Stat": "Agility",
+        "Value": 5
+      }
+    ]
   },
   {
     "$type": "ServerArmorData, Assembly-CSharp",
@@ -526,7 +790,7 @@
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 10
+        "Value": 54
       },
       {
         "Stat": "Stamina",
@@ -547,17 +811,17 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 17,
+    "sellPrice": 21,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 16
+        "Value": 91
       },
       {
         "Stat": "Stamina",
-        "Value": 2
+        "Value": 3
       },
       {
         "Stat": "Agility",
@@ -574,13 +838,13 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 14,
+    "sellPrice": 17,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 13
+        "Value": 72
       },
       {
         "Stat": "Stamina",
@@ -588,7 +852,7 @@
       },
       {
         "Stat": "Agility",
-        "Value": 2
+        "Value": 3
       }
     ]
   },
@@ -607,7 +871,7 @@
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 15
+        "Value": 86
       },
       {
         "Stat": "Stamina",
@@ -626,10 +890,402 @@
     "quality": "Common",
     "maxStackSize": 100,
     "requiredLevel": 1,
-    "sellPrice": 5,
+    "sellPrice": 3,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": []
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Plate",
+    "equipmentSlot": "Feet",
+    "itemID": "plate_bandids_lvl5_boots_01",
+    "itemName": "Botas de Ferro Gasto",
+    "quality": "Uncommon",
+    "maxStackSize": 1,
+    "requiredLevel": 5,
+    "sellPrice": 30,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 449
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 2
+      },
+      {
+        "Stat": "MasteryRating",
+        "Value": 1
+      },
+      {
+        "Stat": "Strength",
+        "Value": 2
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Plate",
+    "equipmentSlot": "Chest",
+    "itemID": "plate_bandids_lvl5_chest_01",
+    "itemName": "Armadura de Ferro Gasto",
+    "quality": "Uncommon",
+    "maxStackSize": 1,
+    "requiredLevel": 5,
+    "sellPrice": 49,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 748
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 4
+      },
+      {
+        "Stat": "MasteryRating",
+        "Value": 2
+      },
+      {
+        "Stat": "Strength",
+        "Value": 2
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Plate",
+    "equipmentSlot": "Head",
+    "itemID": "plate_bandids_lvl5_head_01",
+    "itemName": "Capacete de Ferro Gasto",
+    "quality": "Uncommon",
+    "maxStackSize": 1,
+    "requiredLevel": 5,
+    "sellPrice": 42,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 599
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 4
+      },
+      {
+        "Stat": "MasteryRating",
+        "Value": 1
+      },
+      {
+        "Stat": "Strength",
+        "Value": 2
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Plate",
+    "equipmentSlot": "Legs",
+    "itemID": "plate_bandids_lvl5_legs_01",
+    "itemName": "Perneiras de Ferro Gasto",
+    "quality": "Uncommon",
+    "maxStackSize": 1,
+    "requiredLevel": 5,
+    "sellPrice": 49,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 711
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 4
+      },
+      {
+        "Stat": "CriticalStrikeRating",
+        "Value": 2
+      },
+      {
+        "Stat": "Strength",
+        "Value": 2
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Plate",
+    "equipmentSlot": "Feet",
+    "itemID": "plate_bandids_lvl10_boots_01",
+    "itemName": "Botas de Ferro Gasto",
+    "quality": "Uncommon",
+    "maxStackSize": 1,
+    "requiredLevel": 10,
+    "sellPrice": 67,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 1773
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 6
+      },
+      {
+        "Stat": "CriticalStrikeRating",
+        "Value": 2
+      },
+      {
+        "Stat": "Strength",
+        "Value": 3
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Plate",
+    "equipmentSlot": "Chest",
+    "itemID": "plate_bandids_lvl10_chest_01",
+    "itemName": "Armadura de Ferro Gasto",
+    "quality": "Uncommon",
+    "maxStackSize": 1,
+    "requiredLevel": 10,
+    "sellPrice": 115,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 2954
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 10
+      },
+      {
+        "Stat": "HasteRating",
+        "Value": 4
+      },
+      {
+        "Stat": "Strength",
+        "Value": 5
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Plate",
+    "equipmentSlot": "Head",
+    "itemID": "plate_bandids_lvl10_head_01",
+    "itemName": "Capacete de Ferro Gasto",
+    "quality": "Uncommon",
+    "maxStackSize": 1,
+    "requiredLevel": 10,
+    "sellPrice": 91,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 2363
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 8
+      },
+      {
+        "Stat": "CriticalStrikeRating",
+        "Value": 3
+      },
+      {
+        "Stat": "Strength",
+        "Value": 4
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Plate",
+    "equipmentSlot": "Legs",
+    "itemID": "plate_bandids_lvl10_legs_01",
+    "itemName": "Perneiras de Ferro Gasto",
+    "quality": "Uncommon",
+    "maxStackSize": 1,
+    "requiredLevel": 10,
+    "sellPrice": 110,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 2807
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 9
+      },
+      {
+        "Stat": "HasteRating",
+        "Value": 4
+      },
+      {
+        "Stat": "Strength",
+        "Value": 5
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Plate",
+    "equipmentSlot": "Feet",
+    "itemID": "plate_bandids_lvl10_boots_02",
+    "itemName": "Botas de Ferro Gasto",
+    "quality": "Rare",
+    "maxStackSize": 1,
+    "requiredLevel": 10,
+    "sellPrice": 140,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 2192
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 8
+      },
+      {
+        "Stat": "HasteRating",
+        "Value": 2
+      },
+      {
+        "Stat": "MasteryRating",
+        "Value": 2
+      },
+      {
+        "Stat": "Strength",
+        "Value": 4
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Plate",
+    "equipmentSlot": "Chest",
+    "itemID": "plate_bandids_lvl10_chest_02",
+    "itemName": "Armadura de Ferro Gasto",
+    "quality": "Rare",
+    "maxStackSize": 1,
+    "requiredLevel": 10,
+    "sellPrice": 225,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 3653
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 13
+      },
+      {
+        "Stat": "HasteRating",
+        "Value": 3
+      },
+      {
+        "Stat": "CriticalStrikeRating",
+        "Value": 3
+      },
+      {
+        "Stat": "Strength",
+        "Value": 7
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Plate",
+    "equipmentSlot": "Head",
+    "itemID": "plate_bandids_lvl10_head_02",
+    "itemName": "Capacete de Ferro Gasto",
+    "quality": "Rare",
+    "maxStackSize": 1,
+    "requiredLevel": 10,
+    "sellPrice": 185,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 2923
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 10
+      },
+      {
+        "Stat": "MasteryRating",
+        "Value": 2
+      },
+      {
+        "Stat": "HasteRating",
+        "Value": 3
+      },
+      {
+        "Stat": "Strength",
+        "Value": 6
+      },
+      {
+        "Stat": "Avoidance",
+        "Value": 1
+      }
+    ]
+  },
+  {
+    "$type": "ServerArmorData, Assembly-CSharp",
+    "armorType": "Plate",
+    "equipmentSlot": "Legs",
+    "itemID": "plate_bandids_lvl10_legs_02",
+    "itemName": "Perneiras de Ferro Gasto",
+    "quality": "Rare",
+    "maxStackSize": 1,
+    "requiredLevel": 10,
+    "sellPrice": 220,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": [
+      {
+        "Stat": "Armor",
+        "Value": 3471
+      },
+      {
+        "Stat": "Stamina",
+        "Value": 12
+      },
+      {
+        "Stat": "HasteRating",
+        "Value": 3
+      },
+      {
+        "Stat": "MasteryRating",
+        "Value": 3
+      },
+      {
+        "Stat": "Strength",
+        "Value": 7
+      }
+    ]
   },
   {
     "$type": "ServerArmorData, Assembly-CSharp",
@@ -646,7 +1302,7 @@
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 29
+        "Value": 163
       },
       {
         "Stat": "Stamina",
@@ -667,17 +1323,17 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 17,
+    "sellPrice": 21,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 48
+        "Value": 272
       },
       {
         "Stat": "Stamina",
-        "Value": 2
+        "Value": 3
       },
       {
         "Stat": "Strength",
@@ -694,13 +1350,13 @@
     "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 14,
+    "sellPrice": 17,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 38
+        "Value": 217
       },
       {
         "Stat": "Stamina",
@@ -708,7 +1364,7 @@
       },
       {
         "Stat": "Strength",
-        "Value": 2
+        "Value": 3
       }
     ]
   },
@@ -727,7 +1383,7 @@
     "Stats": [
       {
         "Stat": "Armor",
-        "Value": 46
+        "Value": 258
       },
       {
         "Stat": "Stamina",
@@ -746,7 +1402,7 @@
     "quality": "Epic",
     "maxStackSize": 100,
     "requiredLevel": 1,
-    "sellPrice": 5,
+    "sellPrice": 4,
     "Durability": null,
     "IsIndestructible": false,
     "Stats": []
@@ -825,5 +1481,149 @@
         "Value": 2
       }
     ]
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "Adaga_Cega",
+    "itemName": "Adaga Cega",
+    "quality": "Common",
+    "maxStackSize": 9999,
+    "requiredLevel": 1,
+    "sellPrice": 27,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "Bolsa_Rasgada",
+    "itemName": "Bolsa Rasgada",
+    "quality": "Common",
+    "maxStackSize": 9999,
+    "requiredLevel": 1,
+    "sellPrice": 27,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "Botina_Furada",
+    "itemName": "Botina Furada",
+    "quality": "Common",
+    "maxStackSize": 9999,
+    "requiredLevel": 1,
+    "sellPrice": 86,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "Moeda_Enferrujada",
+    "itemName": "Moeda_Enferrujada",
+    "quality": "Common",
+    "maxStackSize": 9999,
+    "requiredLevel": 1,
+    "sellPrice": 113,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "Trapo_Sujo",
+    "itemName": "Trapo Sujo",
+    "quality": "Common",
+    "maxStackSize": 9999,
+    "requiredLevel": 1,
+    "sellPrice": 113,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "femur_trincado",
+    "itemName": "Fêmur Trincado",
+    "quality": "Common",
+    "maxStackSize": 9999,
+    "requiredLevel": 1,
+    "sellPrice": 27,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "fragmento_de_osso",
+    "itemName": "Fragmento de Osso",
+    "quality": "Common",
+    "maxStackSize": 9999,
+    "requiredLevel": 1,
+    "sellPrice": 59,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "bone_drop",
+    "itemName": "Osso Velho",
+    "quality": "Common",
+    "maxStackSize": 9999,
+    "requiredLevel": 1,
+    "sellPrice": 27,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "po_de_ossos",
+    "itemName": "Pó de Ossos",
+    "quality": "Common",
+    "maxStackSize": 9999,
+    "requiredLevel": 1,
+    "sellPrice": 59,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "Dente_de_Urso",
+    "itemName": "Dente de Urso",
+    "quality": "Common",
+    "maxStackSize": 9999,
+    "requiredLevel": 1,
+    "sellPrice": 27,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "Garra_Quebrada",
+    "itemName": "Garra Quebrada",
+    "quality": "Common",
+    "maxStackSize": 9999,
+    "requiredLevel": 1,
+    "sellPrice": 27,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
+  },
+  {
+    "$type": "ServerJunkItemData, Assembly-CSharp",
+    "itemID": "Pedaco_de_Pele_Grossa",
+    "itemName": "Pedaço de Pele Grossa",
+    "quality": "Common",
+    "maxStackSize": 9999,
+    "requiredLevel": 1,
+    "sellPrice": 59,
+    "Durability": null,
+    "IsIndestructible": false,
+    "Stats": []
   }
 ]

@@ -18,46 +18,55 @@ public class PatrollingGuardBehavior : PatrollingAggressiveBehavior
     /// </summary>
     public override void Update(NpcInstance npc, float deltaTime)
     {
-        // Se já estamos em combate, usamos a lógica de combate da classe base, que é segura.
-        if (npc.CurrentState == NpcAiState.Chasing || npc.CurrentState == NpcAiState.Attacking)
+        // Obtém o alvo atual no início
+        ICombatEntity? target = GetCurrentTarget(npc);
+
+        // --- LÓGICA DE MANUTENÇÃO DE COMBATE ---
+        if (target != null)
         {
-            // O Update da classe base chamará HandleChasingState e HandleAttackingState,
-            // que são perfeitos para o combate.
-            base.Update(npc, deltaTime);
-            return;
+            // Se o alvo morreu ou quebrou o leash, abandona o combate.
+            if (target.IsDead || Vector3Helper.Distance2D(npc.Position, npc.AggroPosition) > npc.BaseData.LeashRange)
+            {
+                ResetAggro(npc);
+                HandleReturningToSpawnState(npc); // Inicia o retorno imediatamente
+                return;
+            }
+            else // O alvo é válido, continua o combate
+            {
+                float distanceToTarget = Vector3Helper.Distance2D(npc.Position, target.Position);
+                if (distanceToTarget > npc.BaseData.MaxAbilityRange)
+                {
+                    HandleChasingState(npc);
+                }
+                else
+                {
+                    // Para o guarda patrulheiro, HandleAttackingState precisa do alvo
+                    // Vamos precisar de uma versão sobrecarregada ou passar o alvo.
+                    // Por simplicidade, vamos chamar a lógica de ataque diretamente aqui.
+                    base.HandleAttackingState(npc);
+                }
+                return; // Lógica de combate concluída.
+            }
         }
 
-        // Se precisamos retornar ao spawn, usamos o handler da classe base.
-        if (npc.CurrentState == NpcAiState.ReturningToSpawn)
-        {
-            HandleReturningToSpawnState(npc);
-            return;
-        }
-
-        // --- LÓGICA DE DECISÃO DO GUARDA (FORA DE COMBATE) ---
-        // Se chegamos aqui, o guarda está ocioso ou patrulhando.
-
-        // Prioridade 1: Ajudar aliados próximos que estão sendo atacados.
+        // --- LÓGICA DE DECISÃO FORA DE COMBATE (se target == null) ---
+        // Prioridade 1: Ajudar aliados
         ICombatEntity? targetToAssist = FindEnemyAttackingAlly(npc);
         if (targetToAssist != null)
         {
-            // Console.WriteLine($"[Guard AI] {npc.Id} vai ajudar um aliado contra {targetToAssist.Id}");
             EngageTarget(npc, targetToAssist);
             return;
         }
 
-        // Prioridade 2: Atacar monstros hostis que entram no raio de agressão.
+        // Prioridade 2: Atacar monstros próximos
         ICombatEntity? nearbyMonster = FindClosestEnemyMonster(npc);
         if (nearbyMonster != null)
         {
-            // Console.WriteLine($"[Guard AI] {npc.Id} engajando monstro próximo {nearbyMonster.Id}");
             EngageTarget(npc, nearbyMonster);
             return;
         }
 
-        // --- LÓGICA DE PATRULHA (SE NÃO HÁ AMEAÇAS) ---
-        // Se não há inimigos, apenas executa a lógica de patrulha.
-        // Chamamos nossos próprios handlers de estado para evitar a busca por jogadores da classe base.
+        // Prioridade 3: Lógica de patrulha
         switch (npc.CurrentState)
         {
             case NpcAiState.Idle:
@@ -65,6 +74,9 @@ public class PatrollingGuardBehavior : PatrollingAggressiveBehavior
                 break;
             case NpcAiState.Patrolling:
                 Guard_HandlePatrollingState(npc);
+                break;
+            case NpcAiState.ReturningToSpawn:
+                HandleReturningToSpawnState(npc);
                 break;
         }
     }

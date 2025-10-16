@@ -1,24 +1,401 @@
 {
   "LootTables": [
     {
-      "LootTableID": "bear_common_drops",
-      "Entries": [
+      "LootTableID": "bandids_0001",
+      "Pools": [
         {
-          "ItemID": "hide",
-          "DropChance": 75.0,
-          "MinQuantity": 1,
-          "MaxQuantity": 2
+          "Chance": 1.0,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "Adaga_Cega",
+              "Weight": 100,
+              "MinQuantity": 1,
+              "MaxQuantity": 4
+            },
+            {
+              "ItemID": "Bolsa_Rasgada",
+              "Weight": 70,
+              "MinQuantity": 2,
+              "MaxQuantity": 3
+            },
+            {
+              "ItemID": "Trapo_Sujo",
+              "Weight": 60,
+              "MinQuantity": 2,
+              "MaxQuantity": 5
+            }
+          ]
+        },
+        {
+          "Chance": 0.05,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "leather_bandids_lvl5_boots_01",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "leather_bandids_lvl5_chest_01",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "leather_bandids_lvl5_head_01",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "leather_bandids_lvl5_legs_01",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            }
+          ]
         }
       ]
     },
     {
-      "LootTableID": "quest_raiz_problema_collect",
-      "Entries": [
+      "LootTableID": "bandids_0001_elite",
+      "Pools": [
         {
-          "ItemID": "potato_glitch",
-          "DropChance": 100.0,
-          "MinQuantity": 1,
-          "MaxQuantity": 1
+          "Chance": 1.0,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "Trapo_Sujo",
+              "Weight": 100,
+              "MinQuantity": 1,
+              "MaxQuantity": 5
+            },
+            {
+              "ItemID": "Bolsa_Rasgada",
+              "Weight": 70,
+              "MinQuantity": 1,
+              "MaxQuantity": 5
+            },
+            {
+              "ItemID": "Moeda_Enferrujada",
+              "Weight": 70,
+              "MinQuantity": 1,
+              "MaxQuantity": 2
+            }
+          ]
+        },
+        {
+          "Chance": 0.05,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "plate_bandids_lvl5_boots_01",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "plate_bandids_lvl5_chest_01",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "plate_bandids_lvl5_head_01",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "plate_bandids_lvl5_legs_01",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "LootTableID": "bandids_0002",
+      "Pools": [
+        {
+          "Chance": 1.0,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "Moeda_Enferrujada",
+              "Weight": 100,
+              "MinQuantity": 5,
+              "MaxQuantity": 15
+            },
+            {
+              "ItemID": "Bolsa_Rasgada",
+              "Weight": 70,
+              "MinQuantity": 1,
+              "MaxQuantity": 5
+            }
+          ]
+        },
+        {
+          "Chance": 0.05,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "leather_bandids_lvl10_boots_01",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "leather_bandids_lvl10_chest_01",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "leather_bandids_lvl10_head_01",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "leather_bandids_lvl10_legs_01",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "LootTableID": "bandids_0002_elite",
+      "Pools": [
+        {
+          "Chance": 1.0,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "Moeda_Enferrujada",
+              "Weight": 1,
+              "MinQuantity": 5,
+              "MaxQuantity": 20
+            },
+            {
+              "ItemID": "Trapo_Sujo",
+              "Weight": 1,
+              "MinQuantity": 5,
+              "MaxQuantity": 20
+            }
+          ]
+        },
+        {
+          "Chance": 0.1,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "plate_bandids_lvl10_boots_01",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "plate_bandids_lvl10_chest_01",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "plate_bandids_lvl10_head_01",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "plate_bandids_lvl10_legs_01",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            }
+          ]
+        },
+        {
+          "Chance": 0.01,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "plate_bandids_lvl10_boots_02",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "plate_bandids_lvl10_chest_02",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "plate_bandids_lvl10_head_02",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "plate_bandids_lvl10_legs_02",
+              "Weight": 10,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "LootTableID": "bear_common_drops",
+      "Pools": [
+        {
+          "Chance": 1.0,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "common_hide",
+              "Weight": 70,
+              "MinQuantity": 1,
+              "MaxQuantity": 4
+            },
+            {
+              "ItemID": "Dente_de_Urso",
+              "Weight": 100,
+              "MinQuantity": 1,
+              "MaxQuantity": 4
+            },
+            {
+              "ItemID": "Garra_Quebrada",
+              "Weight": 50,
+              "MinQuantity": 1,
+              "MaxQuantity": 4
+            },
+            {
+              "ItemID": "Pedaco_de_Pele_Grossa",
+              "Weight": 30,
+              "MinQuantity": 1,
+              "MaxQuantity": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "LootTableID": "skeleton_drop",
+      "Pools": [
+        {
+          "Chance": 1.0,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "femur_trincado",
+              "Weight": 70,
+              "MinQuantity": 1,
+              "MaxQuantity": 4
+            },
+            {
+              "ItemID": "fragmento_de_osso",
+              "Weight": 100,
+              "MinQuantity": 1,
+              "MaxQuantity": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "LootTableID": "skeleton_drop_10",
+      "Pools": [
+        {
+          "Chance": 1.0,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "bone_drop",
+              "Weight": 70,
+              "MinQuantity": 1,
+              "MaxQuantity": 7
+            },
+            {
+              "ItemID": "fragmento_de_osso",
+              "Weight": 100,
+              "MinQuantity": 1,
+              "MaxQuantity": 6
+            },
+            {
+              "ItemID": "po_de_ossos",
+              "Weight": 100,
+              "MinQuantity": 1,
+              "MaxQuantity": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "LootTableID": "skeleton_drop_10_elite",
+      "Pools": [
+        {
+          "Chance": 1.0,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "bone_drop",
+              "Weight": 70,
+              "MinQuantity": 1,
+              "MaxQuantity": 3
+            },
+            {
+              "ItemID": "fragmento_de_osso",
+              "Weight": 100,
+              "MinQuantity": 1,
+              "MaxQuantity": 5
+            },
+            {
+              "ItemID": "po_de_ossos",
+              "Weight": 100,
+              "MinQuantity": 1,
+              "MaxQuantity": 5
+            },
+            {
+              "ItemID": "femur_trincado",
+              "Weight": 100,
+              "MinQuantity": 1,
+              "MaxQuantity": 8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "LootTableID": "skeleton_drop_elite",
+      "Pools": [
+        {
+          "Chance": 1.0,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "femur_trincado",
+              "Weight": 70,
+              "MinQuantity": 1,
+              "MaxQuantity": 7
+            },
+            {
+              "ItemID": "fragmento_de_osso",
+              "Weight": 100,
+              "MinQuantity": 1,
+              "MaxQuantity": 10
+            }
+          ]
         }
       ]
     }

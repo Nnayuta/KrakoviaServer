@@ -1,17 +1,16 @@
-// Data/VendorData.cs
+// Servidor/Data/VendorData.cs
 using System.Collections.Generic;
 
+// Representa um item na lista de um vendedor
 public class VendorItemData
 {
     public string ItemID { get; set; }
     public int BuyPrice { get; set; }
-    // Futuramente, você pode adicionar:
-    // public int? Stock { get; set; } // Para estoque limitado
 }
 
+// Representa os dados completos de um único vendedor, linkado a um NpcTypeId
 public class VendorData
 {
     public string NpcTypeId { get; set; }
-    public string CurrencyType { get; set; } = "Gold"; // Moeda padrão
-    public List<VendorItemData> Items { get; set; } = new List<VendorItemData>();
+    public List<VendorItemData> Items { get; set; }
 }

@@ -3,7 +3,9 @@ using System.Numerics;
 using System;
 public interface ICombatEntity
 {
-    string Id { get; }
+    string Id { get; } // Pode ser mantido como o SessionId em string para compatibilidade
+    int SessionId { get; } // <<< NOVO: O identificador de rede primário
+    string InstanceId { get; } // <<< NOVO: O identificador único e persistente (GUID)
     Vector3 Position { get; }
     bool IsDead { get; }
     CharacterStats? Stats { get; }

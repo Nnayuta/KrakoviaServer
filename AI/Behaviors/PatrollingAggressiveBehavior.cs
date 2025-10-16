@@ -9,21 +9,61 @@ public class PatrollingAggressiveBehavior : WanderingAggressiveBehavior
     // (CORREÇÃO) Marcado como OVERRIDE.
     public override void Update(NpcInstance npc, float deltaTime)
     {
-        base.Update(npc, deltaTime);
-
-        if (npc.CurrentState == NpcAiState.Chasing || npc.CurrentState == NpcAiState.Attacking)
+        // PRIORIDADE 0: Casting (copiado da base)
+        if (npc.CurrentState == NpcAiState.Casting)
         {
+            HandleCastingState(npc);
             return;
         }
 
-        switch (npc.CurrentState)
+        ICombatEntity? target = GetCurrentTarget(npc);
+
+        // --- LÓGICA DE COMBATE ---
+        if (target != null)
         {
-            case NpcAiState.Idle:
-                HandleIdleState(npc);
-                break;
-            case NpcAiState.Patrolling:
-                HandlePatrollingState(npc);
-                break;
+            if (target.IsDead || Vector3Helper.Distance2D(npc.Position, npc.AggroPosition) > npc.BaseData.LeashRange)
+            {
+                ResetAggro(npc);
+            }
+            else
+            {
+                float distanceToTarget = Vector3Helper.Distance2D(npc.Position, target.Position);
+                if (distanceToTarget > npc.BaseData.MaxAbilityRange)
+                {
+                    HandleChasingState(npc);
+                }
+                else
+                {
+                    HandleAttackingState(npc);
+                }
+            }
+        }
+        // --- LÓGICA FORA DE COMBATE ---
+        else
+        {
+            // <<<< A GRANDE MUDANÇA ESTÁ AQUI >>>>
+            // Em vez de procurar só por players, procuramos pelo inimigo mais próximo.
+            target = FindClosestEnemy(npc, npc.BaseData.AggroRange);
+
+            if (target != null)
+            {
+                EngageTarget(npc, target); // Encontrou um inimigo, entra em combate!
+            }
+            else // Não encontrou inimigos, executa a rotina de patrulha.
+            {
+                if (npc.CurrentState == NpcAiState.ReturningToSpawn)
+                {
+                    HandleReturningToSpawnState(npc);
+                }
+                else if (npc.CurrentState == NpcAiState.Patrolling)
+                {
+                    HandlePatrollingState(npc);
+                }
+                else // Por padrão, fica Idle esperando o próximo ponto de patrulha.
+                {
+                    HandleIdleState(npc);
+                }
+            }
         }
     }
 

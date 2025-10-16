@@ -1,6 +1,7 @@
 ﻿// Managers/NetworkManager.cs
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -15,8 +16,9 @@ public class NetworkManager
 {
     private readonly UDPServer _server;
     private readonly UdpClient _udpListener;
-    
+
     private readonly ICharacterDatabase _characterDb;
+    private const int SAFE_MTU = 1300;
 
     public NetworkManager(UDPServer server, UdpClient udpListener, ICharacterDatabase characterDatabase)
     {
@@ -30,17 +32,15 @@ public class NetworkManager
     /// Escuta por mensagens de jogadores de forma assíncrona até que o cancelamento seja solicitado.
     /// </summary>
     /// <param name="cancellationToken">O token para monitorar solicitações de cancelamento.</param>
-    // Em NetworkManager.cs
-
     public async Task ListenForPlayerMessagesAsync(CancellationToken cancellationToken)
     {
+        Console.ForegroundColor = ConsoleColor.Blue;
         Console.WriteLine("[NetworkManager] Iniciando listener de mensagens UDP...");
+        Console.ResetColor();
         while (!cancellationToken.IsCancellationRequested)
         {
             try
             {
-                // (MUDANÇA) Removemos o CancellationToken daqui.
-                // A tarefa agora só pode ser interrompida por um erro de socket.
                 var result = await _udpListener.ReceiveAsync();
                 await HandlePlayerMessageAsync(result.Buffer, result.RemoteEndPoint);
             }
@@ -73,6 +73,62 @@ public class NetworkManager
         Console.WriteLine("[NetworkManager] Listener de mensagens UDP finalizado.");
     }
 
+    /// <summary>
+    /// Este método deve ser chamado a cada tick do servidor (ex: 20 vezes por segundo).
+    /// Ele processa a fila de saída de cada jogador e envia os pacotes agrupados.
+    /// </summary>
+    public void DispatchQueuedMessages()
+    {
+        // Itera sobre uma cópia da lista de jogadores para evitar problemas de concorrência
+        // se um jogador se conectar/desconectar durante o loop.
+        var allPlayers = _server.ConnectedPlayers.Values.ToList();
+
+        foreach (var player in allPlayers)
+        {
+            var queue = player.GetMessageQueue();
+            var queueLock = player.GetQueueLock();
+
+            // Se não há nada para enviar para este jogador, pulamos.
+            if (queue.Count == 0) continue;
+
+            // Usamos um MemoryStream para construir nosso pacote grande
+            using (var packageStream = new MemoryStream(SAFE_MTU))
+            using (var writer = new BinaryWriter(packageStream))
+            {
+                lock (queueLock)
+                {
+                    while (queue.Count > 0)
+                    {
+                        byte[] message = queue.Peek(); // Apenas olhamos, não removemos ainda
+
+                        // O formato do pacote será: [tamanho da msg (2 bytes)][msg][tamanho da msg][msg]...
+                        // +2 bytes para o tamanho
+                        if (packageStream.Position + message.Length + 2 > SAFE_MTU)
+                        {
+                            // O pacote atual está cheio. Envia e começa um novo.
+                            break;
+                        }
+
+                        // Se coube, removemos da fila e escrevemos no nosso "pacotão"
+                        queue.Dequeue();
+
+                        // Escreve o tamanho da mensagem (como um ushort = 2 bytes)
+                        writer.Write((ushort)message.Length);
+                        // Escreve a mensagem em si
+                        writer.Write(message);
+                    }
+                }
+
+                // Se montamos um pacote com pelo menos uma mensagem, enviamos.
+                if (packageStream.Position > 0)
+                {
+                    byte[] finalPackage = packageStream.ToArray();
+                    _udpListener.Send(finalPackage, finalPackage.Length, player.EndPoint);
+                }
+            }
+        }
+    }
+
     public void SendFullStateToPlayer(Player player)
     {
         SendInventoryUpdate(player);
@@ -88,13 +144,13 @@ public class NetworkManager
         var fullLog = player.QuestLog.AllQuests.Values.ToList();
 
         string json = JsonConvert.SerializeObject(fullLog);
-        SendMessageToClient($"QUEST_LOG_INIT|{json}", player.EndPoint);
+        SendMessageToPlayer(player, $"QUEST_LOG_INIT|{json}");
     }
 
     public void SendQuestUpdate(Player player, QuestProgress progress)
     {
         string json = JsonConvert.SerializeObject(progress);
-        SendMessageToClient($"QUEST_UPDATE|{json}", player.EndPoint);
+        SendMessageToPlayer(player, $"QUEST_UPDATE|{json}");
     }
 
     public void SendStatsUpdate(Player player)
@@ -114,7 +170,7 @@ public class NetworkManager
         // Junta tudo na mensagem final
         string message = $"STATS_UPDATE|{player.Id}|{string.Join("|", statParts)}";
 
-        SendMessageToClient(message, player.EndPoint);
+        SendMessageToPlayer(player, message);
     }
 
     public void SendVitalsUpdate(Player player)
@@ -125,7 +181,7 @@ public class NetworkManager
             player.CurrentResource,
             player.MaxResource
         );
-        SendMessageToClient(message, player.EndPoint);
+        SendMessageToPlayer(player, message);
     }
 
     public void SendInventoryUpdate(Player player)
@@ -135,7 +191,7 @@ public class NetworkManager
             stack == null ? "null" : $"{stack.InstanceID},{stack.ItemID},{stack.Quantity}"
         );
         string inventoryMessage = "INVENTORY_UPDATE|" + string.Join("|", inventoryParts);
-        SendMessageToClient(inventoryMessage, player.EndPoint);
+        SendMessageToPlayer(player, inventoryMessage);
     }
 
     public void SendEquipmentUpdate(Player player)
@@ -153,33 +209,78 @@ public class NetworkManager
         });
 
         string message = "EQUIPMENT_UPDATE|" + string.Join("|", equipmentParts);
-        SendMessageToClient(message, player.EndPoint);
+        SendMessageToPlayer(player, message);
     }
 
     public void SendCurrencyUpdate(Player player)
     {
         string message = $"CURRENCY_UPDATE|{player.TotalBronze}";
-        SendMessageToClient(message, player.EndPoint);
+        SendMessageToPlayer(player, message);
     }
+
+    // Em NetworkManager.cs
+
+    // SUBSTITUA SEU MÉTODO ATUAL HandlePlayerMessageAsync POR ESTES DOIS:
 
     private async Task HandlePlayerMessageAsync(byte[] buffer, IPEndPoint clientEndPoint)
     {
-        var message = Encoding.UTF8.GetString(buffer).TrimEnd('\0');
+        //Console.WriteLine($"[SERVER] {buffer.Length} bytes recebidos de {clientEndPoint}");
+
+        // Usamos um MemoryStream para ler o pacote recebido
+        using (var packageStream = new MemoryStream(buffer))
+        using (var reader = new BinaryReader(packageStream))
+        {
+            // Enquanto houver dados para ler...
+            while (packageStream.Position < packageStream.Length)
+            {
+                try
+                {
+                    // Lê o tamanho da próxima mensagem (ushort = 2 bytes)
+                    ushort messageSize = reader.ReadUInt16();
+
+                    // Garante que o buffer contém a mensagem inteira
+                    if (packageStream.Position + messageSize > packageStream.Length)
+                    {
+                        Console.WriteLine($"[NetworkManager] Erro: Pacote malformado de {clientEndPoint}. Tamanho de mensagem inválido.");
+                        break; // Sai do loop se o pacote estiver corrompido
+                    }
+
+                    // Lê os bytes da mensagem
+                    byte[] messageBytes = reader.ReadBytes(messageSize);
+
+                    // Agora, processa a mensagem individual como antes
+                    await ProcessSingleMessage(messageBytes, clientEndPoint);
+                }
+                catch (EndOfStreamException)
+                {
+                    // Acontece se o pacote terminar inesperadamente. Apenas paramos de ler.
+                    Console.WriteLine($"[NetworkManager] Aviso: Fim do stream atingido ao desempacotar mensagem de {clientEndPoint}.");
+                    break;
+                }
+            }
+        }
+    }
+
+    // ESTE NOVO MÉTODO CONTÉM A LÓGICA QUE VOCÊ JÁ TINHA
+    private async Task ProcessSingleMessage(byte[] messageBuffer, IPEndPoint clientEndPoint)
+    {
+        var message = Encoding.UTF8.GetString(messageBuffer).TrimEnd('\0');
         if (string.IsNullOrEmpty(message)) return;
 
         string[] parts = message.Split('|');
         string command = parts[0];
         string clientKey = clientEndPoint.ToString();
+        //Console.WriteLine(command);
 
         if (command == "CONNECT")
         {
             if (parts.Length < 2)
             {
-                SendMessageToClient("ERROR|Token de acesso ausente.", clientEndPoint);
+                SendImmediateMessageToEndpoint("ERROR|Token de acesso ausente.", clientEndPoint);
                 return;
             }
             string receivedToken = parts[1];
-            // <<< MUDANÇA 5: Agora usamos 'await' para esperar a conexão do jogador ser processada.
+            //Console.WriteLine(receivedToken);
             await HandleNewPlayerConnection(clientKey, clientEndPoint, receivedToken);
         }
         else if (_server.ConnectedPlayers.TryGetValue(clientKey, out Player? player) && player != null)
@@ -187,10 +288,11 @@ public class NetworkManager
             player.LastMessageTime = _server.CurrentTimeUtc;
             string? messageToBroadcast = null;
 
+
             switch (command)
             {
                 case "HEARTBEAT":
-                    SendMessageToClient($"PONG|{parts[1]}", clientEndPoint);
+                    SendMessageToPlayer(player, $"PONG|{parts[1]}");
                     break;
 
                 case "PLAYER_QUITTING":
@@ -324,15 +426,17 @@ public class NetworkManager
             if (existingPlayer != null)
             {
                 Console.WriteLine($"[Conexão Duplicada] Personagem {playerInfo.CharacterId} já estava online. Desconectando a sessão antiga.");
-                SendMessageToClient("FATAL_ERROR|Sua conta foi conectada de outro local.", existingPlayer.EndPoint);
+                SendMessageToPlayer(existingPlayer, "FATAL_ERROR|Sua conta foi conectada de outro local.");
                 _server.DisconnectPlayer(existingPlayer.EndPoint.ToString(), "Conectado de outra localidade.");
             }
 
             Console.WriteLine($"[Conexão] Autenticado: {playerInfo.Username} | Perm: {playerInfo.PermissionLevel}, Personagem: {playerInfo.CharacterName} (Classe: {playerInfo.ClassID}, Nível: {playerInfo.Level})");
 
             CharacterData characterData = await _characterDb.LoadOrCreateAsync(playerInfo);
-            var newPlayer = new Player(clientEndPoint, playerInfo, _server, characterData);
-            newPlayer.IsPendingInitialization = true;
+            var newPlayer = new Player(clientEndPoint, playerInfo, _server, characterData)
+            {
+                IsPendingInitialization = true
+            };
 
             if (_server.ConnectedPlayers.TryAdd(clientKey, newPlayer))
             {
@@ -340,23 +444,15 @@ public class NetworkManager
                 Console.WriteLine($"Novo jogador ({newPlayer.SessionId}) conectado de {clientEndPoint}. Total: {_server.ConnectedPlayers.Count}");
                 OnlineStatusManager.SetOnline(newPlayer.CharacterId); // Usa o ID permanente para status global
 
-                // --- [CORREÇÃO 1] ---
-                // A mensagem ASSIGN_ID precisa enviar AMBOS os IDs.
-                // O CharacterId (GUID) para o cliente saber "quem eu sou".
-                // O SessionId (int) para o cliente saber o seu próprio ID de sessão.
                 string assignIdMessage = $"ASSIGN_ID|{newPlayer.CharacterId}|{newPlayer.SessionId}";
-                SendMessageToClient(assignIdMessage, clientEndPoint);
-
-                // --- [CORREÇÃO 2] ---
-                // A mensagem de spawn do PRÓPRIO jogador também precisa de ambos os IDs.
-                // O cliente usa isso para se instanciar.
+                SendMessageToPlayer(newPlayer, assignIdMessage);
                 string spawnMessage = newPlayer.GetSpawnMessage();
-                SendMessageToClient(spawnMessage, clientEndPoint);
+                SendMessageToPlayer(newPlayer, spawnMessage);
             }
         }
         else
         {
-            SendMessageToClient("ERROR|Token de acesso inválido ou expirado.", clientEndPoint);
+            SendImmediateMessageToEndpoint("ERROR|Token de acesso inválido ou expirado.", clientEndPoint);
         }
     }
 
@@ -367,7 +463,7 @@ public class NetworkManager
             !DataManager.Vendors.TryGetValue(npcInstance.BaseData.TypeId, out var vendorData))
         {
             // Envia uma mensagem de falha se o NPC não for um vendedor
-            SendMessageToClient("ERROR|Este NPC não é um vendedor.", player.EndPoint);
+            SendMessageToPlayer(player, "ERROR|Este NPC não é um vendedor.");
             return;
         }
 
@@ -375,7 +471,7 @@ public class NetworkManager
         string vendorPayloadJson = JsonConvert.SerializeObject(vendorData.Items);
 
         // Envia a mensagem para o cliente abrir a janela da loja
-        SendMessageToClient($"OPEN_SHOP_WINDOW|{npcId}|{vendorPayloadJson}", player.EndPoint);
+        SendMessageToPlayer(player, $"OPEN_SHOP_WINDOW|{npcId}|{vendorPayloadJson}");
         Console.WriteLine($"[Loja] Jogador {player.Username} abriu a loja do NPC {npcId}.");
     }
 
@@ -457,39 +553,31 @@ public class NetworkManager
 
     public void BroadcastMessageToRelevantPlayers(Vector3 centerPosition, string message, Player? excludePlayer = null, float visibilityRange = 80f)
     {
-        byte[] data = Encoding.UTF8.GetBytes(message);
-
-        // 1. Pega todas as entidades próximas.
+        // Não precisa mais converter para byte[] aqui
         var candidateEntities = _server.GridManager.GetEntitiesInRadius(centerPosition, visibilityRange);
-
-        // 2. Filtra para pegar apenas os jogadores.
         var playersToSendTo = candidateEntities.OfType<Player>();
 
-        // 3. Itera diretamente sobre a lista de jogadores encontrados.
         foreach (var player in playersToSendTo)
         {
-            // A condição de exclusão: Não envia se o jogador da lista for o mesmo
-            // que originou a mensagem (o excludePlayer).
             if (excludePlayer != null && player.Id == excludePlayer.Id)
             {
-                continue; // Pula para o próximo jogador
+                continue;
             }
 
-            // Garante que o jogador ainda está conectado.
-            // A chave do seu dicionário é o EndPoint.ToString().
             if (_server.ConnectedPlayers.ContainsKey(player.EndPoint.ToString()))
             {
-                _udpListener.Send(data, data.Length, player.EndPoint);
+                // Em vez de enviar, enfileiramos!
+                SendMessageToPlayer(player, message);
             }
         }
     }
 
     public void BroadcastMessageToAll(string message)
     {
-        byte[] data = Encoding.UTF8.GetBytes(message);
         foreach (var player in _server.ConnectedPlayers.Values)
         {
-            _udpListener.Send(data, data.Length, player.EndPoint);
+            // Em vez de enviar, enfileiramos!
+            SendMessageToPlayer(player, message);
         }
     }
 
@@ -508,24 +596,51 @@ public class NetworkManager
             // A condição crucial: só envia se o ID do jogador no loop for diferente do ID do jogador de origem.
             if (player.Id != sourcePlayer.Id)
             {
-                SendMessageToClient(message, player.EndPoint);
+                SendMessageToPlayer(player, message);
             }
         }
     }
 
     public void BroadcastMessage(string message, string senderSessionId)
     {
-        byte[] data = Encoding.UTF8.GetBytes(message);
         foreach (var player in _server.ConnectedPlayers.Values.Where(p => p.GuidSessionId != senderSessionId))
         {
-            _udpListener.Send(data, data.Length, player.EndPoint);
+            // Em vez de enviar, enfileiramos!
+            SendMessageToPlayer(player, message);
         }
     }
-
-    public void SendMessageToClient(string message, IPEndPoint endPoint)
+    public void SendMessageToPlayer(Player player, string message)
     {
+        if (player == null) return;
+
         byte[] data = Encoding.UTF8.GetBytes(message);
-        _udpListener.Send(data, data.Length, endPoint);
+        player.EnqueueMessage(data); // Apenas enfileira!
+    }
+
+    public void SendImmediateMessageToEndpoint(string message, IPEndPoint endPoint)
+    {
+        // Este método NÃO usa a fila. Ele envia um pacote diretamente.
+        // É útil para erros de conexão antes que um objeto Player seja criado.
+        try
+        {
+            byte[] data = Encoding.UTF8.GetBytes(message);
+
+            // CRUCIAL: Precisamos construir o pacote no formato que o cliente espera: [tamanho][dados]
+            // Mesmo que seja apenas uma mensagem, ela precisa seguir o formato do pacote.
+            using (var packageStream = new MemoryStream())
+            using (var writer = new BinaryWriter(packageStream))
+            {
+                writer.Write((ushort)data.Length); // Escreve o tamanho
+                writer.Write(data);                // Escreve a mensagem
+
+                byte[] finalPackage = packageStream.ToArray();
+                _udpListener.Send(finalPackage, finalPackage.Length, endPoint);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"[SendImmediate] Erro ao enviar mensagem para {endPoint}: {e.Message}");
+        }
     }
 
     public Vector3 ToEulerAngles(Quaternion q)

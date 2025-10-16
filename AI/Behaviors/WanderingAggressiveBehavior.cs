@@ -12,41 +12,67 @@ public class WanderingAggressiveBehavior : BaseBehavior
 
     public override void Update(NpcInstance npc, float deltaTime)
     {
-
+        // PRIORIDADE 0: Se estiver castando, não faz mais nada.
         if (npc.CurrentState == NpcAiState.Casting)
         {
             HandleCastingState(npc);
-            return; // Sai do Update para não tomar outras decisões.
+            return;
         }
 
-        if (npc.CurrentState == NpcAiState.Chasing || npc.CurrentState == NpcAiState.Attacking)
+        // --- LÓGICA DE COMBATE ---
+        ICombatEntity? target = GetCurrentTarget(npc);
+
+        // Se temos um alvo, decidimos o que fazer com ele.
+        if (target != null)
         {
-            ICombatEntity? target = GetCurrentTarget(npc);
-            if (target == null || target.IsDead || Vector3.Distance(npc.Position, npc.AggroPosition) > npc.BaseData.LeashRange)
+            // Validação do alvo: está morto ou fora da "coleira" (leash)?
+            if (target.IsDead || Vector3Helper.Distance2D(npc.Position, npc.AggroPosition) > npc.BaseData.LeashRange)
             {
-                ResetAggro(npc);
-                return;
+                ResetAggro(npc); // Abandona o combate.
+            }
+            else
+            {
+                // O alvo é válido, então executamos a lógica de combate.
+                float distanceToTarget = Vector3Helper.Distance2D(npc.Position, target.Position);
+
+                // Se estamos longe demais, perseguimos.
+                if (distanceToTarget > npc.BaseData.MaxAbilityRange)
+                {
+                    HandleChasingState(npc);
+                }
+                else // Se estamos no alcance, atacamos.
+                {
+                    HandleAttackingState(npc);
+                }
             }
         }
+        // --- LÓGICA FORA DE COMBATE (SEM ALVO) ---
         else
         {
-            ICombatEntity? target = FindClosestPlayerInAggroRange(npc);
+            // Se não temos um alvo, procuramos por um.
+            target = FindClosestPlayerInAggroRange(npc);
             if (target != null)
             {
-                EngageTarget(npc, target);
-                return;
+                EngageTarget(npc, target); // Encontrou um alvo, entra em combate!
+            }
+            else // Se não encontrou nenhum alvo, executa a rotina pacífica.
+            {
+                if (npc.CurrentState == NpcAiState.ReturningToSpawn)
+                {
+                    HandleReturningToSpawnState(npc);
+                }
+                else if (npc.CurrentState == NpcAiState.Wandering)
+                {
+                    HandleWanderingState(npc);
+                }
+                else // Por padrão, fica no estado Idle
+                {
+                    HandleIdleState(npc);
+                }
             }
         }
-
-        switch (npc.CurrentState)
-        {
-            case NpcAiState.Idle: HandleIdleState(npc); break;
-            case NpcAiState.Wandering: HandleWanderingState(npc); break;
-            case NpcAiState.Chasing: HandleChasingState(npc); break;
-            case NpcAiState.Attacking: HandleAttackingState(npc); break;
-            case NpcAiState.ReturningToSpawn: HandleReturningToSpawnState(npc); break;
-        }
     }
+
 
     protected virtual void HandleCastingState(NpcInstance npc)
     {
@@ -81,14 +107,19 @@ public class WanderingAggressiveBehavior : BaseBehavior
 
     public override void OnDamaged(NpcInstance npc, ICombatEntity attacker)
     {
-        if (npc.Id == attacker.Id) return;
-        if (npc.CurrentState != NpcAiState.Chasing && npc.CurrentState != NpcAiState.Attacking)
+        if (npc.Id == attacker.Id || npc.IsDead) return;
+
+        // Se não estávamos em combate, ou se fomos atacados por outra pessoa,
+        // engajamos o novo atacante.
+        if (npc.TargetPlayerId != attacker.Id)
         {
             EngageTarget(npc, attacker);
         }
-        // (CORREÇÃO THREAT) Adiciona 1.0f para corresponder ao tipo float
+
+        // Adiciona ameaça (threat) para que o NPC possa trocar de alvo se necessário.
         npc.ThreatTable[attacker.Id] = npc.ThreatTable.GetValueOrDefault(attacker.Id, 0) + 1.0f;
     }
+
 
     // (CORREÇÃO) Marcado como OVERRIDE para corresponder à nova classe base
     protected override void HandleIdleState(NpcInstance npc)
@@ -139,80 +170,43 @@ public class WanderingAggressiveBehavior : BaseBehavior
     // (CORREÇÃO) Marcado como OVERRIDE
     protected override void HandleAttackingState(NpcInstance npc)
     {
-        // 1. OBTER O ALVO ATUAL
-        // A IA precisa saber quem está atacando. Usamos o método auxiliar para isso.
         ICombatEntity? target = GetCurrentTarget(npc);
+        if (target == null) return; // Segurança
 
-        // Se por algum motivo perdermos o alvo (ele morreu, desconectou), a lógica
-        // principal no método Update irá detectar isso e nos tirar do estado de ataque.
-        // Mas por segurança, verificamos aqui também.
-        if (target == null) return;
+        ChangeNpcState(npc, NpcAiState.Attacking);
 
+        // *** A LÓGICA DE ZONA MORTA FOI REMOVIDA DAQUI ***
+        // O NPC agora só precisa se reposicionar se o alvo sair do alcance máximo.
+        // A checagem de distância já é feita no método Update principal.
 
-        if (!_server.CombatManager.HasLineOfSight(npc, target))
-        {
-            ChangeNpcState(npc, NpcAiState.Chasing);
-            return;
-        }
-
-        // 2. ENCARAR O ALVO (Lógica conceitual)
-        FaceTarget(npc, target);
-
-
-        // 3. CÁLCULO DE DISTÂNCIA
-        float distanceToTarget = Vector3.Distance(npc.Position, target.Position);
-
-
-        // 4. LÓGICA DE REPOSICIONAMENTO (A "ZONA MORTA")
-        // Se o NPC tem uma distância mínima de ataque definida e o alvo está perto demais...
-        // if (npc.BaseData.MinAttackRange > 0 && distanceToTarget < npc.BaseData.MinAttackRange)
-        var MinAttackRange = 4f;
-        if (MinAttackRange > 0 && distanceToTarget < MinAttackRange)
-        {
-            // ... a prioridade máxima é se afastar.
-            Vector3 directionAwayFromTarget = Vector3.Normalize(npc.Position - target.Position);
-
-            // Calcula um ponto para recuar. Recuar 5 metros deve ser suficiente para sair da zona de perigo.
-            Vector3 repositionPoint = npc.Position + directionAwayFromTarget * 5.0f;
-
-            SetNpcDestination(npc, repositionPoint);
-
-            // Importante: retornamos para que ele não tente atacar enquanto se reposiciona.
-            return;
-        }
-
-
-        const float MELEE_ATTACK_BUFFER = 1.5f; // 1.5 metros de "zona de conforto"
-        if (distanceToTarget > npc.BaseData.MaxAbilityRange + MELEE_ATTACK_BUFFER)
-        {
-            ChangeNpcState(npc, NpcAiState.Chasing);
-            return;
-        }
-
-        // Paramos de nos mover para poder atacar ou conjurar.
+        // Garante que o NPC pare de se mover para poder atacar.
         SetNpcDestination(npc, npc.Position);
 
-        // Primeiro, verificamos se o GCD está ativo. Nenhuma ação pode ser tomada se estiver.
+        // Se o Cooldown Global (GCD) estiver ativo, não faz nada.
         if (_server.CurrentTimeUtc < npc.GlobalCooldownEndTime) return;
 
+        // Tenta usar uma habilidade especial primeiro.
         AbilityData? specialAbility = ChooseBestSpecialAbility(npc, target);
         if (specialAbility != null)
         {
+            // Inicia o processo de usar a habilidade (pode ser instantânea ou com cast).
             _server.CombatManager.ProcessAbilityRequest(npc, specialAbility.ID, target.Id);
+
+            // <<< CORREÇÃO 3.1: HABILIDADES INSTANTÂNEAS DEVEM ATIVAR O GCD >>>
+            // (A lógica de cast já lida com isso ao finalizar)
+            if (specialAbility.CastTime <= 0)
+            {
+                npc.GlobalCooldownEndTime = _server.CurrentTimeUtc.AddSeconds(1.5);
+            }
         }
-        // Se não puder usar uma habilidade especial, tenta o auto-ataque.
+        // Se não puder, tenta o auto-ataque.
         else if (npc.BaseData.AutoAttackAbilityID != null && _server.CurrentTimeUtc >= npc.NextAutoAttackTime)
         {
-            if (DataManager.Abilities.TryGetValue(npc.BaseData.AutoAttackAbilityID, out var autoAttack) && distanceToTarget <= autoAttack.Range)
+            if (DataManager.Abilities.TryGetValue(npc.BaseData.AutoAttackAbilityID, out var autoAttack) &&
+                Vector3Helper.Distance2D(npc.Position, target.Position) <= autoAttack.Range)
             {
                 _server.CombatManager.ProcessAbilityRequest(npc, autoAttack.ID, target.Id);
-
-                // <<< A CORREÇÃO CRÍTICA ESTÁ AQUI >>>
-                // O auto-ataque agora também ativa o Global Cooldown.
-                // O valor do GCD pode ser o mesmo para todos ou vir de uma constante. 1.5s é um padrão.
                 npc.GlobalCooldownEndTime = _server.CurrentTimeUtc.AddSeconds(1.5);
-
-                // E também reinicia seu próprio timer (swing timer).
                 npc.NextAutoAttackTime = _server.CurrentTimeUtc.AddSeconds(npc.BaseData.SwingTimer);
             }
         }
@@ -249,6 +243,12 @@ public class WanderingAggressiveBehavior : BaseBehavior
             npc.TargetPlayerId = null;
         }
 
+        if (npc.UpdateTier == AiUpdateTier.Slow)
+        {
+            npc.UpdateTier = AiUpdateTier.Fast;
+            Console.WriteLine($"[AI-TIER] NPC {npc.Id} ({npc.BaseData.TypeId}) promovido para o loop RÁPIDO.");
+        }
+
         npc.ThreatTable[target.Id] = npc.ThreatTable.GetValueOrDefault(target.Id, 0) + 1.0f;
         npc.AggroPosition = npc.Position;
         npc.LastKnownTargetDistance = float.MaxValue;
@@ -261,6 +261,13 @@ public class WanderingAggressiveBehavior : BaseBehavior
         npc.TargetPlayerId = null;
         npc.ThreatTable.Clear();
         npc.AggroPosition = npc.SpawnPosition;
+
+        if (npc.UpdateTier == AiUpdateTier.Fast)
+        {
+            npc.UpdateTier = AiUpdateTier.Slow;
+            Console.WriteLine($"[AI-TIER] NPC {npc.Id} ({npc.BaseData.TypeId}) rebaixado para o loop LENTO.");
+        }
+
         ChangeNpcState(npc, NpcAiState.ReturningToSpawn);
     }
 
