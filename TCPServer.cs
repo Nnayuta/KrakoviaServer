@@ -18,7 +18,6 @@ public class TCPServer
     private readonly ICharacterDatabase _characterDb;
     private readonly ConcurrentQueue<TcpClient> _pendingClients = new ConcurrentQueue<TcpClient>();
     private const int MAX_LOGIN_WORKERS = 4;
-    private static readonly SemaphoreSlim _dbSemaphore = new SemaphoreSlim(1, 1);
 
     public TCPServer(int port, IAccountDatabase accountDatabase, ICharacterDatabase characterDatabase)
     {
@@ -47,7 +46,10 @@ public class TCPServer
                 _pendingClients.Enqueue(client);
             }
         }
-        catch (OperationCanceledException) { Console.WriteLine("[TCP-AUTH] Listener de conexões cancelado para shutdown."); }
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine("[TCP-AUTH] Listener de conexões cancelado para shutdown.");
+        }
         finally
         {
             _listener.Stop();
@@ -56,28 +58,17 @@ public class TCPServer
         }
     }
 
-    // Em TCPServer.cs
-
     public void Stop()
     {
-        // Força o TcpListener a parar de aceitar novas conexões.
-        // Isso fará com que o AcceptTcpClientAsync lance uma exceção e saia do loop.
         _listener.Stop();
     }
 
-
-    /// <summary>
-    /// (NOVO) Uma tarefa "trabalhadora" que continuamente pega clientes da fila e os processa.
-    /// </summary>
     private async Task LoginWorkerAsync(CancellationToken cancellationToken)
     {
-        // O loop agora é infinito (controlado pelo CancellationToken), garantindo
-        // que o worker sempre volte para a fila após atender um cliente.
         while (!cancellationToken.IsCancellationRequested)
         {
             if (_pendingClients.TryDequeue(out TcpClient client))
             {
-                // Processa o cliente e esquece dele. O worker não "morre" mais.
                 await HandleClientAsync(client, cancellationToken);
             }
             else
@@ -86,7 +77,6 @@ public class TCPServer
             }
         }
     }
-
 
     private async Task HandleClientAsync(TcpClient client, CancellationToken cancellationToken)
     {
@@ -99,12 +89,11 @@ public class TCPServer
         {
             while (client.Connected && !cancellationToken.IsCancellationRequested)
             {
-                // <<< CORREÇÃO >>> O timeout agora é criado A CADA iteração do loop
-                using var timeoutCts = new CancellationTokenSource(TimeSpan.FromMinutes(2)); // 2 minutos de inatividade
+                using var timeoutCts = new CancellationTokenSource(TimeSpan.FromMinutes(2));
                 using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
 
                 var jsonString = await reader.ReadLineAsync(linkedCts.Token);
-                if (string.IsNullOrEmpty(jsonString)) break; // Cliente desconectou
+                if (string.IsNullOrEmpty(jsonString)) break;
 
                 var baseRequest = JsonConvert.DeserializeObject<BaseRequest>(jsonString);
                 if (baseRequest == null) continue;
@@ -123,24 +112,30 @@ public class TCPServer
                         break;
                     case "select_character":
                         await HandleSelectCharacterRequest(stream, jsonString, loggedInAccount);
-                        closeAfterRequest = true; // Marca para fechar a conexão
+                        closeAfterRequest = true;
                         break;
+                    case "ping":
+                        await SendResponseAsync(stream, new BaseResponse { Command = "pong" });
+                        continue;
                 }
 
-                if (closeAfterRequest) break;
+                if (closeAfterRequest)
+                    break;
             }
         }
         catch (OperationCanceledException)
         {
-            // Esta exceção agora só será acionada se o cliente ficar inativo por 2 minutos
-            // OU se o servidor estiver desligando.
             if (!cancellationToken.IsCancellationRequested)
-            {
                 Console.WriteLine($"[TCP] Cliente {client.Client.RemoteEndPoint} desconectado por inatividade.");
-            }
         }
-        catch (IOException) { /* Cliente desconectou (normal) */ }
-        catch (Exception ex) { Console.WriteLine($"[TCP-ERROR] Erro no HandleClient: {ex}"); }
+        catch (IOException)
+        {
+            // desconexão normal
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[TCP-ERROR] Erro no HandleClient: {ex}");
+        }
         finally
         {
             Console.WriteLine($"[TCP] Conexão com {client.Client.RemoteEndPoint} finalizada.");
@@ -148,167 +143,200 @@ public class TCPServer
         }
     }
 
-    #region Handlers de Requisição (Sem alterações necessárias aqui)
+    #region Handlers
 
     private async Task HandleRegisterRequest(NetworkStream stream, string jsonString)
     {
-        // Espera para obter acesso exclusivo ao banco de dados
-        await _dbSemaphore.WaitAsync();
-        try
-        {
-            var regReq = JsonConvert.DeserializeObject<RegisterRequest>(jsonString);
-            if (regReq == null) return;
+        var regReq = JsonConvert.DeserializeObject<RegisterRequest>(jsonString);
+        if (regReq == null) return;
 
-            bool success = await _accountDb.RegisterAsync(regReq.Username, regReq.Password);
-            var response = new BaseResponse { Command = "register_response", Success = success, Message = success ? "Cadastro bem-sucedido." : "Nome de usuário já existe." };
-            await SendResponseAsync(stream, response);
-        }
-        finally
+        bool success = await _accountDb.RegisterAsync(regReq.Username, regReq.Password);
+        var response = new BaseResponse
         {
-            // Libera o acesso para o próximo worker na fila
-            _dbSemaphore.Release();
-        }
+            Command = "register_response",
+            Success = success,
+            Message = success ? "Cadastro bem-sucedido." : "Nome de usuário já existe."
+        };
+        await SendResponseAsync(stream, response);
     }
+
     private async Task<Account?> HandleLoginRequest(NetworkStream stream, string jsonString)
     {
-        await _dbSemaphore.WaitAsync();
-        try
+        var loginReq = JsonConvert.DeserializeObject<LoginRequest>(jsonString);
+        if (loginReq == null) return null;
+
+        if (loginReq.ClientVersion != ServerConfig.GAME_VERSION)
         {
-            var loginReq = JsonConvert.DeserializeObject<LoginRequest>(jsonString);
-            if (loginReq == null) return null;
-
-            if (loginReq.ClientVersion != ServerConfig.GAME_VERSION)
+            var versionResponse = new BaseResponse
             {
-                var versionResponse = new BaseResponse { Command = "login_response", Success = false, Message = "Versão do jogo incompatível." };
-                await SendResponseAsync(stream, versionResponse);
-                return null;
-            }
-
-            Account? account = await _accountDb.AuthenticateAsync(loginReq.Username, loginReq.Password);
-            if (account != null)
-            {
-                var characters = account.Characters?.Select(c => c.ToSummary()).ToList() ?? new List<CharacterSummary>();
-                var response = new CharacterListResponse { Command = "login_response", Success = true, Message = "Login bem-sucedido.", Characters = characters };
-                await SendResponseAsync(stream, response);
-                return account;
-            }
-            else
-            {
-                var response = new BaseResponse { Command = "login_response", Success = false, Message = "Usuário ou senha inválidos." };
-                await SendResponseAsync(stream, response);
-                return null;
-            }
+                Command = "login_response",
+                Success = false,
+                Message = "Versão do jogo incompatível."
+            };
+            await SendResponseAsync(stream, versionResponse);
+            return null;
         }
-        finally
+
+        Account? account = await _accountDb.AuthenticateAsync(loginReq.Username, loginReq.Password);
+        if (account != null)
         {
-            _dbSemaphore.Release();
+            var characters = account.Characters?.Select(c => c.ToSummary()).ToList() ?? new List<CharacterSummary>();
+            var response = new CharacterListResponse
+            {
+                Command = "login_response",
+                Success = true,
+                Message = "Login bem-sucedido.",
+                Characters = characters
+            };
+            await SendResponseAsync(stream, response);
+            return account;
+        }
+        else
+        {
+            var response = new BaseResponse
+            {
+                Command = "login_response",
+                Success = false,
+                Message = "Usuário ou senha inválidos."
+            };
+            await SendResponseAsync(stream, response);
+            return null;
         }
     }
-
 
     private async Task HandleCreateCharacterRequest(NetworkStream stream, string jsonString, Account? loggedInAccount)
     {
         if (loggedInAccount == null)
         {
-            await SendResponseAsync(stream, new BaseResponse { Command = "create_character_response", Success = false, Message = "Usuário não está logado." });
+            await SendResponseAsync(stream, new BaseResponse
+            {
+                Command = "create_character_response",
+                Success = false,
+                Message = "Usuário não está logado."
+            });
             return;
         }
 
-
-        await _dbSemaphore.WaitAsync();
-        try
+        var createReq = JsonConvert.DeserializeObject<CreateCharacterRequest>(jsonString);
+        if (createReq == null || string.IsNullOrWhiteSpace(createReq.Name) || createReq.Name.Length < 3 || createReq.Name.Length > 16)
         {
-            var createReq = JsonConvert.DeserializeObject<CreateCharacterRequest>(jsonString);
-            if (createReq == null || string.IsNullOrWhiteSpace(createReq.Name) || createReq.Name.Length < 3 || createReq.Name.Length > 16)
+            await SendResponseAsync(stream, new BaseResponse
             {
-                await SendResponseAsync(stream, new BaseResponse { Command = "create_character_response", Success = false, Message = "Nome inválido (3-16 caracteres)." });
-                return;
-            }
-
-            var newCharacter = new Character { Name = createReq.Name, ClassID = createReq.ClassID ?? "WARRIOR", Appearance = createReq.Appearance ?? new CharacterAppearance() };
-            bool success = await _accountDb.AddCharacterToAccountAsync(loggedInAccount.Username, newCharacter);
-
-            var updatedAccount = await _accountDb.GetAccountByUsernameAsync(loggedInAccount.Username);
-            loggedInAccount.Characters = updatedAccount?.Characters ?? loggedInAccount.Characters;
-            var characters = loggedInAccount.Characters?.Select(c => c.ToSummary()).ToList() ?? new List<CharacterSummary>();
-
-            var message = success ? "Personagem criado!" : "Nome de personagem já existe ou limite atingido.";
-            var response = new CharacterListResponse { Command = "create_character_response", Success = success, Message = message, Characters = characters };
-            await SendResponseAsync(stream, response);
+                Command = "create_character_response",
+                Success = false,
+                Message = "Nome inválido (3-16 caracteres)."
+            });
+            return;
         }
-        finally
+
+        var newCharacter = new Character
         {
-            _dbSemaphore.Release();
-        }
+            Name = createReq.Name,
+            ClassID = createReq.ClassID ?? "WARRIOR",
+            Appearance = createReq.Appearance ?? new CharacterAppearance()
+        };
+
+        bool success = await _accountDb.AddCharacterToAccountAsync(loggedInAccount.Username, newCharacter);
+
+        var updatedAccount = await _accountDb.GetAccountByUsernameAsync(loggedInAccount.Username);
+        loggedInAccount.Characters = updatedAccount?.Characters ?? loggedInAccount.Characters;
+        var characters = loggedInAccount.Characters?.Select(c => c.ToSummary()).ToList() ?? new List<CharacterSummary>();
+
+        var message = success ? "Personagem criado!" : "Nome de personagem já existe ou limite atingido.";
+        var response = new CharacterListResponse
+        {
+            Command = "create_character_response",
+            Success = success,
+            Message = message,
+            Characters = characters
+        };
+        await SendResponseAsync(stream, response);
     }
+
     private async Task HandleSelectCharacterRequest(NetworkStream stream, string jsonString, Account? loggedInAccount)
     {
         if (loggedInAccount == null)
         {
-            await SendResponseAsync(stream, new BaseResponse { Command = "select_character_response", Success = false, Message = "Usuário não está logado." });
+            await SendResponseAsync(stream, new BaseResponse
+            {
+                Command = "select_character_response",
+                Success = false,
+                Message = "Usuário não está logado."
+            });
             return;
         }
 
-        await _dbSemaphore.WaitAsync();
-        try
+        var selectReq = JsonConvert.DeserializeObject<SelectCharacterRequest>(jsonString);
+        if (selectReq == null) return;
+
+        var selectedCharacter = loggedInAccount.Characters.FirstOrDefault(c => c.Id == selectReq.CharacterId);
+        if (selectedCharacter == null)
         {
-            var selectReq = JsonConvert.DeserializeObject<SelectCharacterRequest>(jsonString);
-            if (selectReq == null) return;
-
-            var selectedCharacter = loggedInAccount.Characters.FirstOrDefault(c => c.Id == selectReq.CharacterId);
-            if (selectedCharacter == null)
-            {
-                await SendResponseAsync(stream, new BaseResponse { Command = "select_character_response", Success = false, Message = "Personagem não encontrado." });
-                return;
-            }
-
-            if (OnlineStatusManager.IsOnline(selectedCharacter.Id))
-            {
-                await SendResponseAsync(stream, new BaseResponse { Command = "select_character_response", Success = false, Message = "Este personagem já está conectado ao jogo." });
-                return;
-            }
-
-            var authInfo = new AuthenticatedPlayerInfo
-            {
-                Username = loggedInAccount.Username,
-                CharacterId = selectedCharacter.Id,
-                CharacterName = selectedCharacter.Name,
-                ClassID = selectedCharacter.ClassID,
-                Level = selectedCharacter.Level,
-                Appearance = selectedCharacter.Appearance,
-                PermissionLevel = loggedInAccount.PermissionLevel
-            };
-
-            CharacterData characterData = await _characterDb.LoadOrCreateAsync(authInfo);
-
-            var (_, _, _, knownAbilities) = CharacterStateGenerator.GenerateInitialState(selectedCharacter.ClassID, selectedCharacter.Level);
-            string accessToken = AuthTokenManager.GenerateToken(loggedInAccount, selectedCharacter);
-
-            var splitPos = characterData.Position.Split(",");
-
-            var response = new SelectCharacterResponse
+            await SendResponseAsync(stream, new BaseResponse
             {
                 Command = "select_character_response",
-                Success = true,
-                AccessToken = accessToken,
-                WorldServerIp = ServerConfig.SERVER_IP,
-                WorldServerPort = ServerConfig.WORLD_SERVER_PORT,
-                CharacterId = selectedCharacter.Id,
-                ClassID = selectedCharacter.ClassID,
-                Level = selectedCharacter.Level,
-                KnownAbilityIDs = knownAbilities,
-                Inventory = characterData.PlayerInventory.slots.Select(s => s == null ? null : new ItemStackSummary { InstanceID = s.InstanceID, ItemID = s.ItemID, Quantity = s.Quantity }).ToList(),
-                Equipment = characterData.PlayerEquipment.equippedItems.Where(kvp => kvp.Value != null).ToDictionary(kvp => kvp.Key, kvp => new ItemStackSummary { InstanceID = kvp.Value!.InstanceID, ItemID = kvp.Value.ItemID, Quantity = kvp.Value.Quantity }),
-                ActionBar = characterData.PlayerActionBar,
-                Position = characterData.PositionVec
-            };
+                Success = false,
+                Message = "Personagem não encontrado."
+            });
+            return;
+        }
 
-            await SendResponseAsync(stream, response);
-        }
-        finally
+        if (OnlineStatusManager.IsOnline(selectedCharacter.Id))
         {
-            _dbSemaphore.Release();
+            await SendResponseAsync(stream, new BaseResponse
+            {
+                Command = "select_character_response",
+                Success = false,
+                Message = "Este personagem já está conectado ao jogo."
+            });
+            return;
         }
+
+        var authInfo = new AuthenticatedPlayerInfo
+        {
+            Username = loggedInAccount.Username,
+            CharacterId = selectedCharacter.Id,
+            CharacterName = selectedCharacter.Name,
+            ClassID = selectedCharacter.ClassID,
+            Level = selectedCharacter.Level,
+            Appearance = selectedCharacter.Appearance,
+            PermissionLevel = loggedInAccount.PermissionLevel
+        };
+
+        CharacterData characterData = await _characterDb.LoadOrCreateAsync(authInfo);
+
+        var (_, _, _, knownAbilities) = CharacterStateGenerator.GenerateInitialState(selectedCharacter.ClassID, selectedCharacter.Level);
+        string accessToken = AuthTokenManager.GenerateToken(loggedInAccount, selectedCharacter);
+
+        var response = new SelectCharacterResponse
+        {
+            Command = "select_character_response",
+            Success = true,
+            AccessToken = accessToken,
+            WorldServerIp = ServerConfig.SERVER_IP,
+            WorldServerPort = ServerConfig.WORLD_SERVER_PORT,
+            CharacterId = selectedCharacter.Id,
+            ClassID = selectedCharacter.ClassID,
+            Level = selectedCharacter.Level,
+            KnownAbilityIDs = knownAbilities,
+            Inventory = characterData.PlayerInventory.slots.Select(s => s == null ? null : new ItemStackSummary
+            {
+                InstanceID = s.InstanceID,
+                ItemID = s.ItemID,
+                Quantity = s.Quantity
+            }).ToList(),
+            Equipment = characterData.PlayerEquipment.equippedItems
+                .Where(kvp => kvp.Value != null)
+                .ToDictionary(kvp => kvp.Key, kvp => new ItemStackSummary
+                {
+                    InstanceID = kvp.Value!.InstanceID,
+                    ItemID = kvp.Value.ItemID,
+                    Quantity = kvp.Value.Quantity
+                }),
+            ActionBar = characterData.PlayerActionBar,
+        };
+
+        await SendResponseAsync(stream, response);
     }
 
     #endregion

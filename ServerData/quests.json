@@ -32,6 +32,8 @@
       "QuestID": "01_quest_despertar_glitchado",
       "RequiredLevel": 1,
       "PrerequisiteQuestIDs": [],
+      "QuestGiverID": "npc_Valdisney",
+      "QuestCompleterID": "npc_Valdisney",
       "Category": "Main",
       "Objectives": [],
       "GuaranteedRewards": [],
@@ -43,15 +45,24 @@
       "PrerequisiteQuestIDs": [
         "01_quest_despertar_glitchado"
       ],
+      "QuestGiverID": "npc_Valdisney",
+      "QuestCompleterID": "npc_Valdisney",
       "Category": "Main",
       "Objectives": [
         {
           "Type": "Collect",
-          "TargetID": "",
-          "RequiredAmount": 0
+          "TargetID": "potato_glitch",
+          "RequiredAmount": 5
         }
       ],
-      "GuaranteedRewards": [],
+      "GuaranteedRewards": [
+        {
+          "Type": "Currency",
+          "ItemID": "",
+          "Amount": 100,
+          "AbilityID": ""
+        }
+      ],
       "ChooseOneRewards": []
     },
     {
@@ -60,11 +71,13 @@
       "PrerequisiteQuestIDs": [
         "02_quest_raiz_problema"
       ],
+      "QuestGiverID": "npc_Valdisney",
+      "QuestCompleterID": "npc_Dona_Cleide",
       "Category": "Main",
       "Objectives": [
         {
           "Type": "GoTo",
-          "TargetID": "",
+          "TargetID": "npc_Dona_Cleide",
           "RequiredAmount": 0
         }
       ],
@@ -77,11 +90,13 @@
       "PrerequisiteQuestIDs": [
         "03_quest_sopa_legado"
       ],
+      "QuestGiverID": "npc_Dona_Cleide",
+      "QuestCompleterID": "npc_Dona_Cleide",
       "Category": "Main",
       "Objectives": [
         {
           "Type": "GoTo",
-          "TargetID": "",
+          "TargetID": "npc_Dona_Cleide",
           "RequiredAmount": 0
         }
       ],
@@ -94,12 +109,14 @@
       "PrerequisiteQuestIDs": [
         "04_cheiro_de_jogo_ruim"
       ],
+      "QuestGiverID": "npc_Dona_Cleide",
+      "QuestCompleterID": "npc_Dona_Cleide",
       "Category": "Main",
       "Objectives": [
         {
           "Type": "Slay",
-          "TargetID": "",
-          "RequiredAmount": 0
+          "TargetID": "wolf_3fab7236",
+          "RequiredAmount": 3
         }
       ],
       "GuaranteedRewards": [],

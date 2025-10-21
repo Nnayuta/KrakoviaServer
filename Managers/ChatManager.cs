@@ -5,12 +5,13 @@ using System.Linq;
 public class ChatManager
 {
     private readonly UDPServer _server;
+    private readonly CommandManager _commandManager;
 
-    public ChatManager(UDPServer server)
+    public ChatManager(UDPServer server, CommandManager commandManager)
     {
         _server = server;
+        _commandManager = commandManager;
     }
-
     /// <summary>
     /// Ponto de entrada principal para qualquer mensagem de chat vinda de um jogador.
     /// </summary>
@@ -18,20 +19,19 @@ public class ChatManager
     {
         if (string.IsNullOrWhiteSpace(rawMessage)) return;
 
-        // Limita o tamanho da mensagem para prevenir spam/ataques
         if (rawMessage.Length > 150)
         {
             rawMessage = rawMessage.Substring(0, 150);
         }
 
-        // Verifica se é um comando (começa com '/')
         if (rawMessage.StartsWith("/"))
         {
-            ParseCommand(sender, rawMessage);
+            // DELEGA a lógica de comando para o CommandManager
+            string commandLine = rawMessage.Substring(1); // Remove o "/"
+            _commandManager.ProcessCommand(sender, commandLine);
         }
         else
         {
-            // Se não for um comando, o padrão é o chat "Say"
             HandleSayChat(sender, rawMessage);
         }
     }

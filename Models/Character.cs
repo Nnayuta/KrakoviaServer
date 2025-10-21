@@ -41,7 +41,6 @@ public class Character
             Name = Name,
             Class = ClassID,
             Level = Level,
-            // Passa os novos dados para o resumo
             Appearance = this.Appearance,
             EquippedItems = this.EquippedItems
         };

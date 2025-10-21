@@ -28,49 +28,32 @@ public class CombatManager
 
     public void HandleLootRequest(Player player, string targetNpcId)
     {
-        // Encontra o NPC no dicionário de NPCs ATIVOS (mesmo que IsActive = false)
         if (!_server.DeadNpcCor_pses.TryGetValue(targetNpcId, out var npc)) return;
 
         // Validações
-        if (!npc.IsDead) return; // Só pode pegar loot de corpos
-        if (!npc.HasLoot) return; // Não há loot para pegar
-        if (Vector3Helper.Distance2D(player.Position, npc.Position) > 5.0f) return;
-
-        // Tenta adicionar todos os itens ao inventário do jogador
-        bool allItemsAdded = true;
-        // Proteção contra referência nula em npc.Loot
-        if (npc.Loot == null || npc.Loot.Count == 0)
+        if (!npc.IsDead) return;
+        if (!npc.HasLoot)
         {
-            _server.NetworkManager.SendMessageToPlayer(player, "ERROR|Nenhum loot disponível.");
+            _server.NetworkManager.SendMessageToPlayer(player, "SHOW_FEEDBACK|Nada para saquear.");
+            return;
+        }
+        if (Vector3Helper.Distance2D(player.Position, npc.Position) > 5.0f)
+        {
+            _server.NetworkManager.SendMessageToPlayer(player, "ERROR|Você está muito longe.");
             return;
         }
 
-        foreach (var itemStack in npc.Loot)
-        {
-            if (!player.PlayerInventory.AddItem(itemStack.ItemID, itemStack.Quantity))
-            {
-                allItemsAdded = false;
-                _server.NetworkManager.SendMessageToPlayer(player, "ERROR|Inventário cheio.");
-                break;
-            }
-            else
-            {
-                _server.NetworkManager.SendMessageToPlayer(player, $"SHOW_FEEDBACK|Item+{itemStack.ItemID}");
-            }
-        }
+        // Delega a tarefa de dar os itens para o PlayerInventoryManager.
+        // O npc.Loot contém a lista de ItemStacks com os InstanceIDs corretos.
+        _server.PlayerInventoryManager.GrantLootToPlayer(player, npc.Loot);
 
-        if (allItemsAdded)
-        {
-            // Se todos os itens foram pegos, limpa o loot do NPC
-            npc.ClearLoot();
+        // Se a lógica acima for bem-sucedida (o PlayerInventoryManager lida com inventário cheio),
+        // podemos limpar o loot do NPC.
+        npc.ClearLoot();
 
-            // Notifica o cliente que a janela de loot deve ser fechada (ou o corpo para de brilhar)
-            // e que seu inventário foi atualizado.
-            _server.NetworkManager.SendMessageToPlayer(player, "LOOT_SUCCESSFUL");
-            player.SendFullStateToClient();
-        }
+        // Notifica o cliente que o saque foi concluído (para fechar a janela, etc.)
+        _server.NetworkManager.SendMessageToPlayer(player, "LOOT_SUCCESSFUL");
     }
-
 
     /// <summary>
     /// PONTO DE ENTRADA PRINCIPAL. Valida uma requisição de habilidade e decide se a
@@ -83,6 +66,18 @@ public class CombatManager
         if (!DataManager.Abilities.TryGetValue(abilityId, out var ability)) return;
         if (source is Player p_casting && p_casting.IsCasting) return;
         if (source is NpcInstance npc_casting && npc_casting.IsCasting) return;
+
+        if (source is Player playerS)
+        {
+            // Se a fonte for um jogador, verificamos se o ID da habilidade está na sua lista de habilidades conhecidas.
+            if (!playerS.KnownAbilityIDs.Contains(abilityId))
+            {
+                Console.WriteLine($"[SECURITY-WARN] Jogador '{playerS.Username}' tentou usar a habilidade '{abilityId}' que ele não conhece. Ação bloqueada.");
+                // _server.NetworkManager.SendMessageToPlayer(playerS, $"ABILITY_FAILED|{abilityId}|NotKnown");
+                _server.NetworkManager.SendMessageToPlayer(playerS, $"ABILITY_FAILED|{abilityId}|ActionNotAllowed");
+                return; // Bloqueia a execução da habilidade
+            }
+        }
 
         // Validações de Cooldown e Recurso
         if (source.AbilityCooldowns.TryGetValue(abilityId, out DateTime cdEnd) && _server.CurrentTimeUtc < cdEnd)
@@ -209,7 +204,7 @@ public class CombatManager
             // Habilidades instantâneas (que não são auto-ataques) também devem ativar o GCD.
             if (source is NpcInstance npc && abilityId != npc.BaseData.AutoAttackAbilityID)
             {
-                npc.GlobalCooldownEndTime = _server.CurrentTimeUtc.AddSeconds(1.5);
+                npc.GlobalCooldownEndTime = _server.CurrentTimeUtc.AddSeconds(1.0);
             }
 
             if (source is Player p) _server.NetworkManager.SendVitalsUpdate(p);

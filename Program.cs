@@ -14,7 +14,9 @@ class Program
                 string? commandLine = await Console.In.ReadLineAsync(token);
                 if (!string.IsNullOrEmpty(commandLine))
                 {
-                    server.CommandManager.ProcessCommand(commandLine);
+                    // ALTERAÇÃO AQUI: Passamos 'null' como o remetente (Player),
+                    // pois o comando vem do console e não de um jogador.
+                    server.CommandManager.ProcessCommand(null, commandLine);
                 }
             }
             catch (OperationCanceledException) { break; }
@@ -39,7 +41,10 @@ $@"
 ");
 
         Console.WriteLine("Conectando ao banco de dados MariaDB...");
-        string connectionString = "Server=127.0.0.1;Database=krakovia;User=root;Password=;";
+        string connectionString = "Server=127.0.0.1;Database=krakovia;User=kakovia;Password=s3@>C6U3K5£:;";
+
+        //string connectionString = "Server=127.0.0.1;Database=krakovia;User=root;Password=;";
+
         IAccountDatabase accountDatabase = new MariaDBAccountDatabase(connectionString);
         ICharacterDatabase characterDatabase = new MariaDBCharacterDatabase(connectionString);
 
@@ -49,19 +54,24 @@ $@"
 
         var cts = new CancellationTokenSource();
 
-        Console.CancelKeyPress += (sender, e) =>
+        Console.CancelKeyPress += async (sender, e) =>
         {
             e.Cancel = true;
 
             if (!cts.IsCancellationRequested)
             {
-                Console.WriteLine("\n[SERVER] Shutdown signal received. Closing servers...");
+                Console.WriteLine("\n[SERVER] Shutdown signal received. Saving all players...");
+
+                // 1. SALVA TODOS OS JOGADORES PRIMEIRO
+                await udpServer.SaveAllPlayersAsync();
+
+                Console.WriteLine("[SERVER] Closing servers...");
 
                 cts.Cancel();
 
                 tcpServer.Stop();
                 udpServer.Stop();
-                webServer.Stop(); // (CORREÇÃO 1) Adicionado o stop do web server
+                webServer.Stop();
             }
         };
 

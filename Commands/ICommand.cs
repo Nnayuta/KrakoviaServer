@@ -1,10 +1,11 @@
-// Servidor/Commands/ICommand.cs
 public interface ICommand
 {
-    string Name { get; } // O nome do comando (ex: "giveitem")
-    string Description { get; } // A descrição para o comando "help"
-    string Usage { get; } // A sintaxe (ex: "giveitem <charId> <itemId> <qty>")
-    int RequiredPermissionLevel { get; } // Nível de permissão necessário (0=jogador, 1=moderador, 2=GM, etc.)
+    string Name { get; }
+    string Description { get; }
+    string Usage { get; }
+    int RequiredPermissionLevel { get; }
 
-    void Execute(string[] args, UDPServer server);
+    // ALTERADO: Adicionamos o parâmetro 'Player sender'.
+    // Ele será 'null' se o comando for executado pelo console do servidor.
+    void Execute(Player sender, string[] args, UDPServer server);
 }

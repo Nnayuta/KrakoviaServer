@@ -1,16 +1,15 @@
-// Servidor/Commands/GiveItemCommand.cs
 public class GiveItemCommand : ICommand
 {
     public string Name => "item";
     public string Description => "Dá um item a um jogador online.";
     public string Usage => "item <CharacterNameOrID> <ItemID> <Quantidade>";
-    public int RequiredPermissionLevel => 2; // Apenas GMs
+    public int RequiredPermissionLevel => 50; // Apenas GMs
 
-    public void Execute(string[] args, UDPServer server)
+    public void Execute(Player sender, string[] args, UDPServer server)
     {
         if (args.Length < 3)
         {
-            Console.WriteLine($"[Comando] Uso incorreto. Sintaxe: {Usage}");
+            server.CommandManager.SendFeedbackToSender(sender, $"[Comando] Uso incorreto. Sintaxe: {Usage}");
             return;
         }
 
@@ -21,23 +20,23 @@ public class GiveItemCommand : ICommand
             quantity = 1;
         }
 
-        // Usa o novo método auxiliar para encontrar jogadores
         Player? targetPlayer = server.FindPlayerByNameOrId(playerNameOrId);
 
         if (targetPlayer == null)
         {
-            Console.WriteLine($"[Comando] Erro: Jogador '{playerNameOrId}' não encontrado ou não está online.");
+            server.CommandManager.SendFeedbackToSender(sender, $"[Comando] Erro: Jogador '{playerNameOrId}' não encontrado ou não está online.");
             return;
         }
 
         if (targetPlayer.PlayerInventory.AddItem(itemId, quantity))
         {
-            Console.WriteLine($"[Comando] Sucesso! {quantity}x '{itemId}' adicionado ao inventário de {targetPlayer.CharacterName}.");
+            string successMsg = $"[Comando] Sucesso! {quantity}x '{itemId}' adicionado ao inventário de {targetPlayer.CharacterName}.";
+            server.CommandManager.SendFeedbackToSender(sender, successMsg);
             server.NetworkManager.SendInventoryUpdate(targetPlayer);
         }
         else
         {
-            Console.WriteLine($"[Comando] Falha! O inventário de {targetPlayer.CharacterName} está provavelmente cheio.");
+            server.CommandManager.SendFeedbackToSender(sender, $"[Comando] Falha! O inventário de {targetPlayer.CharacterName} está provavelmente cheio.");
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿// Servidor/Managers/PlayerEquipmentManager.cs
+﻿// ARQUIVO COMPLETO E CORRIGIDO: Managers/PlayerEquipmentManager.cs
+
 using System;
 using System.Linq;
 
@@ -11,40 +12,46 @@ public class PlayerEquipmentManager
         _server = server;
     }
 
-    /// <summary>
-    /// Lida com uma requisição para EQUIPAR um item do inventário.
-    /// </summary>
     public void HandleEquipItemRequest(Player player, int inventorySlot, EquipmentSlot equipmentSlot)
     {
-        // --- VALIDAÇÃO (sem alterações) ---
+        // --- VALIDAÇÃO BÁSICA ---
         if (inventorySlot < 0 || inventorySlot >= player.PlayerInventory.slots.Count) return;
         ItemStack itemToEquipStack = player.PlayerInventory.slots[inventorySlot];
         if (itemToEquipStack == null) return;
-        if (!DataManager.Items.TryGetValue(itemToEquipStack.ItemID, out ServerItemData itemData)) return;
-        if (itemData is not ServerEquipmentData equipmentData) return;
-        if (equipmentData.equipmentSlot != equipmentSlot) return;
-        if (player.Level < equipmentData.requiredLevel) return;
 
-        // --- LÓGICA DE ARMAS (sem alterações) ---
-        if (equipmentData is ServerWeaponData weaponDataToEquip)
+        // Pega o template para informações genéricas (tipo de slot, etc.)
+        if (!DataManager.Items.TryGetValue(itemToEquipStack.ItemID, out ServerItemData itemTemplate)) return;
+        if (itemTemplate is not ServerEquipmentData eqTemplate || eqTemplate.equipmentSlot != equipmentSlot) return;
+
+        // =================================================================================
+        // <<< A CORREÇÃO QUE FALTAVA ESTÁ AQUI >>>
+        // =================================================================================
+        int requiredLevel = eqTemplate.requiredLevel; // Começa com o nível do template como fallback.
+
+        // Tenta pegar os dados da instância para este item específico.
+        var instanceData = _server.ItemInstanceManager.GetDataForInstance(itemToEquipStack.InstanceID);
+        if (instanceData != null)
         {
+            // Se encontrou dados de instância, o nível requerido é o que foi gerado!
+            requiredLevel = instanceData.RequiredLevel;
+        }
 
-            Console.WriteLine($"[Equip-Debug] Tentando equipar arma. Tipo: {weaponDataToEquip.weaponType}. " + $"Proficiências do jogador: [{string.Join(", ", player.CurrentWeaponProficiencies)}]");
+        // Agora, faz a verificação usando o nível correto.
+        if (player.Level < requiredLevel)
+        {
+            Console.WriteLine($"[Equip] FALHA: {player.Username} (Nível {player.Level}) tentou equipar item que requer nível {requiredLevel}.");
+            _server.NetworkManager.SendMessageToPlayer(player, "ERROR|Você não tem o nível necessário para equipar este item.");
+            return;
+        }
+        // =================================================================================
 
-            if (!player.CurrentWeaponProficiencies.Contains(weaponDataToEquip.weaponType)) {
-                Console.WriteLine($"[Equip] FALHA: {player.Username} não tem proficiência para usar {weaponDataToEquip.weaponType}.");
-                return;
-            }
-
-
-            if (weaponDataToEquip.handType == WeaponHandType.TwoHanded)
+        // --- VALIDAÇÕES DE ARMA (sem alteração) ---
+        if (eqTemplate is ServerWeaponData weaponData)
+        {
+            if (!player.CurrentWeaponProficiencies.Contains(weaponData.weaponType)) return;
+            if (weaponData.handType == WeaponHandType.TwoHanded)
             {
-                if (equipmentSlot != EquipmentSlot.MainHand)
-                {
-                    Console.WriteLine($"[Equip] FALHA: Armas de duas mãos só podem ser equipadas na Mão Principal.");
-
-                    return;
-                }
+                if (equipmentSlot != EquipmentSlot.MainHand) return;
                 UnequipSlot(player, EquipmentSlot.OffHand);
             }
         }
@@ -58,50 +65,33 @@ public class PlayerEquipmentManager
             }
         }
 
-        // --- EXECUÇÃO DA TROCA ---
-        Console.WriteLine($"[Equip] {player.Username} equipando '{equipmentData.itemName}' no slot {equipmentSlot}.");
+        // --- EXECUÇÃO DA TROCA (sem alteração) ---
+        Console.WriteLine($"[Equip] {player.Username} tentando equipar '{itemToEquipStack.ItemID}'.");
 
-        // =================================================================================
-        // LÓGICA DE TROCA CORRIGIDA E ATÔMICA
-        // =================================================================================
-        // 1. Guarda uma referência do item que está atualmente equipado.
         ItemStack currentlyEquippedStack = player.PlayerEquipment.GetItemInSlot(equipmentSlot);
+        player.PlayerInventory.slots[inventorySlot] = null;
+        if (currentlyEquippedStack != null)
+        {
+            player.PlayerInventory.AddItemStack(currentlyEquippedStack);
+        }
 
-        // 2. Coloca o item antigo DIRETAMENTE no slot de inventário de onde o novo veio.
-        player.PlayerInventory.slots[inventorySlot] = currentlyEquippedStack;
-
-        // 3. Coloca o item novo no slot de equipamento. Esta é a única chamada que
-        //    dispara o evento OnEquipmentChanged, garantindo uma única atualização de stats.
-        player.PlayerEquipment.SetItemInSlot(equipmentSlot, itemToEquipStack);
-
-        // As chamadas para UpdateCharacterState e SendFullStateToPlayer não são mais necessárias aqui,
-        // pois o evento OnEquipmentChanged e o Player.cs agora cuidam disso.
-        // No entanto, ainda precisamos notificar o cliente sobre a mudança no inventário.
-        player.SendFullStateToClient();
+        player.EquipItem(itemToEquipStack, equipmentSlot);
     }
 
-    /// <summary>
-    /// Lida com uma requisição para DESEQUIPAR um item.
-    /// </summary>
+    // O resto da classe (HandleUnequipItemRequest, UnequipSlot) pode continuar exatamente como está.
     public void HandleUnequipItemRequest(Player player, EquipmentSlot equipmentSlot)
     {
         ItemStack itemToUnequipStack = player.PlayerEquipment.GetItemInSlot(equipmentSlot);
         if (itemToUnequipStack == null) return;
 
-        // Tenta adicionar o item de volta ao inventário.
-        if (player.PlayerInventory.AddItem(itemToUnequipStack.ItemID, itemToUnequipStack.Quantity))
+        if (player.PlayerInventory.AddItemStack(itemToUnequipStack))
         {
-            // Se conseguiu adicionar, remove o item do slot de equipamento.
-            // Isso irá disparar o OnEquipmentChanged e recalcular os stats.
-            player.PlayerEquipment.SetItemInSlot(equipmentSlot, null);
-            Console.WriteLine($"[Equip] {player.Username} desequipou item do slot {equipmentSlot}.");
-
-            player.SendFullStateToClient();
+            player.UnequipItem(equipmentSlot);
         }
         else
         {
-            Console.WriteLine($"[Equip] FALHA: {player.Username} tentou desequipar, mas o inventário está cheio.");
-            // TODO: Enviar uma mensagem de erro para o cliente.
+            Console.WriteLine($"[Equip] FALHA: Inventário de {player.Username} está cheio.");
+            _server.NetworkManager.SendMessageToPlayer(player, "ERROR|Inventário cheio.");
         }
     }
 
@@ -110,7 +100,7 @@ public class PlayerEquipmentManager
         ItemStack itemStack = player.PlayerEquipment.GetItemInSlot(slot);
         if (itemStack == null) return;
 
-        if (player.PlayerInventory.AddItem(itemStack.ItemID, itemStack.Quantity))
+        if (player.PlayerInventory.AddItemStack(itemStack))
         {
             player.PlayerEquipment.SetItemInSlot(slot, null);
         }

@@ -63,11 +63,17 @@ public class WorldManager
         Player? creditPlayer = this.GetCreditPlayer(npc, killer);
         if (creditPlayer != null)
         {
-            if (npc.BaseData.ExperienceReward > 0)
+            // --- LÓGICA DE XP DINÂMICA ---
+            // 1. Calcula a quantidade de XP a ser concedida usando a nova lógica.
+            int experienceToGrant = ExperienceManager.CalculateExperienceReward(creditPlayer, npc);
+
+            // 2. Concede a experiência calculada.
+            if (experienceToGrant > 0)
             {
-                _server.PlayerProgressionManager.GrantExperience(creditPlayer, npc.BaseData.ExperienceReward);
-                _server.NetworkManager.SendMessageToPlayer(creditPlayer, $"SHOW_FEEDBACK|+{npc.BaseData.ExperienceReward} EXP");
+                _server.PlayerProgressionManager.GrantExperience(creditPlayer, experienceToGrant);
+                _server.NetworkManager.SendMessageToPlayer(creditPlayer, $"SHOW_FEEDBACK|+{experienceToGrant} EXP");
             }
+            // --- FIM DA LÓGICA DE XP ---
 
             if (npc.BaseData.CurrencyReward > 0)
             {
@@ -78,11 +84,12 @@ public class WorldManager
             }
         }
 
-
-        // 3. Processa recompensas de Loot
         if (!string.IsNullOrEmpty(npc.BaseData.LootTableID))
         {
-            List<ItemStack> generatedLoot = _server.LootManager.GenerateLootForNpc(npc.BaseData.LootTableID);
+            // O LootManager GERA os stats e REGISTRA no ItemInstanceManager. CORRETO.
+            List<ItemStack> generatedLoot = _server.LootManager.GenerateLootForNpc(npc.BaseData.LootTableID, npc.Level);
+
+            // O loot é atribuído ao CORPO do NPC. CORRETO.
             npc.SetLoot(generatedLoot);
         }
 

@@ -40,11 +40,12 @@ public class UDPServer
     public readonly SpatialGridManager GridManager;
     public readonly GatherableManager GatherableManager;
     public readonly ChatManager ChatManager;
+    public readonly ItemInstanceManager ItemInstanceManager;
 
 
     private readonly ICharacterDatabase _characterDb;
     private readonly UdpClient _udpListener;
-    private const int TIMEOUT_SECONDS = 15;
+    private const int TIMEOUT_SECONDS = 30;
 
     private int _nextSessionId = 0;
     private int _nextNpcSessionId = 0;
@@ -54,7 +55,7 @@ public class UDPServer
         Instance = this;
 
         this._characterDb = characterDatabase;
-        IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), port);
+        IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Any, port);
         this._udpListener = new UdpClient(serverEndPoint);
         DataManager.LoadAllData();
 
@@ -64,7 +65,6 @@ public class UDPServer
         this.NpcAiManager = new NpcAiManager(this);
         this.InterestManager = new InterestManager(this);
         this.CombatManager = new CombatManager(this);
-        this.CommandManager = new CommandManager(this);
         this.PlayerEquipmentManager = new PlayerEquipmentManager(this);
         this.PlayerInventoryManager = new PlayerInventoryManager(this);
         this.PlayerLifecycleManager = new PlayerLifecycleManager(this);
@@ -74,7 +74,10 @@ public class UDPServer
         this.Scheduler = new Scheduler(this);
         this.GridManager = new SpatialGridManager();
         this.GatherableManager = new GatherableManager(this);
-        this.ChatManager = new ChatManager(this);
+        this.ItemInstanceManager = new ItemInstanceManager(this);
+
+        this.CommandManager = new CommandManager(this);
+        this.ChatManager = new ChatManager(this, this.CommandManager);
     }
 
     public int GetNextSessionId()
@@ -196,13 +199,16 @@ public class UDPServer
                 break;
             }
 
+            // A lógica de encontrar os jogadores timed out permanece a mesma
             var timedOutPlayers = ConnectedPlayers
                     .Where(p => (DateTime.UtcNow - p.Value.LastMessageTime).TotalSeconds > TIMEOUT_SECONDS)
                     .ToList();
 
             foreach (var playerEntry in timedOutPlayers)
             {
-                DisconnectPlayer(playerEntry.Key);
+                // playerEntry.Key agora é o ConnectionGuid, que é o que DisconnectPlayer espera.
+                // A chamada está correta!
+                await DisconnectPlayer(playerEntry.Key, "Timeout");
             }
         }
     }
@@ -212,29 +218,81 @@ public class UDPServer
     /// e notificando os outros jogadores e sistemas (como o OnlineStatusManager).
     /// </summary>
     /// <param name="clientKey">A chave do jogador no dicionário (geralmente EndPoint.ToString()).</param>
-    public void DisconnectPlayer(string clientKey, string reason = "Conexão perdida.")
+    // EM UDPServer.cs
+
+    /// <summary>
+    /// Desconecta um jogador do servidor, SALVANDO SEUS DADOS, removendo-o da lista de conectados
+    /// e notificando os outros jogadores e sistemas.
+    /// </summary>
+    public async Task DisconnectPlayer(string connectionGuid, string reason = "Conexão perdida.")
     {
-        if (ConnectedPlayers.TryRemove(clientKey, out Player? disconnectedPlayer))
+        if (ConnectedPlayers.TryRemove(connectionGuid, out Player? disconnectedPlayer))
         {
             if (disconnectedPlayer != null)
             {
-                // (NOVO) Adiciona o motivo ao log
+                // 1. SALVAR OS DADOS PRIMEIRO
+                try
+                {
+                    var dataToSave = disconnectedPlayer.GetCharacterDataForSaving();
+                    await _characterDb.SaveAsync(dataToSave);
+                    Console.WriteLine($"[SAVE] Dados de {disconnectedPlayer.Username} salvos devido a desconexão ({reason}).");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[SAVE-ERROR] Falha ao salvar dados de {disconnectedPlayer.Username} na desconexão: {ex.Message}");
+                }
+
+                // 2. CONTINUAR COM A LÓGICA DE DESCONEXÃO
                 Console.WriteLine($"Jogador {disconnectedPlayer.Username} (ID Sessão: {disconnectedPlayer.SessionId}) foi desconectado. Motivo: {reason}");
 
                 PlayersBySessionId.TryRemove(disconnectedPlayer.SessionId, out _);
                 OnlineStatusManager.SetOffline(disconnectedPlayer.CharacterId);
 
-                // Envia a mensagem PLAYER_LEFT para os outros.
-                // Note que aqui o player.Id é o SessionId, o que está correto para os outros clientes.
-                NetworkManager.BroadcastMessageToRelevantPlayers(disconnectedPlayer.Position, $"PLAYER_LEFT|{disconnectedPlayer.Id}");
+                GridManager.RemoveEntity(disconnectedPlayer); // Boa prática adicionar a remoção do grid aqui também
 
-                // (NOVO) Se o motivo for específico (como login duplicado), podemos notificar o jogador desconectado.
-                if (reason.Contains("outra localidade"))
-                {
-                    NetworkManager.SendMessageToPlayer(disconnectedPlayer, "FATAL_ERROR|Sua conta foi conectada de outro local.");
-                }
+                NetworkManager.BroadcastMessageToRelevantPlayers(disconnectedPlayer.Position, $"PLAYER_LEFT|{disconnectedPlayer.Id}");
+                NetworkManager.SendMessageToPlayer(disconnectedPlayer, "FATAL_ERROR|Conexão Perdida");
             }
         }
+    }
+
+    /// <summary>
+    /// Itera sobre todos os jogadores conectados e salva seus dados no banco de dados.
+    /// Projetado para ser chamado durante o desligamento do servidor.
+    /// </summary>
+    public async Task SaveAllPlayersAsync()
+    {
+        Console.WriteLine($"[SHUTDOWN-SAVE] Iniciando salvamento final para {ConnectedPlayers.Count} jogador(es)...");
+
+        // Cria uma lista de tarefas de salvamento, uma para cada jogador.
+        var saveTasks = new List<Task>();
+
+        // Pega uma cópia da lista de jogadores para iterar com segurança.
+        var playersToSave = ConnectedPlayers.Values.ToList();
+
+        foreach (var player in playersToSave)
+        {
+            // Adiciona a tarefa de salvamento à lista.
+            // Não usamos 'await' aqui para que todos os salvamentos possam rodar em paralelo.
+            saveTasks.Add(Task.Run(async () =>
+            {
+                try
+                {
+                    var dataToSave = player.GetCharacterDataForSaving();
+                    await _characterDb.SaveAsync(dataToSave);
+                    Console.WriteLine($"[SHUTDOWN-SAVE] Dados de {player.Username} salvos com sucesso.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[SHUTDOWN-SAVE-ERROR] Falha ao salvar {player.Username}: {ex.Message}");
+                }
+            }));
+        }
+
+        // Espera que TODAS as tarefas de salvamento terminem.
+        await Task.WhenAll(saveTasks);
+
+        Console.WriteLine("[SHUTDOWN-SAVE] Salvamento final de todos os jogadores concluído.");
     }
 
     private async Task PeriodicAutoSaveAsync(CancellationToken token)

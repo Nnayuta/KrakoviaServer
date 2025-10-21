@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class CharacterStats
 {
-    public event Action<StatType> OnStatChanged;
+    public event Action<StatType>? OnStatChanged;
 
     private readonly Dictionary<StatType, Stat> _stats = new Dictionary<StatType, Stat>();
     private readonly int _level;
@@ -15,25 +15,26 @@ public class CharacterStats
     {
         _level = level;
 
-        // Inicializa todos os stats com um valor base de 0.
+        // 1. Inicializa todos os stats com um valor base de 0. (CORRETO)
         foreach (StatType statType in Enum.GetValues(typeof(StatType)))
         {
             _stats.Add(statType, new Stat(0));
         }
 
-        // Calcula os valores base dos atributos primários usando o novo sistema.
+        // 2. Calcula os valores base dos atributos primários. (CORRETO)
         float finalStrength = ClassStatCalculator.GetStatAtLevel(classData.BaseStrength, classData.StrengthGrowth, _level);
         float finalAgility = ClassStatCalculator.GetStatAtLevel(classData.BaseAgility, classData.AgilityGrowth, _level);
         float finalIntellect = ClassStatCalculator.GetStatAtLevel(classData.BaseIntelligence, classData.IntelligenceGrowth, _level);
         float finalStamina = ClassStatCalculator.GetStatAtLevel(classData.BaseStamina, classData.StaminaGrowth, _level);
 
+        // 3. Define os valores base calculados nos respectivos stats. (CORRETO)
         _stats[StatType.MovementSpeed].SetBaseValue(100.0f);
         _stats[StatType.Strength].SetBaseValue(finalStrength);
         _stats[StatType.Agility].SetBaseValue(finalAgility);
         _stats[StatType.Intellect].SetBaseValue(finalIntellect);
         _stats[StatType.Stamina].SetBaseValue(finalStamina);
 
-        // Atribui outros valores base definidos na classe.
+        // 4. Atribui outros valores base definidos na classe. (CORRETO)
         float finalHealth = ClassStatCalculator.GetStatAtLevel(classData.BaseHealth, classData.HealthGrowth, _level);
         float finalResource = ClassStatCalculator.GetStatAtLevel(classData.BaseResource, classData.ResourceGrowth, _level);
 
@@ -41,6 +42,9 @@ public class CharacterStats
         _stats[StatType.Mana].SetBaseValue(finalResource);
 
         _stats[StatType.CriticalStrikeChance].SetBaseValue(5.0f);
+
+        // 5. AGORA, com todos os valores base no lugar, calcula os derivados. (A PEÇA FINAL)
+        CalculateAllDerivedStats(); // <<< ADICIONE APENAS ESTA LINHA
     }
 
     public float GetStatValue(StatType statType)
@@ -54,27 +58,61 @@ public class CharacterStats
         // Note que não chamamos CalculateAllDerivedStats() aqui.
     }
 
-    public void AddStatModifier(StatType statType, StatModifier modifier)
+    private void AddStatModifierInternal(StatType statType, StatModifier modifier)
     {
         _stats[statType].AddModifier(modifier);
-        CalculateAllDerivedStats();
         OnStatChanged?.Invoke(statType);
+    }
+
+    private bool IsPrimaryOrRatingStat(StatType statType)
+    {
+        return statType == StatType.Strength ||
+               statType == StatType.Agility ||
+               statType == StatType.Intellect ||
+               statType == StatType.Stamina ||
+               statType == StatType.CriticalStrikeRating ||
+               statType == StatType.HasteRating;
+    }
+
+    /// <summary>
+    /// Adiciona um modificador de status e recalcula os atributos derivados APENAS SE NECESSÁRIO.
+    /// </summary>
+    public void AddStatModifier(StatType statType, StatModifier modifier)
+    {
+        // Adiciona o modificador ao stat alvo.
+        AddStatModifierInternal(statType, modifier);
+
+        // Agora, a lógica inteligente: só recalcule tudo se o stat modificado
+        // for um dos que servem de base para outros.
+        if (IsPrimaryOrRatingStat(statType))
+        {
+            CalculateAllDerivedStats();
+        }
     }
 
     public void RemoveAllStatModifiersFromSource(object source)
     {
         bool statsChanged = false;
-        foreach (var stat in _stats.Values)
+        // Criamos uma lista para armazenar os tipos de stats que foram alterados.
+        List<StatType> changedStatTypes = new List<StatType>();
+
+        foreach (var pair in _stats)
         {
-            if (stat.RemoveAllModifiersFromSource(source))
+            if (pair.Value.RemoveAllModifiersFromSource(source))
             {
                 statsChanged = true;
+                changedStatTypes.Add(pair.Key);
             }
         }
 
         if (statsChanged)
         {
-            CalculateAllDerivedStats();
+            // Verificamos se algum dos stats removidos era um stat primário.
+            bool needsRecalculation = changedStatTypes.Any(IsPrimaryOrRatingStat);
+            if (needsRecalculation)
+            {
+                CalculateAllDerivedStats();
+            }
         }
     }
 

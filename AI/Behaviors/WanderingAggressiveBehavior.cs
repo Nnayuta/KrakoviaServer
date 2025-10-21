@@ -196,7 +196,7 @@ public class WanderingAggressiveBehavior : BaseBehavior
             // (A lógica de cast já lida com isso ao finalizar)
             if (specialAbility.CastTime <= 0)
             {
-                npc.GlobalCooldownEndTime = _server.CurrentTimeUtc.AddSeconds(1.5);
+                npc.GlobalCooldownEndTime = _server.CurrentTimeUtc.AddSeconds(1.0);
             }
         }
         // Se não puder, tenta o auto-ataque.

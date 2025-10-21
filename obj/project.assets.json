@@ -1643,9 +1643,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\GameDev\\Krakovia Server\\Krakovia Server\\Krakovia Server.csproj",
-      "projectName": "Krakovia Server",
-      "projectPath": "C:\\GameDev\\Krakovia Server\\Krakovia Server\\Krakovia Server.csproj",
+      "projectUniqueName": "C:\\GameDev\\Krakovia Server\\Krakovia Server\\Krakovia_Server.csproj",
+      "projectName": "Krakovia_Server",
+      "projectPath": "C:\\GameDev\\Krakovia Server\\Krakovia Server\\Krakovia_Server.csproj",
       "packagesPath": "C:\\Users\\naayu\\.nuget\\packages\\",
       "outputPath": "C:\\GameDev\\Krakovia Server\\Krakovia Server\\obj\\",
       "projectStyle": "PackageReference",

@@ -21,6 +21,7 @@ public class ServerJunkItemData : ServerItemData
 
 // Seu enum CombatStyle continua existindo, mas agora é apenas para ANIMAÇÃO
 public enum CombatStyle { Unarmed, Melee, Ranged, Magic }
+public enum PrimaryStatFocus { Strength, Agility, Intellect }
 
 // A classe base para todos os itens no servidor
 public class ServerItemData
@@ -36,6 +37,7 @@ public class ServerItemData
     // Propriedade terciária
     public bool IsIndestructible { get; set; } = false;
     public List<BaseStatData> Stats { get; set; } = new List<BaseStatData>();
+    public PrimaryStatFocus primaryStatFocus { get; set; } = PrimaryStatFocus.Strength;
 
     [Newtonsoft.Json.JsonIgnore] // Garante que o serializador não tente salvar esta propriedade no JSON
     public bool isStackable => maxStackSize > 1;
@@ -68,9 +70,5 @@ public class ServerConsumableData : ServerItemData
     // Efeitos Instantâneos (para poções, etc.)
     public int InstantHealthGain { get; set; }
     public int InstantResourceGain { get; set; }
-
-    // Efeito de Status Aplicado (para comidas, elixires, etc.)
-    // Armazena o ID do StatusEffect a ser buscado e aplicado pelo servidor.
-    // Ex: "buff_well_fed", "elixir_of_fortitude"
     public string StatusEffectID { get; set; }
 }

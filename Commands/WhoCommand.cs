@@ -5,9 +5,9 @@ public class WhoCommand : ICommand
     public string Name => "who";
     public string Description => "Lista todos os jogadores online e seus IDs de sessão.";
     public string Usage => "who";
-    public int RequiredPermissionLevel => 1; // Apenas moderadores e acima
+    public int RequiredPermissionLevel => 50; // Apenas moderadores e acima
 
-    public void Execute(string[] args, UDPServer server)
+    public void Execute(Player sender, string[] args, UDPServer server)
     {
         var players = server.ConnectedPlayers.Values.ToList();
 

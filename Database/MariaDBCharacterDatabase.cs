@@ -47,7 +47,9 @@ public class MariaDBCharacterDatabase : ICharacterDatabase
                     DELETE FROM character_inventory WHERE character_id = @id;
                     DELETE FROM character_equipment WHERE character_id = @id;
                     DELETE FROM character_actionbar WHERE character_id = @id;
-                    DELETE FROM character_quests WHERE character_id = @id;"; // Adicionamos a linha de quests aqui.
+                    DELETE FROM character_quests WHERE character_id = @id;
+                    DELETE FROM character_item_instances WHERE character_id = @id;
+                    ";
 
                     var deleteCmd = new MySqlCommand(deleteCmdText, connection, transaction);
                     // O parâmetro @id agora é adicionado a este comando unificado.
@@ -59,6 +61,7 @@ public class MariaDBCharacterDatabase : ICharacterDatabase
                     // 3. Insere os novos dados (sem alterações)
                     await BulkInsertInventoryAsync(dataToSave, connection, transaction);
                     await BulkInsertEquipmentAsync(dataToSave, connection, transaction);
+                    await BulkInsertItemInstancesAsync(dataToSave, connection, transaction);
                     await BulkInsertActionBarAsync(dataToSave, connection, transaction);
                     await BulkInsertQuestsAsync(dataToSave, connection, transaction);
 
@@ -98,6 +101,7 @@ public class MariaDBCharacterDatabase : ICharacterDatabase
                 // Cenário 2: Personagem existe. Vamos carregar seus itens.
                 await LoadInventoryAsync(characterData, connection);
                 await LoadEquipmentAsync(characterData, connection);
+                await LoadItemInstancesAsync(characterData, connection);
                 await LoadActionBarAsync(characterData, connection);
                 await LoadQuestLogAsync(characterData, connection);
 
@@ -118,6 +122,7 @@ public class MariaDBCharacterDatabase : ICharacterDatabase
                         // Não precisamos atualizar a tabela 'characters', só as de itens.
                         await BulkInsertInventoryAsync(characterData, connection, transaction);
                         await BulkInsertEquipmentAsync(characterData, connection, transaction);
+                        await BulkInsertItemInstancesAsync(characterData, connection, transaction);
                         // Barra de ações também, por garantia.
                         await BulkInsertActionBarAsync(characterData, connection, transaction);
 
@@ -170,8 +175,6 @@ public class MariaDBCharacterDatabase : ICharacterDatabase
     {
         // 1. Cria o objeto de dados em memória
         var newCharData = new CharacterData(authInfo.CharacterId, authInfo.ClassID, authInfo.Level, authInfo.Appearance);
-
-        // 2. <<< A LÓGICA QUE FALTAVA >>> Popula o objeto com os itens iniciais
         PopulateStartingItems(newCharData);
 
         // 3. Salva TUDO no banco de dados dentro de uma transação segura
@@ -200,7 +203,7 @@ public class MariaDBCharacterDatabase : ICharacterDatabase
                 // Insere os itens de inventário e equipamento
                 await BulkInsertInventoryAsync(newCharData, connection, transaction);
                 await BulkInsertEquipmentAsync(newCharData, connection, transaction);
-                // A barra de ações inicial geralmente está vazia, mas podemos chamar por consistência
+                await BulkInsertItemInstancesAsync(newCharData, connection, transaction);
                 await BulkInsertActionBarAsync(newCharData, connection, transaction);
 
                 await transaction.CommitAsync();
@@ -216,23 +219,46 @@ public class MariaDBCharacterDatabase : ICharacterDatabase
         return newCharData;
     }
 
-    // <<< NOVO MÉTODO AUXILIAR PARA REUTILIZAR A LÓGICA DE ITENS INICIAIS >>>
     private static void PopulateStartingItems(CharacterData characterData)
     {
+        if (UDPServer.Instance == null)
+        {
+            Console.WriteLine("[ERROR] Tentativa de popular itens iniciais, mas a instância do UDPServer é nula!");
+            return;
+        }
+
         if (!DataManager.Classes.TryGetValue(characterData.ClassID, out var classData)) return;
 
+        // 1. Equipar itens iniciais E GERAR SEUS STATS
         foreach (string itemID in classData.StartingEquipmentIDs)
         {
-            if (DataManager.Items.TryGetValue(itemID, out var itemData) && itemData is ServerEquipmentData eqData)
+            if (DataManager.Items.TryGetValue(itemID, out var itemTemplate) && itemTemplate is ServerEquipmentData eqItemTemplate)
             {
-                characterData.PlayerEquipment.equippedItems[eqData.equipmentSlot] = new ItemStack(itemID, 1);
+                // a. Cria o ItemStack. Ele ganha um InstanceID único.
+                var itemStack = new ItemStack(itemID, 1);
+
+                // b. Gera os stats e a qualidade para o item de nível 1.
+                var (generatedStats, finalQuality) = ServerStatAllocator.GenerateStatsForItem(eqItemTemplate, 1);
+
+                // c. Cria o pacote de dados da instância.
+                var instanceData = new ItemInstanceData
+                {
+                    Quality = finalQuality,
+                    ItemLevel = 1,
+                    Stats = generatedStats
+                };
+
+                // d. Registra a nova instância e seus stats no manager global.
+                UDPServer.Instance!.ItemInstanceManager.RegisterGeneratedItem(itemStack.InstanceID, instanceData);
+
+                // e. Equipa o item no CharacterData.
+                characterData.PlayerEquipment.equippedItems[eqItemTemplate.equipmentSlot] = itemStack;
             }
         }
 
-        // Adiciona itens de inventário
+        // 2. Adicionar itens ao inventário (não muda)
         foreach (string itemID in classData.StartingInventoryIDs)
         {
-            // Usa o método AddItem do inventário do CharacterData
             characterData.PlayerInventory.AddItem(itemID);
         }
     }
@@ -455,6 +481,71 @@ public class MariaDBCharacterDatabase : ICharacterDatabase
                 }
 
                 data.QuestLog.AllQuests[progress.QuestID] = progress;
+            }
+        }
+    }
+
+    private async Task BulkInsertItemInstancesAsync(CharacterData data, MySqlConnection conn, MySqlTransaction tr)
+    {
+        // A fonte da verdade para um personagem que está sendo salvo são os itens que ele possui.
+        var allItemStacks = data.PlayerInventory.slots.Where(s => s != null && s != null)
+                               .Concat(data.PlayerEquipment.equippedItems.Values.Where(s => s != null))
+                               .ToList();
+
+        if (!allItemStacks.Any()) return;
+
+        var sb = new StringBuilder("INSERT INTO character_item_instances (instance_id, character_id, stats_json) VALUES ");
+        var parameters = new List<MySqlParameter>();
+        int paramIndex = 0;
+
+        var itemInstanceManager = UDPServer.Instance!.ItemInstanceManager;
+
+        foreach (var stack in allItemStacks)
+        {
+            // <<< A CORREÇÃO PRINCIPAL ESTÁ AQUI >>>
+            // Durante o salvamento, a fonte da verdade é o manager ativo do servidor.
+            // Ele contém os dados mais recentes, incluindo itens recém-dropados.
+            var instanceData = itemInstanceManager.GetDataForInstance(stack.InstanceID);
+
+            if (instanceData != null)
+            {
+                sb.Append($"(@instId{paramIndex}, @charId{paramIndex}, @json{paramIndex}),");
+                parameters.Add(new MySqlParameter($"@instId{paramIndex}", stack.InstanceID));
+                parameters.Add(new MySqlParameter($"@charId{paramIndex}", data.CharacterId));
+                parameters.Add(new MySqlParameter($"@json{paramIndex}", JsonConvert.SerializeObject(instanceData)));
+                paramIndex++;
+            }
+        }
+
+        if (paramIndex == 0) return;
+
+        sb.Length--;
+        var cmd = new MySqlCommand(sb.ToString(), conn, tr);
+        cmd.Parameters.AddRange(parameters.ToArray());
+        await cmd.ExecuteNonQueryAsync();
+    }
+
+    // NOVO MÉTODO PARA CARREGAR OS STATS DOS ITENS
+    private async Task LoadItemInstancesAsync(CharacterData data, MySqlConnection conn)
+    {
+        var cmd = new MySqlCommand("SELECT instance_id, stats_json FROM character_item_instances WHERE character_id = @id", conn);
+        cmd.Parameters.AddWithValue("@id", data.CharacterId);
+
+        var itemInstanceManager = UDPServer.Instance!.ItemInstanceManager;
+
+        using (var reader = await cmd.ExecuteReaderAsync())
+        {
+            while (await reader.ReadAsync())
+            {
+                string instanceId = Convert.ToString(reader["instance_id"]);
+                string dataJson = Convert.ToString(reader["stats_json"]);
+
+                if (!string.IsNullOrEmpty(dataJson))
+                {
+                    var instanceData = JsonConvert.DeserializeObject<ItemInstanceData>(dataJson);
+                    itemInstanceManager.RegisterGeneratedItem(instanceId, instanceData);
+                    data.TrackGeneratedItem(instanceId, instanceData); // Método helper atualizado
+                }
             }
         }
     }

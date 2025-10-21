@@ -1,5 +1,6 @@
 // Managers/PlayerInventoryManager.cs
 using System;
+using System.Diagnostics;
 using System.Linq;
 
 /// <summary>
@@ -23,40 +24,46 @@ public class PlayerInventoryManager
     /// </summary>
     /// <param name="player">O jogador que receberá o loot.</param>
     /// <param name="lootItems">A lista de itens a serem concedidos.</param>
+    // ARQUIVO ATUALIZADO: Managers/PlayerInventoryManager.cs
+
     public void GrantLootToPlayer(Player player, List<ItemStack> lootItems)
     {
         if (lootItems == null || !lootItems.Any())
         {
-            // Se não há loot, podemos enviar uma mensagem de "não encontrou nada"
             _server.NetworkManager.SendMessageToPlayer(player, "SHOW_FEEDBACK|Você não encontrou nada.");
             return;
         }
 
         foreach (var itemStack in lootItems)
         {
-            // Tenta adicionar o item usando o método que já existe no inventário do jogador.
-            if (player.PlayerInventory.AddItem(itemStack.ItemID, itemStack.Quantity))
+            // <<< A CORREÇÃO >>>
+            // Usamos o novo método AddItemStack que preserva o InstanceID.
+            if (player.PlayerInventory.AddItemStack(itemStack))
             {
-                // Sucesso! Envia feedback visual para o cliente.
+                // Sucesso!
                 var itemData = DataManager.Items[itemStack.ItemID];
                 string feedback = itemStack.Quantity > 1 ? $"+{itemStack.Quantity} {itemData.itemName}" : $"+{itemData.itemName}";
                 _server.NetworkManager.SendMessageToPlayer(player, $"SHOW_FEEDBACK|{feedback}");
+
+                // AGORA, enviamos os dados da instância para o cliente, pois o item foi adicionado com sucesso.
+                var instanceData = _server.ItemInstanceManager.GetDataForInstance(itemStack.InstanceID);
+                if (instanceData != null)
+                {
+                    _server.NetworkManager.SendItemInstanceData(player, itemStack.InstanceID, instanceData);
+                }
             }
             else
             {
                 // Falha! O inventário está cheio.
                 _server.NetworkManager.SendMessageToPlayer(player, "ERROR|Inventário cheio.");
-
-                // TODO: Lógica futura para enviar o item pelo correio ou dropá-lo no chão.
-                // Por enquanto, paramos de adicionar o resto.
+                // TODO: Lógica de correio ou dropar no chão.
                 break;
             }
         }
 
-        // Após adicionar todos os itens (ou falhar), envia uma atualização completa do inventário.
+        // Após a tentativa de adicionar, sempre envia a atualização do inventário.
         _server.NetworkManager.SendInventoryUpdate(player);
     }
-
     /// <summary>
     /// Handler principal para a movimentação de itens. Cobre arrastar e soltar,
     /// trocar, mover para slot vazio, e empilhar.
@@ -119,8 +126,7 @@ public class PlayerInventoryManager
             return;
         }
 
-        if (!DataManager.Items.TryGetValue(itemStack.ItemID, out var itemData) ||
-            itemData is not ServerConsumableItemData consumableData)
+        if (!DataManager.Items.TryGetValue(itemStack.ItemID, out var itemData) || itemData is not ServerConsumableData consumableData)
         {
             Console.WriteLine($"[UseItem] FALHA: {player.Username} tentou usar o item '{itemStack.ItemID}' que não é consumível.");
             return;
@@ -142,9 +148,9 @@ public class PlayerInventoryManager
 
         // CORREÇÃO: Apenas esta chamada é necessária.
         // O jogador é tanto o conjurador (caster) quanto o alvo (target).
-        if (!string.IsNullOrEmpty(consumableData.StatusEffectToApplyID))
+        if (!string.IsNullOrEmpty(consumableData.StatusEffectID))
         {
-            player.StatusEffectController.ApplyEffect(consumableData.StatusEffectToApplyID, player);
+            player.StatusEffectController.ApplyEffect(consumableData.StatusEffectID, player);
         }
 
         // --- Consumo do Item ---
@@ -163,50 +169,80 @@ public class PlayerInventoryManager
     /// </summary>
     public void HandleBuyItemRequest(Player player, string npcId, string itemId, int quantity)
     {
-        // Validação 1: O NPC é um vendedor válido?
-        // Usamos o 'TypeId' do NpcInstance para encontrar os dados do vendedor
+        // --- Validações Iniciais (sem mudança) ---
         if (!_server.ActiveNpcs.TryGetValue(npcId, out var npcInstance) ||
-            !DataManager.Vendors.TryGetValue(npcInstance.BaseData.TypeId, out var vendorData))
+            !DataManager.Vendors.TryGetValue(npcInstance.BaseData.TypeId, out var vendorData)) return;
+
+        var itemForSaleTemplate = vendorData.Items.FirstOrDefault(i => i.ItemID == itemId);
+        if (itemForSaleTemplate == null) return;
+
+        if (!DataManager.Items.TryGetValue(itemId, out var itemTemplate)) return;
+
+        long totalCost;
+
+        // --- LÓGICA DE GERAÇÃO DINÂMICA PARA EQUIPAMENTOS ---
+        if (itemTemplate is ServerEquipmentData eqTemplate)
         {
-            Console.WriteLine($"[Loja] FALHA: Requisição de compra para um NPC que não é vendedor ({npcId}).");
-            return;
+            // Se for um equipamento, o preço é dinâmico e só pode comprar um por vez.
+            if (quantity > 1) return;
+
+            // Calcula o preço dinâmico com base no nível do jogador.
+            totalCost = ServerStatAllocator.CalculateBuyPrice(eqTemplate, player.Level);
+
+            if (player.TotalBronze < totalCost) return; // Não tem dinheiro
+
+            // Verifica se há espaço para UM item.
+            if (player.PlayerInventory.FindEmptySlot() == null)
+            {
+                _server.NetworkManager.SendMessageToPlayer(player, "ERROR|Inventário cheio.");
+                return;
+            }
+
+            // --- GERAÇÃO DO ITEM ---
+            var itemStack = new ItemStack(itemId, 1);
+
+            // Usamos o nível do jogador para gerar o iLvl e o ReqLvl
+            int itemLevel = ItemLevelConverter.GetItemLevelForCreature(player.Level);
+            int requiredLevel = ItemLevelConverter.GetRequiredLevelForItemLevel(itemLevel);
+
+            // Itens de vendedor geralmente são de qualidade Incomum (verde).
+            var (generatedStats, _) = ServerStatAllocator.GenerateStatsForItem(eqTemplate, itemLevel);
+
+            var instanceData = new ItemInstanceData
+            {
+                Quality = ItemQuality.Uncommon, // Qualidade fixa para itens de vendedor
+                ItemLevel = itemLevel,
+                RequiredLevel = requiredLevel,
+                Stats = generatedStats
+            };
+
+            // Registra a nova instância
+            _server.ItemInstanceManager.RegisterGeneratedItem(itemStack.InstanceID, instanceData);
+
+            // --- EXECUÇÃO DA TRANSAÇÃO ---
+            player.TotalBronze -= totalCost;
+            player.PlayerInventory.AddItemStack(itemStack);
+
+            // Envia os dados da instância para o cliente
+            _server.NetworkManager.SendItemInstanceData(player, itemStack.InstanceID, instanceData);
+        }
+        else // --- LÓGICA ANTIGA PARA ITENS NORMAIS (Consumíveis, Lixo) ---
+        {
+            totalCost = (long)itemForSaleTemplate.BuyPrice * quantity;
+            if (player.TotalBronze < totalCost) return;
+            if (!player.PlayerInventory.HasSpaceFor(itemId, quantity))
+            {
+                _server.NetworkManager.SendMessageToPlayer(player, "ERROR|Inventário cheio.");
+                return;
+            }
+
+            player.TotalBronze -= totalCost;
+            player.PlayerInventory.AddItem(itemId, quantity);
         }
 
-        // Validação 2: O vendedor vende este item?
-        var itemForSale = vendorData.Items.FirstOrDefault(i => i.ItemID == itemId);
-        if (itemForSale == null)
-        {
-            Console.WriteLine($"[Loja] FALHA: {player.Username} tentou comprar o item {itemId} que o NPC {npcId} não vende.");
-            return;
-        }
-
-        // Validação 3: O jogador tem dinheiro/moeda suficiente?
-        long totalCostInBronze = (long)itemForSale.BuyPrice * quantity;
-
-        // if (!player.HasCurrency(vendorData.CurrencyType, totalCost)) return; // Lógica de moeda mais avançada
-        if (player.TotalBronze < totalCostInBronze)
-        {
-            Console.WriteLine($"[Loja] FALHA: {player.Username} não tem {totalCostInBronze} de bronze.");
-            return;
-        }
-
-        // Validação 4: O jogador tem espaço no inventário?
-        if (!player.PlayerInventory.HasSpaceFor(itemId, quantity))
-        {
-            Console.WriteLine($"[Loja] FALHA: {player.Username} não tem espaço no inventário.");
-            // Enviar uma mensagem de erro para o cliente é uma boa ideia.
-            return;
-        }
-
-        // Execução da Transação
-        // player.RemoveCurrency(vendorData.CurrencyType, totalCost);
-        player.TotalBronze -= totalCostInBronze;
-        player.PlayerInventory.AddItem(itemId, quantity);
-
-        _server.NetworkManager.SendInventoryUpdate(player);
-
-        // Futuramente, você enviará uma atualização de moeda
-        _server.NetworkManager.SendMessageToPlayer(player, $"CURRENCY_UPDATE|{player.TotalBronze}");
+        // --- ATUALIZAÇÕES FINAIS PARA O CLIENTE ---
+        _server.NetworkManager.SendInventoryUpdate(player, true);
+        _server.NetworkManager.SendCurrencyUpdate(player, true);
     }
 
     /// <summary>
@@ -216,11 +252,10 @@ public class PlayerInventoryManager
     {
         var inventory = player.PlayerInventory;
         if (!IsValidSlot(inventory, inventorySlot) || inventory.slots[inventorySlot] == null) return;
-
         ItemStack itemStack = inventory.slots[inventorySlot]!;
-        if (!DataManager.Items.TryGetValue(itemStack.ItemID, out var itemData)) return;
 
-        // TODO: Verificar se o NPC é um vendedor que pode comprar este item.
+
+        if (!DataManager.Items.TryGetValue(itemStack.ItemID, out var itemData)) return;
 
         int sellQuantity = Math.Min(quantity, itemStack.Quantity);
         long totalValueInBronze = (long)itemData.sellPrice * sellQuantity;
@@ -229,7 +264,16 @@ public class PlayerInventoryManager
         itemStack.Quantity -= sellQuantity;
         if (itemStack.Quantity <= 0)
         {
+            // <<< A LÓGICA DE LIMPEZA VEM AQUI >>>
+            // Antes de remover o item do slot, pegamos seu InstanceID.
+            string instanceIdToUnregister = itemStack.InstanceID;
+
+            // Remove o item do inventário do jogador.
             inventory.slots[inventorySlot] = null;
+
+            // Notifica o ItemInstanceManager para remover os dados desta instância, liberando memória.
+            _server.ItemInstanceManager.UnregisterItem(instanceIdToUnregister);
+            Console.WriteLine($"[ItemCleanup] Stats para o item {instanceIdToUnregister} foram removidos do cache.");
         }
 
         player.TotalBronze += totalValueInBronze;

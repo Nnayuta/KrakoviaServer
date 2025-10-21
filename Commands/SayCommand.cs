@@ -4,9 +4,9 @@ public class SayCommand : ICommand
     public string Name => "say";
     public string Description => "Envia uma mensagem global para todos os jogadores.";
     public string Usage => "say <Mensagem>";
-    public int RequiredPermissionLevel => 1; // Moderadores e acima
+    public int RequiredPermissionLevel => 50; // Moderadores e acima
 
-    public void Execute(string[] args, UDPServer server)
+    public void Execute(Player sender, string[] args, UDPServer server)
     {
         if (args.Length == 0)
         {

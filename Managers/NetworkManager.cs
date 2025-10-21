@@ -12,6 +12,15 @@ using System.Threading; // Adicionado para CancellationToken
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
+/// <summary>
+/// Representa um item de vendedor com seu preço de compra já calculado para um jogador específico.
+/// </summary>
+public class VendorItemForClient
+{
+    public string ItemID { get; set; }
+    public int BuyPrice { get; set; } // << RENOMEADO para BuyPrice
+}
+
 public class NetworkManager
 {
     private readonly UDPServer _server;
@@ -131,21 +140,26 @@ public class NetworkManager
 
     public void SendFullStateToPlayer(Player player)
     {
-        SendInventoryUpdate(player);
-        SendEquipmentUpdate(player);
-        SendCurrencyUpdate(player);
-        SendStatsUpdate(player);
-        SendFullQuestLog(player);
-        SendVitalsUpdate(player);
-        player.StatusEffectController.SendFullEffectListToClient();
+        // Envia todas as mensagens de estado imediatamente.
+        SendInventoryUpdate(player, true);
+        SendEquipmentUpdate(player, true);
+        SendCurrencyUpdate(player, true);
+        SendStatsUpdate(player, true);
+        SendFullQuestLog(player, true);
+        SendVitalsUpdate(player, true);
+        player.StatusEffectController.SendFullEffectListToClient(); // Este já envia direto, está ok.
     }
 
-    public void SendFullQuestLog(Player player)
+    public void SendFullQuestLog(Player player, bool immediate = false)
     {
         var fullLog = player.QuestLog.AllQuests.Values.ToList();
-
         string json = JsonConvert.SerializeObject(fullLog);
-        SendMessageToPlayer(player, $"QUEST_LOG_INIT|{json}");
+        string message = $"QUEST_LOG_INIT|{json}";
+
+        if (immediate)
+            SendImmediateMessageToEndpoint(message, player.EndPoint);
+        else
+            SendMessageToPlayer(player, message);
     }
 
     public void SendQuestUpdate(Player player, QuestProgress progress)
@@ -154,74 +168,71 @@ public class NetworkManager
         SendMessageToPlayer(player, $"QUEST_UPDATE|{json}");
     }
 
-    public void SendStatsUpdate(Player player)
+    public void SendStatsUpdate(Player player, bool immediate = false)
     {
-        // Pega todos os valores possíveis do enum StatType
         var allStatTypes = Enum.GetValues(typeof(StatType)).Cast<StatType>();
-
-        // Constrói as partes da mensagem "StatTypeInt,Value"
         var statParts = allStatTypes.Select(stat =>
         {
-            // Pega o valor final calculado do sistema de stats do jogador
             float value = player.Stats.GetStatValue(stat);
-            // Formata como "int,float" (ex: "0,150.5")
             return $"{(int)stat},{value.ToString(CultureInfo.InvariantCulture)}";
         });
-
-        // Junta tudo na mensagem final
         string message = $"STATS_UPDATE|{player.Id}|{string.Join("|", statParts)}";
 
-        SendMessageToPlayer(player, message);
+        if (immediate)
+            SendImmediateMessageToEndpoint(message, player.EndPoint);
+        else
+            SendMessageToPlayer(player, message);
     }
 
-    public void SendVitalsUpdate(Player player)
+    public void SendVitalsUpdate(Player player, bool immediate = false)
     {
         string message = string.Format(CultureInfo.InvariantCulture, "PLAYER_VITALS_UPDATE|{0:F0}|{1:F0}|{2:F0}|{3:F0}",
-            player.CurrentHealth,
-            player.MaxHealth,
-            player.CurrentResource,
-            player.MaxResource
-        );
-        SendMessageToPlayer(player, message);
+            player.CurrentHealth, player.MaxHealth, player.CurrentResource, player.MaxResource);
+
+        if (immediate)
+            SendImmediateMessageToEndpoint(message, player.EndPoint);
+        else
+            SendMessageToPlayer(player, message);
     }
 
-    public void SendInventoryUpdate(Player player)
+    public void SendInventoryUpdate(Player player, bool immediate = false)
     {
-        // O novo formato inclui o InstanceID
         var inventoryParts = player.PlayerInventory.slots.Select(stack =>
             stack == null ? "null" : $"{stack.InstanceID},{stack.ItemID},{stack.Quantity}"
         );
         string inventoryMessage = "INVENTORY_UPDATE|" + string.Join("|", inventoryParts);
-        SendMessageToPlayer(player, inventoryMessage);
+
+        if (immediate)
+            SendImmediateMessageToEndpoint(inventoryMessage, player.EndPoint);
+        else
+            SendMessageToPlayer(player, inventoryMessage);
     }
 
-    public void SendEquipmentUpdate(Player player)
+    public void SendEquipmentUpdate(Player player, bool immediate = false)
     {
-        // Formato: EQUIP_UPDATE|Slot1,InstanceID,ItemID,Qty|Slot2,null|...
         var equipmentParts = player.PlayerEquipment.equippedItems.Select(pair =>
         {
             EquipmentSlot slot = pair.Key;
             ItemStack stack = pair.Value;
-            if (stack == null)
-            {
-                return $"{slot},null";
-            }
-            return $"{slot},{stack.InstanceID},{stack.ItemID},{stack.Quantity}";
+            return stack == null ? $"{slot},null" : $"{slot},{stack.InstanceID},{stack.ItemID},{stack.Quantity}";
         });
-
         string message = "EQUIPMENT_UPDATE|" + string.Join("|", equipmentParts);
-        SendMessageToPlayer(player, message);
+
+        if (immediate)
+            SendImmediateMessageToEndpoint(message, player.EndPoint);
+        else
+            SendMessageToPlayer(player, message);
     }
 
-    public void SendCurrencyUpdate(Player player)
+    public void SendCurrencyUpdate(Player player, bool immediate = false)
     {
         string message = $"CURRENCY_UPDATE|{player.TotalBronze}";
-        SendMessageToPlayer(player, message);
+
+        if (immediate)
+            SendImmediateMessageToEndpoint(message, player.EndPoint);
+        else
+            SendMessageToPlayer(player, message);
     }
-
-    // Em NetworkManager.cs
-
-    // SUBSTITUA SEU MÉTODO ATUAL HandlePlayerMessageAsync POR ESTES DOIS:
 
     private async Task HandlePlayerMessageAsync(byte[] buffer, IPEndPoint clientEndPoint)
     {
@@ -270,89 +281,105 @@ public class NetworkManager
 
         string[] parts = message.Split('|');
         string command = parts[0];
-        string clientKey = clientEndPoint.ToString();
-        //Console.WriteLine(command);
 
+        // --- LÓGICA DE CONEXÃO (JÁ ESTÁ CORRETA, APENAS VERIFICAR) ---
         if (command == "CONNECT")
         {
-            if (parts.Length < 2)
+            if (parts.Length < 3) // Espera CONNECT|Token|Guid
             {
                 SendImmediateMessageToEndpoint("ERROR|Token de acesso ausente.", clientEndPoint);
                 return;
             }
             string receivedToken = parts[1];
-            //Console.WriteLine(receivedToken);
-            await HandleNewPlayerConnection(clientKey, clientEndPoint, receivedToken);
+            string connectionGuid = parts[2];
+            await HandleNewPlayerConnection(connectionGuid, clientEndPoint, receivedToken);
+            return; // Encerra o processamento para a mensagem CONNECT
         }
-        else if (_server.ConnectedPlayers.TryGetValue(clientKey, out Player? player) && player != null)
+
+        // --- NOVA LÓGICA PARA MENSAGENS PÓS-CONEXÃO ---
+
+        // 1. Extrai o ConnectionGuid da mensagem. Ele é sempre o último parâmetro.
+        if (parts.Length < 2) return; // Mensagem inválida sem comando e GUID
+        string receivedConnectionGuid = parts.Last();
+
+        // 2. Busca o jogador usando o GUID como chave.
+        if (_server.ConnectedPlayers.TryGetValue(receivedConnectionGuid, out Player? player) && player != null)
         {
+            // O jogador foi encontrado! Prossiga com a lógica.
             player.LastMessageTime = _server.CurrentTimeUtc;
-            string? messageToBroadcast = null;
+
+            // Recria o array 'parts' sem o GUID no final para que o resto do código funcione como antes.
+            string[] originalParts = new string[parts.Length - 1];
+            Array.Copy(parts, originalParts, originalParts.Length);
+
+            // Agora, use 'originalParts' em seu switch.
+            string originalCommand = originalParts[0];
 
 
-            switch (command)
+            switch (originalCommand)
             {
                 case "HEARTBEAT":
-                    SendMessageToPlayer(player, $"PONG|{parts[1]}");
+                    // Console.WriteLine($"HEARTBEAT: PLAYER: {player.Id}");
+                    SendImmediateMessageToEndpoint($"PONG|{parts[1]}", clientEndPoint);
                     break;
 
                 case "PLAYER_QUITTING":
-                    await HandlePlayerQuitting(clientKey, player);
+                    await HandlePlayerQuitting(player.ConnectionGuid, player);
                     break;
 
                 case "POS_ROT":
-                    HandlePositionRotation(parts, player);
+                    HandlePositionRotation(originalParts, player);
                     break;
 
                 case "REQUEST_OPEN_SHOP":
-                    if (parts.Length >= 2)
+                    if (originalParts.Length >= 2)
                     {
-                        HandleOpenShopRequest(player, parts[1]);
+                        HandleOpenShopRequest(player, originalParts[1]);
                     }
                     break;
 
                 case "REQUEST_USE_ABILITY":
-                    if (parts.Length >= 3)
+                    if (originalParts.Length >= 3)
                     {
-                        _server.CombatManager.ProcessAbilityRequest(player, parts[1], parts[2]);
+                        _server.CombatManager.ProcessAbilityRequest(player, originalParts[1], originalParts[2]);
                     }
                     break;
                 case "EQUIP_ITEM":
-                    if (parts.Length >= 3 &&
-                        int.TryParse(parts[1], out int invSlotToEquip) &&
-                        Enum.TryParse<EquipmentSlot>(parts[2], true, out var eqSlotToEquip))
+                    if (originalParts.Length >= 3 &&
+                        int.TryParse(originalParts[1], out int invSlotToEquip) &&
+                        Enum.TryParse<EquipmentSlot>(originalParts[2], true, out var eqSlotToEquip))
                     {
                         _server.PlayerEquipmentManager.HandleEquipItemRequest(player, invSlotToEquip, eqSlotToEquip);
                     }
                     break;
                 case "UPDATE_ACTIONBAR":
-                    HandleActionBarUpdate(player, parts);
+                    HandleActionBarUpdate(player, originalParts);
                     break;
 
                 case "UNEQUIP_ITEM":
-                    if (parts.Length >= 2 &&
-                        Enum.TryParse<EquipmentSlot>(parts[1], true, out var eqSlotToUnequip))
+                    if (originalParts.Length >= 2 &&
+                        Enum.TryParse<EquipmentSlot>(originalParts[1], true, out var eqSlotToUnequip))
                     {
                         _server.PlayerEquipmentManager.HandleUnequipItemRequest(player, eqSlotToUnequip);
                     }
                     break;
 
                 case "REQUEST_MOVE_ITEM": // Formato: REQUEST_MOVE_ITEM|fromSlot|toSlot
-                    if (parts.Length >= 3 && int.TryParse(parts[1], out int from) && int.TryParse(parts[2], out int to))
+                    if (originalParts.Length >= 3 && int.TryParse(originalParts[1], out int from) && int.TryParse(originalParts[2], out int to))
                     {
                         _server.PlayerInventoryManager.HandleMoveItemRequest(player, from, to);
                     }
                     break;
                 case "REQUEST_BUY_ITEM": // Formato: REQUEST_BUY_ITEM|npcId|itemId|quantity
-                    if (parts.Length >= 4 && int.TryParse(parts[3], out int buyQty))
+                    if (originalParts.Length >= 4 && int.TryParse(originalParts[3], out int buyQty))
                     {
-                        _server.PlayerInventoryManager.HandleBuyItemRequest(player, parts[1], parts[2], buyQty);
+                        _server.PlayerInventoryManager.HandleBuyItemRequest(player, originalParts[1], originalParts[2], buyQty);
                     }
                     break;
                 case "REQUEST_SELL_ITEM": // Formato: REQUEST_SELL_ITEM|npcId|inventorySlot|quantity
-                    if (parts.Length >= 4 && int.TryParse(parts[2], out int sellSlot) && int.TryParse(parts[3], out int sellQty))
+                    if (originalParts.Length >= 4 && int.TryParse(originalParts[2], out int sellSlot) && int.TryParse(originalParts[3], out int sellQty))
                     {
-                        _server.PlayerInventoryManager.HandleSellItemRequest(player, parts[1], sellSlot, sellQty);
+                        _server.PlayerInventoryManager.HandleSellItemRequest(player, originalParts[1], sellSlot, sellQty);
                     }
                     break;
                 case "REQUEST_CANCEL_CAST":
@@ -362,99 +389,122 @@ public class NetworkManager
                     _server.PlayerLifecycleManager.HandleRespawnRequest(player);
                     break;
                 case "REQUEST_LOOT":
-                    if (parts.Length >= 2)
+                    if (originalParts.Length >= 2)
                     {
-                        _server.CombatManager.HandleLootRequest(player, parts[1]);
+                        _server.CombatManager.HandleLootRequest(player, originalParts[1]);
                     }
                     break;
                 case "REQUEST_GATHER":
-                    if (parts.Length >= 2)
+                    if (originalParts.Length >= 2)
                     {
                         // Encaminha a solicitação para o GatherableManager processar.
-                        _server.GatherableManager.OnPlayerAttemptGather(player, parts[1]);
+                        _server.GatherableManager.OnPlayerAttemptGather(player, originalParts[1]);
                     }
                     break;
                 case "REQUEST_ACCEPT_QUEST":
-                    if (parts.Length >= 2)
+                    if (originalParts.Length >= 2)
                     {
-                        _server.QuestManager.HandleAcceptQuestRequest(player, parts[1]);
+                        _server.QuestManager.HandleAcceptQuestRequest(player, originalParts[1]);
                     }
                     break;
 
                 case "REQUEST_ABANDON_QUEST":
-                    if (parts.Length >= 2)
+                    if (originalParts.Length >= 2)
                     {
-                        _server.QuestManager.HandleAbandonQuestRequest(player, parts[1]);
+                        _server.QuestManager.HandleAbandonQuestRequest(player, originalParts[1]);
                     }
                     break;
 
                 case "REQUEST_COMPLETE_QUEST":
-                    if (parts.Length >= 2)
+                    if (originalParts.Length >= 2)
                     {
-                        _server.QuestManager.HandleCompleteQuestRequest(player, parts[1]);
+                        _server.QuestManager.HandleCompleteQuestRequest(player, originalParts[1]);
                     }
                     break;
                 case "SEND_CHAT_MSG":
-                    if (parts.Length > 1)
+                    if (originalParts.Length > 1)
                     {
-                        string chatMessage = string.Join("|", parts.Skip(1)); // Remonta a mensagem caso ela tenha '|'
+                        string chatMessage = string.Join("|", originalParts.Skip(1)); // Remonta a mensagem caso ela tenha '|'
                         _server.ChatManager.ProcessChatMessage(player, chatMessage);
                     }
                     break;
                 case "REQUEST_USE_ITEM": // Formato: REQUEST_USE_ITEM|inventorySlot
-                    if (parts.Length >= 2 && int.TryParse(parts[1], out int useSlot))
+                    if (originalParts.Length >= 2 && int.TryParse(originalParts[1], out int useSlot))
                     {
                         _server.PlayerInventoryManager.HandleUseItemRequest(player, useSlot);
                     }
                     break;
-            }
 
-            if (messageToBroadcast != null)
-            {
-                // Passa o GUID, que é o que a função espera.
-                BroadcastMessage(messageToBroadcast, player.GuidSessionId);
+                case "ANIM":
+                    if (originalParts.Length < 3) break; // comando inválido
+                    string animType = originalParts[1]; // TRIGGER ou BOOL
+                    string animParam = originalParts[2]; // nome do trigger/boolean
+                    string animValue = originalParts.Length > 3 ? originalParts[3] : "";
+
+                    // Cria a mensagem para broadcast
+                    string messageToBroadcast = $"PLAYER_ANIM|{player.Id}|{animType}|{animParam}|{animValue}";
+                    BroadcastMessageToRelevantPlayers(player.Position, messageToBroadcast, player);
+                    break;
             }
         }
     }
 
-    public void SendInitialStateToPlayer(Player player)
+    private async Task HandleNewPlayerConnection(string connectionGuid, IPEndPoint clientEndPoint, string token)
     {
-        SendFullStateToPlayer(player);
-    }
-
-    private async Task HandleNewPlayerConnection(string clientKey, IPEndPoint clientEndPoint, string token)
-    {
-        if (_server.ConnectedPlayers.ContainsKey(clientKey)) return;
+        // Usa o GUID para verificar se já existe uma conexão com esse "crachá"
+        if (_server.ConnectedPlayers.ContainsKey(connectionGuid)) return;
 
         if (AuthTokenManager.IsTokenValid(token, out AuthenticatedPlayerInfo? playerInfo) && playerInfo != null)
         {
-            // Lógica para desconectar sessão antiga (está correta)
             var existingPlayer = _server.ConnectedPlayers.Values.FirstOrDefault(p => p.CharacterId == playerInfo.CharacterId);
             if (existingPlayer != null)
             {
                 Console.WriteLine($"[Conexão Duplicada] Personagem {playerInfo.CharacterId} já estava online. Desconectando a sessão antiga.");
                 SendMessageToPlayer(existingPlayer, "FATAL_ERROR|Sua conta foi conectada de outro local.");
-                _server.DisconnectPlayer(existingPlayer.EndPoint.ToString(), "Conectado de outra localidade.");
+
+                // Desconecta o jogador antigo usando o ConnectionGuid dele.
+                await _server.DisconnectPlayer(existingPlayer.ConnectionGuid, "Conectado de outra localidade.");
             }
 
-            Console.WriteLine($"[Conexão] Autenticado: {playerInfo.Username} | Perm: {playerInfo.PermissionLevel}, Personagem: {playerInfo.CharacterName} (Classe: {playerInfo.ClassID}, Nível: {playerInfo.Level})");
+            Console.WriteLine($"[Conexão] Autenticado: {playerInfo.Username} | Perm: {playerInfo.PermissionLevel}, Personagem: {playerInfo.CharacterName}...");
 
             CharacterData characterData = await _characterDb.LoadOrCreateAsync(playerInfo);
-            var newPlayer = new Player(clientEndPoint, playerInfo, _server, characterData)
-            {
-                IsPendingInitialization = true
-            };
 
-            if (_server.ConnectedPlayers.TryAdd(clientKey, newPlayer))
+            // Passa o connectionGuid para o construtor do Player
+            var newPlayer = new Player(connectionGuid, clientEndPoint, playerInfo, _server, characterData);
+
+            newPlayer.IsPendingInitialization = true;
+            newPlayer.LastMessageTime = _server.CurrentTimeUtc;
+
+            // Usa o connectionGuid como chave
+            if (_server.ConnectedPlayers.TryAdd(connectionGuid, newPlayer))
             {
                 _server.PlayersBySessionId.TryAdd(newPlayer.SessionId, newPlayer);
-                Console.WriteLine($"Novo jogador ({newPlayer.SessionId}) conectado de {clientEndPoint}. Total: {_server.ConnectedPlayers.Count}");
-                OnlineStatusManager.SetOnline(newPlayer.CharacterId); // Usa o ID permanente para status global
+                OnlineStatusManager.SetOnline(newPlayer.CharacterId);
+
+                newPlayer.FinalizeInitialization();
+
+                Console.WriteLine($"[Network] Jogador '{newPlayer.Username}' inicializado. Enviando estado para o cliente...");
 
                 string assignIdMessage = $"ASSIGN_ID|{newPlayer.CharacterId}|{newPlayer.SessionId}";
-                SendMessageToPlayer(newPlayer, assignIdMessage);
+                SendImmediateMessageToEndpoint(assignIdMessage, clientEndPoint);
+
                 string spawnMessage = newPlayer.GetSpawnMessage();
-                SendMessageToPlayer(newPlayer, spawnMessage);
+                SendImmediateMessageToEndpoint(spawnMessage, clientEndPoint);
+
+                SendFullStateToPlayer(newPlayer);
+
+                if (characterData.GeneratedItems.Any())
+                {
+                    foreach (var pair in characterData.GeneratedItems)
+                    {
+                        SendItemInstanceData(newPlayer, pair.Key, pair.Value);
+                    }
+                }
+
+                _server.InterestManager.OnPlayerEnteredWorld(newPlayer);
+
+                Console.WriteLine($"[Network] Estado inicial completo enviado para '{newPlayer.Username}'.");
             }
         }
         else
@@ -463,45 +513,67 @@ public class NetworkManager
         }
     }
 
+    // Em Managers/NetworkManager.cs
+
     private void HandleOpenShopRequest(Player player, string npcId)
     {
-        // Verifica se o NPC existe e se ele é um vendedor registrado
         if (!_server.ActiveNpcs.TryGetValue(npcId, out var npcInstance) ||
             !DataManager.Vendors.TryGetValue(npcInstance.BaseData.TypeId, out var vendorData))
         {
-            // Envia uma mensagem de falha se o NPC não for um vendedor
-            SendMessageToPlayer(player, "ERROR|Este NPC não é um vendedor.");
+            _server.NetworkManager.SendMessageToPlayer(player, "ERROR|Este NPC não é um vendedor.");
             return;
         }
 
-        // Serializa a lista de itens do vendedor para enviar ao cliente
-        string vendorPayloadJson = JsonConvert.SerializeObject(vendorData.Items);
+        // <<< A NOVA LÓGICA ESTÁ AQUI >>>
 
-        // Envia a mensagem para o cliente abrir a janela da loja
-        SendMessageToPlayer(player, $"OPEN_SHOP_WINDOW|{npcId}|{vendorPayloadJson}");
-        Console.WriteLine($"[Loja] Jogador {player.Username} abriu a loja do NPC {npcId}.");
+        // 1. Cria uma nova lista para os itens com preços calculados.
+        var itemsForClient = new List<VendorItemForClient>();
+
+        // 2. Itera sobre os itens que o vendedor tem.
+        foreach (var vendorItem in vendorData.Items)
+        {
+            if (DataManager.Items.TryGetValue(vendorItem.ItemID, out var itemTemplate))
+            {
+                int finalPrice;
+                // Se for um equipamento, calcula o preço dinâmico.
+                if (itemTemplate is ServerEquipmentData eqTemplate)
+                {
+                    finalPrice = ServerStatAllocator.CalculateBuyPrice(eqTemplate, player.Level);
+                }
+                else // Senão, usa o preço fixo.
+                {
+                    finalPrice = vendorItem.BuyPrice;
+                }
+                itemsForClient.Add(new VendorItemForClient
+                {
+                    ItemID = vendorItem.ItemID,
+                    BuyPrice = finalPrice // << RENOMEADO para BuyPrice
+                });
+            }
+        }
+
+        // 3. Serializa a NOVA lista e a envia para o cliente.
+        string vendorPayloadJson = JsonConvert.SerializeObject(itemsForClient);
+        _server.NetworkManager.SendMessageToPlayer(player, $"OPEN_SHOP_WINDOW|{npcId}|{vendorPayloadJson}");
+        Console.WriteLine($"[Loja] Jogador {player.Username} abriu a loja do NPC {npcId} com preços dinâmicos.");
     }
 
-    public async Task HandlePlayerQuitting(string clientKey, Player player)
+    public async Task HandlePlayerQuitting(string connectionGuid, Player player)
     {
         Console.WriteLine($"Jogador {player.Username} informou que está desconectando.");
 
         CharacterData dataToSave = player.GetCharacterDataForSaving();
         await _characterDb.SaveAsync(dataToSave);
 
-        if (_server.ConnectedPlayers.TryRemove(clientKey, out _))
+        // A remoção agora é feita pelo ConnectionGuid, não mais pelo clientKey (EndPoint)
+        if (_server.ConnectedPlayers.TryRemove(connectionGuid, out _))
         {
-            // (CORREÇÃO) Ao sair, removemos dos dois dicionários
             _server.PlayersBySessionId.TryRemove(player.SessionId, out _);
-
             _server.GridManager.RemoveEntity(player);
-            OnlineStatusManager.SetOffline(player.CharacterId); // Usa o ID permanente
-
-            // A mensagem PLAYER_LEFT deve usar o SessionId, pois é para outros jogadores em tempo real
+            OnlineStatusManager.SetOffline(player.CharacterId);
             BroadcastMessageToRelevantPlayers(player.Position, $"PLAYER_LEFT|{player.Id}");
         }
     }
-
     private void HandleActionBarUpdate(Player player, string[] parts)
     {
         // Limpa a barra de ações antiga para preencher com os novos dados
@@ -521,21 +593,28 @@ public class NetworkManager
                 };
             }
         }
-        Console.WriteLine($"[ActionBar] Barra de ações do jogador '{player.Username}' foi atualizada no servidor.");
+        // Console.WriteLine($"[ActionBar] Barra de ações do jogador '{player.Username}' foi atualizada no servidor.");
+    }
+
+    /// <summary>
+    /// Envia os stats gerados de uma instância de item específica para o jogador.
+    /// Formato: ITEM_INSTANCE_DATA|InstanceID|StatType1,Value1;StatType2,Value2;...
+    /// </summary>
+    public void SendItemInstanceData(Player player, string instanceId, ItemInstanceData data)
+    {
+        if (data == null) return;
+
+        // Serializa o objeto inteiro em JSON. É a forma mais fácil e flexível.
+        string dataJson = JsonConvert.SerializeObject(data);
+
+        string message = $"ITEM_INSTANCE_DATA|{instanceId}|{dataJson}";
+
+        SendMessageToPlayer(player, message);
     }
 
     private void HandlePositionRotation(string[] parts, Player player)
     {
         if (parts.Length < 7) return;
-
-        if (player.IsPendingInitialization)
-        {
-            Console.WriteLine($"[Sync] Recebida primeira POS_ROT de {player.Username}. Iniciando sincronização de estado e interesse.");
-            player.IsPendingInitialization = false;
-
-            SendInitialStateToPlayer(player);
-            _server.InterestManager.OnPlayerEnteredWorld(player);
-        }
 
         player.Position = new Vector3(
             float.Parse(parts[1], CultureInfo.InvariantCulture),
@@ -560,7 +639,6 @@ public class NetworkManager
 
     public void BroadcastMessageToRelevantPlayers(Vector3 centerPosition, string message, Player? excludePlayer = null, float visibilityRange = 80f)
     {
-        // Não precisa mais converter para byte[] aqui
         var candidateEntities = _server.GridManager.GetEntitiesInRadius(centerPosition, visibilityRange);
         var playersToSendTo = candidateEntities.OfType<Player>();
 
@@ -571,9 +649,9 @@ public class NetworkManager
                 continue;
             }
 
-            if (_server.ConnectedPlayers.ContainsKey(player.EndPoint.ToString()))
+            // A verificação `ContainsKey` agora usa o ConnectionGuid do jogador.
+            if (_server.ConnectedPlayers.ContainsKey(player.ConnectionGuid))
             {
-                // Em vez de enviar, enfileiramos!
                 SendMessageToPlayer(player, message);
             }
         }
@@ -618,10 +696,14 @@ public class NetworkManager
     }
     public void SendMessageToPlayer(Player player, string message)
     {
-        if (player == null) return;
+        if (player == null)
+        {
+            Console.WriteLine($"Player não encontrado por: {message}");
+            return;
+        }
 
         byte[] data = Encoding.UTF8.GetBytes(message);
-        player.EnqueueMessage(data); // Apenas enfileira!
+        player.EnqueueMessage(data);
     }
 
     public void SendImmediateMessageToEndpoint(string message, IPEndPoint endPoint)

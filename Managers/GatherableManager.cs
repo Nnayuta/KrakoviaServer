@@ -132,7 +132,8 @@ public class GatherableManager
                 item.RespawnTime = _server.CurrentTimeUtc.AddSeconds(item.BaseData.RespawnTimeSeconds);
 
                 // Concede o loot
-                var lootItems = _server.LootManager.GenerateLootForNpc(item.BaseData.LootTableID);
+                /// TODO: VOLTA AQUI
+                var lootItems = _server.LootManager.GenerateLootForNpc(item.BaseData.LootTableID, 0);
                 _server.PlayerInventoryManager.GrantLootToPlayer(player, lootItems);
 
                 _server.NetworkManager.SendMessageToPlayer(player, "GATHER_COMPLETE");

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "xrcB1HJ+9E8=",
+  "dgSpecHash": "QeAGmdPGMbY=",
   "success": true,
-  "projectFilePath": "C:\\GameDev\\Krakovia Server\\Krakovia Server\\Krakovia Server.csproj",
+  "projectFilePath": "C:\\GameDev\\Krakovia Server\\Krakovia Server\\Krakovia_Server.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\naayu\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\naayu\\.nuget\\packages\\bouncycastle.cryptography\\2.5.1\\bouncycastle.cryptography.2.5.1.nupkg.sha512",

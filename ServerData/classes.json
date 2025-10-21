@@ -15,17 +15,9 @@
       "AgilityGrowth": "High",
       "IntelligenceGrowth": "Low",
       "StaminaGrowth": "Medium",
-      "BaseAbilityUnlocks": {
-        "1": [
-          "bow_shot"
-        ]
-      },
+      "BaseAbilityUnlocks": {},
       "StartingEquipmentIDs": [
-        "bow_wood_01",
-        "laether_boots_01",
-        "laether_chest_01",
-        "laether_head_01",
-        "laether_legs_01"
+        "bow_wood_01"
       ],
       "StartingInventoryIDs": [],
       "Specializations": [],
@@ -48,19 +40,12 @@
       "AgilityGrowth": "Low",
       "IntelligenceGrowth": "High",
       "StaminaGrowth": "Low",
-      "BaseAbilityUnlocks": {
-        "1": [
-          "mage_54d36845",
-          "mage_644c55de",
-          "mage_e5dfac90"
-        ]
-      },
+      "BaseAbilityUnlocks": {},
       "StartingEquipmentIDs": [
-        "cloth_boots_03",
-        "cloth_chest_03",
-        "cloth_head_03",
-        "cloth_legs_03",
-        "staff_wood_01"
+        "cloth_template_boots_cloth",
+        "cloth_template_chest_cloth",
+        "cloth_template_head_cloth",
+        "cloth_template_legs_cloth"
       ],
       "StartingInventoryIDs": [],
       "Specializations": [],
@@ -85,17 +70,39 @@
       "StaminaGrowth": "Medium",
       "BaseAbilityUnlocks": {
         "1": [
-          "damage_priest_01",
-          "healer_priest_01",
-          "healer_priest_02"
+          "priest_smite"
+        ],
+        "2": [
+          "priest_umbral_strike"
+        ],
+        "4": [
+          "priest_flashheal"
+        ],
+        "8": [
+          "priest_abyssal_pulse"
+        ],
+        "10": [
+          "priest_powerwordshield"
+        ],
+        "12": [
+          "priest_passive_divinespirit"
+        ],
+        "15": [
+          "priest_circleofhealing"
+        ],
+        "18": [
+          "priest_shadow_lash"
+        ],
+        "20": [
+          "priest_divinehymn"
         ]
       },
       "StartingEquipmentIDs": [
-        "cloth_boots_03",
-        "cloth_chest_03",
-        "cloth_head_03",
-        "cloth_legs_03",
-        "staff_wood_01"
+        "priest_staff_wood_01",
+        "cloth_template_boots_cloth",
+        "cloth_template_chest_cloth",
+        "cloth_template_head_cloth",
+        "cloth_template_legs_cloth"
       ],
       "StartingInventoryIDs": [],
       "Specializations": [],
@@ -120,17 +127,37 @@
       "StaminaGrowth": "High",
       "BaseAbilityUnlocks": {
         "1": [
-          "sword_warrior_autoattack",
-          "sword_light_attack",
-          "sword_heavy_attack"
+          "0_warrior_autoattack",
+          "warrior_herostrike"
+        ],
+        "4": [
+          "warrior_passive_armor"
+        ],
+        "6": [
+          "warrior_whirlwind"
+        ],
+        "8": [
+          "warrior_shieldwall"
+        ],
+        "10": [
+          "warrior_mortalstrike"
+        ],
+        "12": [
+          "warrior_herothrow"
+        ],
+        "18": [
+          "warrior_enragedregeneration"
+        ],
+        "20": [
+          "warrior_shockwave"
         ]
       },
       "StartingEquipmentIDs": [
-        "sword_wood_01",
-        "plate_boots_01",
-        "plate_chest_01",
-        "plate_head_01",
-        "plate_legs_01"
+        "sword_01",
+        "plate_template_chest_cloth",
+        "plate_template_feet_cloth",
+        "plate_template_head_cloth",
+        "plate_template_legs_cloth"
       ],
       "StartingInventoryIDs": [],
       "Specializations": [],

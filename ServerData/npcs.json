@@ -32,12 +32,12 @@
       "LeashRange": 20.0,
       "RespawnTimeSeconds": 30,
       "SwingTimer": 4.0,
-      "AutoAttackAbilityID": "sword_warrior_autoattack",
+      "AutoAttackAbilityID": "0_warrior_autoattack",
       "AbilityIDs": [
-        "sword_light_attack",
-        "sword_heavy_attack"
+        "warrior_herostrike",
+        "warrior_whirlwind"
       ],
-      "CurrencyReward": 24,
+      "CurrencyReward": 28,
       "ExperienceReward": 10,
       "LootTableID": "bandids_0001"
     },
@@ -73,12 +73,13 @@
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 2.0,
-      "AutoAttackAbilityID": "sword_warrior_autoattack",
+      "AutoAttackAbilityID": "0_warrior_autoattack",
       "AbilityIDs": [
-        "sword_light_attack",
-        "sword_heavy_attack"
+        "warrior_mortalstrike",
+        "warrior_herostrike",
+        "warrior_enragedregeneration"
       ],
-      "CurrencyReward": 495,
+      "CurrencyReward": 540,
       "ExperienceReward": 10,
       "LootTableID": "bandids_0001_elite"
     },
@@ -114,12 +115,9 @@
       "LeashRange": 20.0,
       "RespawnTimeSeconds": 30,
       "SwingTimer": 3.0,
-      "AutoAttackAbilityID": "mage_e5dfac90",
-      "AbilityIDs": [
-        "mage_644c55de",
-        "mage_54d36845"
-      ],
-      "CurrencyReward": 20,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "CurrencyReward": 28,
       "ExperienceReward": 10,
       "LootTableID": null
     },
@@ -155,12 +153,12 @@
       "LeashRange": 20.0,
       "RespawnTimeSeconds": 30,
       "SwingTimer": 4.0,
-      "AutoAttackAbilityID": "sword_warrior_autoattack",
+      "AutoAttackAbilityID": "0_warrior_autoattack",
       "AbilityIDs": [
-        "sword_light_attack",
-        "sword_heavy_attack"
+        "warrior_herostrike",
+        "warrior_whirlwind"
       ],
-      "CurrencyReward": 60,
+      "CurrencyReward": 66,
       "ExperienceReward": 10,
       "LootTableID": "bandids_0002"
     },
@@ -196,12 +194,14 @@
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 2.0,
-      "AutoAttackAbilityID": "sword_warrior_autoattack",
+      "AutoAttackAbilityID": "0_warrior_autoattack",
       "AbilityIDs": [
-        "sword_light_attack",
-        "sword_heavy_attack"
+        "warrior_herostrike",
+        "warrior_shockwave",
+        "warrior_enragedregeneration",
+        "warrior_mortalstrike"
       ],
-      "CurrencyReward": 840,
+      "CurrencyReward": 1050,
       "ExperienceReward": 10,
       "LootTableID": "bandids_0002_elite"
     },
@@ -237,14 +237,255 @@
       "LeashRange": 20.0,
       "RespawnTimeSeconds": 30,
       "SwingTimer": 3.0,
-      "AutoAttackAbilityID": "mage_e5dfac90",
-      "AbilityIDs": [
-        "mage_644c55de",
-        "mage_54d36845"
-      ],
-      "CurrencyReward": 56,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "CurrencyReward": 68,
       "ExperienceReward": 10,
       "LootTableID": null
+    },
+    {
+      "TypeId": "bandids_0003",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 39
+        },
+        {
+          "Stat": "Strength",
+          "Value": 39
+        },
+        {
+          "Stat": "Agility",
+          "Value": 39
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 39
+        },
+        {
+          "Stat": "Armor",
+          "Value": 97
+        }
+      ],
+      "Level": 15,
+      "IsBoss": false,
+      "AggroRange": 10.0,
+      "LeashRange": 20.0,
+      "RespawnTimeSeconds": 30,
+      "SwingTimer": 4.0,
+      "AutoAttackAbilityID": "0_warrior_autoattack",
+      "AbilityIDs": [
+        "warrior_herostrike",
+        "warrior_whirlwind"
+      ],
+      "CurrencyReward": 113,
+      "ExperienceReward": 10,
+      "LootTableID": "bandids_15_20"
+    },
+    {
+      "TypeId": "elite_bandids_0003",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 150
+        },
+        {
+          "Stat": "Strength",
+          "Value": 51
+        },
+        {
+          "Stat": "Agility",
+          "Value": 51
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 51
+        },
+        {
+          "Stat": "Armor",
+          "Value": 109
+        }
+      ],
+      "Level": 16,
+      "IsBoss": true,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": "0_warrior_autoattack",
+      "AbilityIDs": [
+        "warrior_herostrike",
+        "warrior_shockwave",
+        "warrior_enragedregeneration",
+        "warrior_mortalstrike"
+      ],
+      "CurrencyReward": 1950,
+      "ExperienceReward": 10,
+      "LootTableID": "bandids_15_20"
+    },
+    {
+      "TypeId": "mage_bandids_0003",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 27
+        },
+        {
+          "Stat": "Strength",
+          "Value": 23
+        },
+        {
+          "Stat": "Agility",
+          "Value": 46
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 54
+        },
+        {
+          "Stat": "Armor",
+          "Value": 58
+        }
+      ],
+      "Level": 15,
+      "IsBoss": false,
+      "AggroRange": 10.0,
+      "LeashRange": 20.0,
+      "RespawnTimeSeconds": 30,
+      "SwingTimer": 3.0,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "CurrencyReward": 99,
+      "ExperienceReward": 10,
+      "LootTableID": "bandids_15_20"
+    },
+    {
+      "TypeId": "bandids_0004",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 68
+        },
+        {
+          "Stat": "Strength",
+          "Value": 68
+        },
+        {
+          "Stat": "Agility",
+          "Value": 68
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 68
+        },
+        {
+          "Stat": "Armor",
+          "Value": 172
+        }
+      ],
+      "Level": 20,
+      "IsBoss": false,
+      "AggroRange": 10.0,
+      "LeashRange": 20.0,
+      "RespawnTimeSeconds": 30,
+      "SwingTimer": 4.0,
+      "AutoAttackAbilityID": "0_warrior_autoattack",
+      "AbilityIDs": [
+        "warrior_herostrike",
+        "warrior_whirlwind"
+      ],
+      "CurrencyReward": 162,
+      "ExperienceReward": 10,
+      "LootTableID": "bandids_0002"
+    },
+    {
+      "TypeId": "elite_bandids_0004",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 238
+        },
+        {
+          "Stat": "Strength",
+          "Value": 81
+        },
+        {
+          "Stat": "Agility",
+          "Value": 81
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 81
+        },
+        {
+          "Stat": "Armor",
+          "Value": 172
+        }
+      ],
+      "Level": 20,
+      "IsBoss": true,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": "0_warrior_autoattack",
+      "AbilityIDs": [
+        "warrior_herostrike",
+        "warrior_shockwave",
+        "warrior_enragedregeneration",
+        "warrior_mortalstrike"
+      ],
+      "CurrencyReward": 1875,
+      "ExperienceReward": 10,
+      "LootTableID": "bandids_15-20_elite"
+    },
+    {
+      "TypeId": "mage_bandids_0004",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 48
+        },
+        {
+          "Stat": "Strength",
+          "Value": 41
+        },
+        {
+          "Stat": "Agility",
+          "Value": 82
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 96
+        },
+        {
+          "Stat": "Armor",
+          "Value": 103
+        }
+      ],
+      "Level": 20,
+      "IsBoss": false,
+      "AggroRange": 10.0,
+      "LeashRange": 20.0,
+      "RespawnTimeSeconds": 30,
+      "SwingTimer": 3.0,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "CurrencyReward": 161,
+      "ExperienceReward": 10,
+      "LootTableID": "bandids_15_20"
     },
     {
       "TypeId": "bear_npc_090d7357",
@@ -283,7 +524,7 @@
         "bear_attack_02",
         "bear_attack_03"
       ],
-      "CurrencyReward": 96,
+      "CurrencyReward": 89,
       "ExperienceReward": 50,
       "LootTableID": "bear_common_drops"
     },
@@ -325,7 +566,7 @@
         "bear_attack_03",
         "bear_buff_01"
       ],
-      "CurrencyReward": 1650,
+      "CurrencyReward": 1230,
       "ExperienceReward": 50,
       "LootTableID": "bear_common_drops"
     },
@@ -363,7 +604,7 @@
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 28,
+      "CurrencyReward": 27,
       "ExperienceReward": 0,
       "LootTableID": null
     },
@@ -401,7 +642,7 @@
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 58,
+      "CurrencyReward": 60,
       "ExperienceReward": 0,
       "LootTableID": null
     },
@@ -477,7 +718,7 @@
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 27,
+      "CurrencyReward": 25,
       "ExperienceReward": 0,
       "LootTableID": null
     },
@@ -515,7 +756,7 @@
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 30,
+      "CurrencyReward": 24,
       "ExperienceReward": 10,
       "LootTableID": null
     },
@@ -526,36 +767,37 @@
       "Stats": [
         {
           "Stat": "Stamina",
-          "Value": 12
+          "Value": 68
         },
         {
           "Stat": "Strength",
-          "Value": 12
+          "Value": 68
         },
         {
           "Stat": "Agility",
-          "Value": 12
+          "Value": 68
         },
         {
           "Stat": "Intellect",
-          "Value": 12
+          "Value": 68
         },
         {
           "Stat": "Armor",
-          "Value": 31
+          "Value": 172
         }
       ],
-      "Level": 5,
+      "Level": 20,
       "IsBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 2.0,
-      "AutoAttackAbilityID": null,
+      "AutoAttackAbilityID": "priest_smite",
       "AbilityIDs": [
-        "healer_priest_01"
+        "priest_flashheal",
+        "priest_circleofhealing"
       ],
-      "CurrencyReward": 22,
+      "CurrencyReward": 176,
       "ExperienceReward": 0,
       "LootTableID": null
     },
@@ -593,7 +835,7 @@
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 69,
+      "CurrencyReward": 68,
       "ExperienceReward": 10,
       "LootTableID": null
     },
@@ -631,7 +873,7 @@
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 23,
+      "CurrencyReward": 20,
       "ExperienceReward": 0,
       "LootTableID": null
     },
@@ -669,12 +911,12 @@
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 20,
+      "CurrencyReward": 22,
       "ExperienceReward": 0,
       "LootTableID": null
     },
     {
-      "TypeId": "75448138",
+      "TypeId": "deer_npc_75448138",
       "Faction": "Neutral",
       "AiType": "Passive_Aggressive",
       "Stats": [
@@ -707,7 +949,45 @@
       "SwingTimer": 4.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 2,
+      "CurrencyReward": 3,
+      "ExperienceReward": 10,
+      "LootTableID": null
+    },
+    {
+      "TypeId": "deer_npc_75448138_20",
+      "Faction": "Neutral",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 68
+        },
+        {
+          "Stat": "Strength",
+          "Value": 68
+        },
+        {
+          "Stat": "Agility",
+          "Value": 68
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 68
+        },
+        {
+          "Stat": "Armor",
+          "Value": 172
+        }
+      ],
+      "Level": 20,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 4.0,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "CurrencyReward": 175,
       "ExperienceReward": 10,
       "LootTableID": null
     },
@@ -718,26 +998,26 @@
       "Stats": [
         {
           "Stat": "Stamina",
-          "Value": 8
+          "Value": 110
         },
         {
           "Stat": "Strength",
-          "Value": 8
+          "Value": 75
         },
         {
           "Stat": "Agility",
-          "Value": 8
+          "Value": 48
         },
         {
           "Stat": "Intellect",
-          "Value": 8
+          "Value": 34
         },
         {
           "Stat": "Armor",
-          "Value": 20
+          "Value": 258
         }
       ],
-      "Level": 1,
+      "Level": 20,
       "IsBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
@@ -745,7 +1025,7 @@
       "SwingTimer": 4.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 2,
+      "CurrencyReward": 122,
       "ExperienceReward": 0,
       "LootTableID": null
     },
@@ -756,34 +1036,36 @@
       "Stats": [
         {
           "Stat": "Stamina",
-          "Value": 217
+          "Value": 679
         },
         {
           "Stat": "Strength",
-          "Value": 51
+          "Value": 159
         },
         {
           "Stat": "Agility",
-          "Value": 32
+          "Value": 102
         },
         {
           "Stat": "Intellect",
-          "Value": 22
+          "Value": 72
         },
         {
           "Stat": "Armor",
-          "Value": 146
+          "Value": 455
         }
       ],
-      "Level": 15,
+      "Level": 25,
       "IsBoss": true,
       "AggroRange": 20.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 120,
       "SwingTimer": 4.0,
       "AutoAttackAbilityID": "giant_cb536791",
-      "AbilityIDs": [],
-      "CurrencyReward": 1440,
+      "AbilityIDs": [
+        "giant_cb536791_2"
+      ],
+      "CurrencyReward": 2820,
       "ExperienceReward": 500,
       "LootTableID": null
     },
@@ -819,11 +1101,9 @@
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 4.0,
-      "AutoAttackAbilityID": "sword_light_attack",
-      "AbilityIDs": [
-        "sword_heavy_attack"
-      ],
-      "CurrencyReward": 169,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "CurrencyReward": 121,
       "ExperienceReward": 10,
       "LootTableID": null
     },
@@ -859,11 +1139,9 @@
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 4.0,
-      "AutoAttackAbilityID": "sword_light_attack",
-      "AbilityIDs": [
-        "sword_heavy_attack"
-      ],
-      "CurrencyReward": 123,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "CurrencyReward": 164,
       "ExperienceReward": 10,
       "LootTableID": null
     },
@@ -899,9 +1177,11 @@
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 2.0,
-      "AutoAttackAbilityID": "sword_warrior_autoattack",
-      "AbilityIDs": [],
-      "CurrencyReward": 675,
+      "AutoAttackAbilityID": "0_warrior_autoattack",
+      "AbilityIDs": [
+        "warrior_herostrike"
+      ],
+      "CurrencyReward": 555,
       "ExperienceReward": 10,
       "LootTableID": "skeleton_drop_elite"
     },
@@ -937,9 +1217,51 @@
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 2.0,
-      "AutoAttackAbilityID": "sword_warrior_autoattack",
-      "AbilityIDs": [],
-      "CurrencyReward": 945,
+      "AutoAttackAbilityID": "0_warrior_autoattack",
+      "AbilityIDs": [
+        "warrior_whirlwind"
+      ],
+      "CurrencyReward": 1200,
+      "ExperienceReward": 10,
+      "LootTableID": "skeleton_drop_10_elite"
+    },
+    {
+      "TypeId": "elite_skeleton_f0f73cb7_15",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 136
+        },
+        {
+          "Stat": "Strength",
+          "Value": 46
+        },
+        {
+          "Stat": "Agility",
+          "Value": 46
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 46
+        },
+        {
+          "Stat": "Armor",
+          "Value": 97
+        }
+      ],
+      "Level": 15,
+      "IsBoss": true,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": "0_warrior_autoattack",
+      "AbilityIDs": [
+        "warrior_whirlwind"
+      ],
+      "CurrencyReward": 1635,
       "ExperienceReward": 10,
       "LootTableID": "skeleton_drop_10_elite"
     },
@@ -975,9 +1297,9 @@
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 2.0,
-      "AutoAttackAbilityID": "sword_warrior_autoattack",
+      "AutoAttackAbilityID": "0_warrior_autoattack",
       "AbilityIDs": [],
-      "CurrencyReward": 25,
+      "CurrencyReward": 34,
       "ExperienceReward": 10,
       "LootTableID": "skeleton_drop"
     },
@@ -1013,10 +1335,86 @@
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 2.0,
-      "AutoAttackAbilityID": "sword_warrior_autoattack",
+      "AutoAttackAbilityID": "0_warrior_autoattack",
       "AbilityIDs": [],
-      "CurrencyReward": 78,
+      "CurrencyReward": 90,
       "ExperienceReward": 10,
+      "LootTableID": "skeleton_drop_10"
+    },
+    {
+      "TypeId": "skeleton_f0f73cb7_15",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 39
+        },
+        {
+          "Stat": "Strength",
+          "Value": 39
+        },
+        {
+          "Stat": "Agility",
+          "Value": 39
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 39
+        },
+        {
+          "Stat": "Armor",
+          "Value": 97
+        }
+      ],
+      "Level": 15,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": "0_warrior_autoattack",
+      "AbilityIDs": [],
+      "CurrencyReward": 87,
+      "ExperienceReward": 10,
+      "LootTableID": "skeleton_drop_10"
+    },
+    {
+      "TypeId": "skeleton_f0f73cb7_18",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 54
+        },
+        {
+          "Stat": "Strength",
+          "Value": 54
+        },
+        {
+          "Stat": "Agility",
+          "Value": 54
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 54
+        },
+        {
+          "Stat": "Armor",
+          "Value": 137
+        }
+      ],
+      "Level": 18,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": "0_warrior_autoattack",
+      "AbilityIDs": [],
+      "CurrencyReward": 131,
+      "ExperienceReward": 27,
       "LootTableID": "skeleton_drop_10"
     },
     {
@@ -1050,15 +1448,15 @@
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 35,
-      "SwingTimer": 2.0,
+      "SwingTimer": 4.0,
       "AutoAttackAbilityID": "wolf_ability_20ce2139",
       "AbilityIDs": [
         "wolf_ability_029ab43c",
         "wolf_ability_73e22c18"
       ],
-      "CurrencyReward": 120,
+      "CurrencyReward": 90,
       "ExperienceReward": 35,
-      "LootTableID": null
+      "LootTableID": "bear_common_drops"
     },
     {
       "TypeId": "elite_wolf_3fab7236_6",
@@ -1097,9 +1495,50 @@
         "wolf_ability_029ab43c",
         "wolf_ability_73e22c18"
       ],
-      "CurrencyReward": 480,
+      "CurrencyReward": 525,
       "ExperienceReward": 35,
-      "LootTableID": null
+      "LootTableID": "bear_common_drops"
+    },
+    {
+      "TypeId": "elite_wolf_3fab7236_15",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 150
+        },
+        {
+          "Stat": "Strength",
+          "Value": 85
+        },
+        {
+          "Stat": "Agility",
+          "Value": 85
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 32
+        },
+        {
+          "Stat": "Armor",
+          "Value": 109
+        }
+      ],
+      "Level": 18,
+      "IsBoss": true,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 35,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": "wolf_ability_20ce2139",
+      "AbilityIDs": [
+        "wolf_ability_029ab43c",
+        "wolf_ability_73e22c18"
+      ],
+      "CurrencyReward": 1965,
+      "ExperienceReward": 35,
+      "LootTableID": "bear_common_drops"
     },
     {
       "TypeId": "wolf_3fab7236",
@@ -1140,7 +1579,7 @@
       ],
       "CurrencyReward": 3,
       "ExperienceReward": 35,
-      "LootTableID": null
+      "LootTableID": "bear_common_drops"
     },
     {
       "TypeId": "wolf_3fab7236_6",
@@ -1179,9 +1618,50 @@
         "wolf_ability_029ab43c",
         "wolf_ability_73e22c18"
       ],
-      "CurrencyReward": 25,
+      "CurrencyReward": 28,
       "ExperienceReward": 35,
-      "LootTableID": null
+      "LootTableID": "bear_common_drops"
+    },
+    {
+      "TypeId": "wolf_3fab7236_15",
+      "Faction": "Enemy",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 31
+        },
+        {
+          "Stat": "Strength",
+          "Value": 50
+        },
+        {
+          "Stat": "Agility",
+          "Value": 50
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 19
+        },
+        {
+          "Stat": "Armor",
+          "Value": 78
+        }
+      ],
+      "Level": 15,
+      "IsBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 35,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": "wolf_ability_20ce2139",
+      "AbilityIDs": [
+        "wolf_ability_029ab43c",
+        "wolf_ability_73e22c18"
+      ],
+      "CurrencyReward": 116,
+      "ExperienceReward": 35,
+      "LootTableID": "bear_common_drops"
     }
   ]
 }

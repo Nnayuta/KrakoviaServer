@@ -50,5 +50,4 @@ public class SelectCharacterResponse : BaseResponse
     public List<ItemStackSummary?> Inventory; // << Adicione o '?'
     public Dictionary<EquipmentSlot, ItemStackSummary> Equipment;
     public ActionBarData ActionBar;
-    public Vector3 Position;
 }

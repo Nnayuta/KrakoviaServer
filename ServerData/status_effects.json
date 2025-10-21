@@ -1,6 +1,77 @@
 {
   "StatusEffects": [
     {
+      "EffectID": "priest_passive_divinespirit_buff",
+      "Duration": -1.0,
+      "IsBuff": true,
+      "StatModifiers": [
+        {
+          "targetStat": "Stamina",
+          "value": 0.5,
+          "type": "PercentAdd"
+        },
+        {
+          "targetStat": "Intellect",
+          "value": 0.5,
+          "type": "PercentAdd"
+        }
+      ]
+    },
+    {
+      "EffectID": "priest_powerwordshield_buff",
+      "Duration": 15.0,
+      "IsBuff": true,
+      "StatModifiers": [
+        {
+          "targetStat": "Armor",
+          "value": 0.25,
+          "type": "PercentAdd"
+        }
+      ]
+    },
+    {
+      "EffectID": "warrior_enragedregen_buff",
+      "Duration": 6.0,
+      "IsBuff": true,
+      "StatModifiers": []
+    },
+    {
+      "EffectID": "warrior_mortalstrike_debuff",
+      "Duration": 5.0,
+      "IsBuff": false,
+      "StatModifiers": [
+        {
+          "targetStat": "Leech",
+          "value": 0.25,
+          "type": "PercentMult"
+        }
+      ]
+    },
+    {
+      "EffectID": "warrior_passive_armor_buff",
+      "Duration": 0.0,
+      "IsBuff": false,
+      "StatModifiers": [
+        {
+          "targetStat": "Armor",
+          "value": 0.1,
+          "type": "PercentAdd"
+        }
+      ]
+    },
+    {
+      "EffectID": "warrior_shieldwall_buff",
+      "Duration": 8.0,
+      "IsBuff": true,
+      "StatModifiers": [
+        {
+          "targetStat": "Armor",
+          "value": 0.5,
+          "type": "PercentAdd"
+        }
+      ]
+    },
+    {
       "EffectID": "0_elixir_forca_pequeno_buff",
       "Duration": 30.0,
       "IsBuff": true,
@@ -104,18 +175,6 @@
         {
           "targetStat": "MovementSpeed",
           "value": 20.0,
-          "type": "PercentAdd"
-        }
-      ]
-    },
-    {
-      "EffectID": "stamina_boost",
-      "Duration": 100.0,
-      "IsBuff": true,
-      "StatModifiers": [
-        {
-          "targetStat": "Stamina",
-          "value": 10.0,
           "type": "PercentAdd"
         }
       ]

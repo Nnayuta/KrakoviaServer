@@ -45,20 +45,32 @@
       "NpcTypeId": "npc_Jaque_Martelo_Fino",
       "Items": [
         {
-          "ItemID": "sword_wood_01",
+          "ItemID": "priest_staff_wood_01",
           "BuyPrice": 35
         },
         {
-          "ItemID": "staff_wood_01",
+          "ItemID": "priest_staff_wood_02",
           "BuyPrice": 35
         },
         {
-          "ItemID": "bow_wood_01",
+          "ItemID": "priest_staff_wood_03",
           "BuyPrice": 35
         },
         {
-          "ItemID": "gm_sword_01",
-          "BuyPrice": 18625
+          "ItemID": "sword_01",
+          "BuyPrice": 35
+        },
+        {
+          "ItemID": "sword_02",
+          "BuyPrice": 35
+        },
+        {
+          "ItemID": "sword_03",
+          "BuyPrice": 35
+        },
+        {
+          "ItemID": "sword_04",
+          "BuyPrice": 35
         }
       ]
     },
@@ -115,88 +127,44 @@
       "NpcTypeId": "npc_Seu_Armando_Martelada",
       "Items": [
         {
-          "ItemID": "laether_boots_01",
+          "ItemID": "plate_template_chest_cloth",
+          "BuyPrice": 562
+        },
+        {
+          "ItemID": "plate_template_feet_cloth",
+          "BuyPrice": 350
+        },
+        {
+          "ItemID": "plate_template_gloves_cloth",
+          "BuyPrice": 350
+        },
+        {
+          "ItemID": "plate_template_head_cloth",
+          "BuyPrice": 462
+        },
+        {
+          "ItemID": "plate_template_legs_cloth",
+          "BuyPrice": 550
+        },
+        {
+          "ItemID": "cloth_template_boots_cloth",
           "BuyPrice": 25
         },
         {
-          "ItemID": "laether_chest_01",
-          "BuyPrice": 52
-        },
-        {
-          "ItemID": "laether_head_01",
+          "ItemID": "cloth_template_chest_cloth",
           "BuyPrice": 42
         },
         {
-          "ItemID": "laether_legs_01",
-          "BuyPrice": 42
-        },
-        {
-          "ItemID": "plate_boots_01",
+          "ItemID": "cloth_template_hands_cloth",
           "BuyPrice": 25
         },
         {
-          "ItemID": "plate_chest_01",
-          "BuyPrice": 52
-        },
-        {
-          "ItemID": "plate_head_01",
-          "BuyPrice": 42
-        },
-        {
-          "ItemID": "plate_legs_01",
-          "BuyPrice": 42
-        },
-        {
-          "ItemID": "cloth_boots_01",
-          "BuyPrice": 25
-        },
-        {
-          "ItemID": "cloth_chest_01",
-          "BuyPrice": 42
-        },
-        {
-          "ItemID": "cloth_head_01",
+          "ItemID": "cloth_template_head_cloth",
           "BuyPrice": 35
         },
         {
-          "ItemID": "cloth_legs_01",
+          "ItemID": "cloth_template_legs_cloth",
           "BuyPrice": 42
-        },
-        {
-          "ItemID": "cloth_boots_03",
-          "BuyPrice": 35
-        },
-        {
-          "ItemID": "cloth_boots_03",
-          "BuyPrice": 35
-        },
-        {
-          "ItemID": "cloth_legs_03",
-          "BuyPrice": 52
-        },
-        {
-          "ItemID": "guard_plate_boots_01",
-          "BuyPrice": 122
-        },
-        {
-          "ItemID": "guard_plate_chest_01",
-          "BuyPrice": 212
-        },
-        {
-          "ItemID": "guard_plate_cloak_01",
-          "BuyPrice": 90
-        },
-        {
-          "ItemID": "guard_plate_hands_01",
-          "BuyPrice": 122
-        },
-        {
-          "ItemID": "guard_plate_head_01",
-          "BuyPrice": 168
-        },
-        {
-          "ItemID": "guard_plate_chest_01",
-          "BuyPrice": 212
         }
       ]
     }

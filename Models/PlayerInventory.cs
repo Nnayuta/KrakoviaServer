@@ -1,4 +1,5 @@
-﻿// Models/PlayerInventory.cs
+﻿// ARQUIVO COMPLETO E CORRIGIDO: Models/PlayerInventory.cs
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,15 +28,14 @@ public class Inventory
     }
 
     /// <summary>
-    /// Adiciona um item ao inventário, tentando empilhar primeiro.
-    /// Retorna true se o item foi adicionado completamente.
+    /// Adiciona um item ao inventário pelo seu ID, criando novos stacks.
+    /// Ideal para itens de quest, itens comprados, ou qualquer item que não tenha uma instância pré-existente.
     /// </summary>
     public bool AddItem(string itemID, int quantity = 1)
     {
         if (!DataManager.Items.TryGetValue(itemID, out var itemData)) return false;
 
         // 1. Tenta empilhar em stacks existentes.
-        // ESTA LINHA AGORA FUNCIONA!
         if (itemData.isStackable)
         {
             foreach (var slot in slots)
@@ -44,16 +44,14 @@ public class Inventory
                 {
                     int spaceAvailable = itemData.maxStackSize - slot.Quantity;
                     int amountToAdd = Math.Min(quantity, spaceAvailable);
-
                     slot.Quantity += amountToAdd;
                     quantity -= amountToAdd;
-
                     if (quantity <= 0) return true;
                 }
             }
         }
 
-        // 2. Se ainda restarem itens, tenta adicioná-los a slots vazios.
+        // 2. Se ainda restarem itens, tenta adicioná-los a slots vazios, criando novos stacks.
         while (quantity > 0)
         {
             int? emptySlot = FindEmptySlot();
@@ -67,6 +65,45 @@ public class Inventory
         return true;
     }
 
+    /// <summary>
+    /// <<< MÉTODO NOVO E CRUCIAL >>>
+    /// Adiciona um ItemStack pré-existente ao inventário, preservando seu InstanceID.
+    /// Ideal para loot de monstros, trocas entre jogadores, etc.
+    /// </summary>
+    /// <param name="stackToAdd">O ItemStack a ser adicionado.</param>
+    /// <returns>True se o item foi adicionado com sucesso.</returns>
+    public bool AddItemStack(ItemStack stackToAdd)
+    {
+        if (stackToAdd == null) return false;
+        if (!DataManager.Items.TryGetValue(stackToAdd.ItemID, out var itemData)) return false;
+
+        // Para itens não empilháveis (como equipamentos), simplesmente encontra um slot vazio.
+        if (!itemData.isStackable)
+        {
+            int? emptySlot = FindEmptySlot();
+            if (emptySlot.HasValue)
+            {
+                slots[emptySlot.Value] = stackToAdd;
+                return true;
+            }
+            return false; // Inventário cheio
+        }
+        else
+        {
+            // Para itens empilháveis, primeiro tenta adicionar ao stack existente (se houver).
+            // (Esta é uma lógica mais complexa que podemos simplificar por enquanto)
+            // Por simplicidade na jam, vamos assumir que loot empilhável também vai para um novo slot.
+            int? emptySlot = FindEmptySlot();
+            if (emptySlot.HasValue)
+            {
+                slots[emptySlot.Value] = stackToAdd;
+                return true;
+            }
+            return false;
+        }
+    }
+
+    // --- O RESTO DA CLASSE CONTINUA IGUAL ---
 
     public void RemoveItem(int slotIndex)
     {
@@ -78,24 +115,11 @@ public class Inventory
 
     public bool RemoveItemFromSlot(int slotIndex, int quantity)
     {
-        if (slotIndex < 0 || slotIndex >= slots.Count || slots[slotIndex] == null)
-        {
-            return false; // Slot inválido ou vazio
-        }
-
-        var itemStack = slots[slotIndex]!; // Usamos '!' para dizer ao compilador que não é nulo aqui.
-        if (itemStack.Quantity < quantity)
-        {
-            return false; // Não há itens suficientes para remover
-        }
-
+        if (slotIndex < 0 || slotIndex >= slots.Count || slots[slotIndex] == null) return false;
+        var itemStack = slots[slotIndex]!;
+        if (itemStack.Quantity < quantity) return false;
         itemStack.Quantity -= quantity;
-
-        if (itemStack.Quantity <= 0)
-        {
-            slots[slotIndex] = null; // Remove o item completamente se o stack acabar
-        }
-
+        if (itemStack.Quantity <= 0) slots[slotIndex] = null;
         return true;
     }
 
@@ -108,13 +132,9 @@ public class Inventory
         return null;
     }
 
-    /// <summary>
-    /// Verifica se há espaço para uma certa quantidade de um item.
-    /// </summary>
     public bool HasSpaceFor(string itemID, int quantity)
     {
         if (!DataManager.Items.TryGetValue(itemID, out var itemData)) return false;
-
         int spaceAvailable = 0;
         foreach (var slot in slots)
         {
@@ -126,10 +146,8 @@ public class Inventory
             {
                 spaceAvailable += itemData.maxStackSize;
             }
-
             if (spaceAvailable >= quantity) return true;
         }
-
         return false;
     }
 }

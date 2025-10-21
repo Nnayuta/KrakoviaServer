@@ -32,26 +32,56 @@
           "Rolls": 1,
           "Entries": [
             {
-              "ItemID": "leather_bandids_lvl5_boots_01",
-              "Weight": 10,
+              "ItemID": "cloth_template_hands_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "cloth_template_legs_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "cloth_template_boots_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "plate_template_feet_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "plate_template_legs_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            }
+          ]
+        },
+        {
+          "Chance": 0.05,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "sword_01",
+              "Weight": 1,
               "MinQuantity": 1,
               "MaxQuantity": 1
             },
             {
-              "ItemID": "leather_bandids_lvl5_chest_01",
-              "Weight": 10,
+              "ItemID": "sword_02",
+              "Weight": 1,
               "MinQuantity": 1,
               "MaxQuantity": 1
             },
             {
-              "ItemID": "leather_bandids_lvl5_head_01",
-              "Weight": 10,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "leather_bandids_lvl5_legs_01",
-              "Weight": 10,
+              "ItemID": "priest_staff_wood_01",
+              "Weight": 1,
               "MinQuantity": 1,
               "MaxQuantity": 1
             }
@@ -87,30 +117,78 @@
           ]
         },
         {
+          "Chance": 0.1,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "cloth_template_boots_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "cloth_template_chest_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "cloth_template_hands_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "cloth_template_head_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "cloth_template_legs_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "plate_template_chest_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "plate_template_feet_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "plate_template_head_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "plate_template_head_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            }
+          ]
+        },
+        {
           "Chance": 0.05,
           "Rolls": 1,
           "Entries": [
             {
-              "ItemID": "plate_bandids_lvl5_boots_01",
-              "Weight": 10,
+              "ItemID": "sword_03",
+              "Weight": 1,
               "MinQuantity": 1,
               "MaxQuantity": 1
             },
             {
-              "ItemID": "plate_bandids_lvl5_chest_01",
-              "Weight": 10,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "plate_bandids_lvl5_head_01",
-              "Weight": 10,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "plate_bandids_lvl5_legs_01",
-              "Weight": 10,
+              "ItemID": "priest_staff_wood_01",
+              "Weight": 1,
               "MinQuantity": 1,
               "MaxQuantity": 1
             }
@@ -144,26 +222,56 @@
           "Rolls": 1,
           "Entries": [
             {
-              "ItemID": "leather_bandids_lvl10_boots_01",
-              "Weight": 10,
+              "ItemID": "cloth_template_hands_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "cloth_template_legs_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "cloth_template_boots_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "plate_template_feet_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "plate_template_legs_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            }
+          ]
+        },
+        {
+          "Chance": 0.08,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "sword_03",
+              "Weight": 3,
               "MinQuantity": 1,
               "MaxQuantity": 1
             },
             {
-              "ItemID": "leather_bandids_lvl10_chest_01",
-              "Weight": 10,
+              "ItemID": "sword_04",
+              "Weight": 1,
               "MinQuantity": 1,
               "MaxQuantity": 1
             },
             {
-              "ItemID": "leather_bandids_lvl10_head_01",
-              "Weight": 10,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "leather_bandids_lvl10_legs_01",
-              "Weight": 10,
+              "ItemID": "priest_staff_wood_02",
+              "Weight": 1,
               "MinQuantity": 1,
               "MaxQuantity": 1
             }
@@ -197,28 +305,99 @@
           "Rolls": 1,
           "Entries": [
             {
-              "ItemID": "plate_bandids_lvl10_boots_01",
-              "Weight": 10,
+              "ItemID": "cloth_template_boots_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "cloth_template_chest_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "cloth_template_hands_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "cloth_template_head_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "cloth_template_legs_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "plate_template_chest_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "plate_template_feet_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "plate_template_head_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "plate_template_head_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            }
+          ]
+        },
+        {
+          "Chance": 0.05,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "sword_04",
+              "Weight": 1,
               "MinQuantity": 1,
               "MaxQuantity": 1
             },
             {
-              "ItemID": "plate_bandids_lvl10_chest_01",
-              "Weight": 10,
+              "ItemID": "priest_staff_wood_02",
+              "Weight": 1,
               "MinQuantity": 1,
               "MaxQuantity": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "LootTableID": "bandids_15_20",
+      "Pools": [
+        {
+          "Chance": 1.0,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "Moeda_Enferrujada",
+              "Weight": 1,
+              "MinQuantity": 5,
+              "MaxQuantity": 20
             },
             {
-              "ItemID": "plate_bandids_lvl10_head_01",
-              "Weight": 10,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "plate_bandids_lvl10_legs_01",
-              "Weight": 10,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
+              "ItemID": "Trapo_Sujo",
+              "Weight": 1,
+              "MinQuantity": 5,
+              "MaxQuantity": 20
             }
           ]
         },
@@ -227,26 +406,115 @@
           "Rolls": 1,
           "Entries": [
             {
-              "ItemID": "plate_bandids_lvl10_boots_02",
-              "Weight": 10,
+              "ItemID": "plate_template_boots",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "plate_template_chest",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "plate_template_cloak",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "plate_template_hands",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "plate_template_head",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "plate_template_legs",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "cloth_template_boots_end",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "cloth_template_chest_end",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "cloth_template_cloak_end",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "cloth_template_hands_end",
+              "Weight": 1,
               "MinQuantity": 1,
               "MaxQuantity": 1
             },
             {
-              "ItemID": "plate_bandids_lvl10_chest_02",
-              "Weight": 10,
+              "ItemID": "cloth_template_head_end",
+              "Weight": 1,
               "MinQuantity": 1,
               "MaxQuantity": 1
             },
             {
-              "ItemID": "plate_bandids_lvl10_head_02",
-              "Weight": 10,
+              "ItemID": "cloth_template_legs_end",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "LootTableID": "bandids_15-20_elite",
+      "Pools": [
+        {
+          "Chance": 1.0,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "Moeda_Enferrujada",
+              "Weight": 1,
+              "MinQuantity": 5,
+              "MaxQuantity": 20
+            },
+            {
+              "ItemID": "Trapo_Sujo",
+              "Weight": 1,
+              "MinQuantity": 5,
+              "MaxQuantity": 20
+            }
+          ]
+        },
+        {
+          "Chance": 0.01,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "priest_staff_wood_04",
+              "Weight": 1,
               "MinQuantity": 1,
               "MaxQuantity": 1
             },
             {
-              "ItemID": "plate_bandids_lvl10_legs_02",
-              "Weight": 10,
+              "ItemID": "sword_07",
+              "Weight": 1,
               "MinQuantity": 1,
               "MaxQuantity": 1
             }
@@ -286,6 +554,60 @@
               "MaxQuantity": 4
             }
           ]
+        },
+        {
+          "Chance": 0.01,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "cloth_template_hands_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "cloth_template_legs_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "cloth_template_boots_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "plate_template_feet_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            },
+            {
+              "ItemID": "plate_template_legs_cloth",
+              "Weight": 0,
+              "MinQuantity": 0,
+              "MaxQuantity": 0
+            }
+          ]
+        },
+        {
+          "Chance": 0.01,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "sword_02",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "priest_staff_wood_01",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            }
+          ]
         }
       ]
     },
@@ -307,6 +629,24 @@
               "Weight": 100,
               "MinQuantity": 1,
               "MaxQuantity": 4
+            }
+          ]
+        },
+        {
+          "Chance": 0.01,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "sword_03",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "priest_staff_wood_01",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
             }
           ]
         }
@@ -336,6 +676,24 @@
               "Weight": 100,
               "MinQuantity": 1,
               "MaxQuantity": 6
+            }
+          ]
+        },
+        {
+          "Chance": 0.01,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "sword_06",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "priest_staff_wood_02",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
             }
           ]
         }
@@ -373,6 +731,30 @@
               "MaxQuantity": 8
             }
           ]
+        },
+        {
+          "Chance": 0.01,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "sword_05",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "sword_03",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "priest_staff_wood_03",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            }
+          ]
         }
       ]
     },
@@ -394,6 +776,24 @@
               "Weight": 100,
               "MinQuantity": 1,
               "MaxQuantity": 10
+            }
+          ]
+        },
+        {
+          "Chance": 0.01,
+          "Rolls": 1,
+          "Entries": [
+            {
+              "ItemID": "sword_01",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "priest_staff_wood_01",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
             }
           ]
         }

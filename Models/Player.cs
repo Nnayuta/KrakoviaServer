@@ -26,6 +26,7 @@ public class Player : ICombatEntity, IWorldEntity
     public readonly HashSet<string> KnownGatherableIds = new();
     public bool IsStationary => false;
 
+    public string ConnectionGuid { get; }
     public string GuidSessionId { get; }
     public int SessionId { get; }
     public string InstanceId => this.CharacterId;
@@ -121,9 +122,11 @@ public class Player : ICombatEntity, IWorldEntity
 
     #endregion
 
-    public Player(IPEndPoint endPoint, AuthenticatedPlayerInfo authInfo, UDPServer server, CharacterData characterData)
+    public Player(string connectionGuid, IPEndPoint endPoint, AuthenticatedPlayerInfo authInfo, UDPServer server, CharacterData characterData)
     {
+        this.ConnectionGuid = connectionGuid;
         _server = server;
+
 
         GuidSessionId = Guid.NewGuid().ToString("N");
         SessionId = server.GetNextSessionId();
@@ -135,7 +138,7 @@ public class Player : ICombatEntity, IWorldEntity
         QuestLog = new PlayerQuestLog(this);
         PermissionLevel = authInfo.PermissionLevel;
 
-        Console.WriteLine($"[Player CONSTRUTOR] Objeto Player criado para {authInfo.CharacterName}. PermissionLevel atribuído: {this.PermissionLevel}");
+        Console.WriteLine($"[Player] Objeto Player criado para {authInfo.CharacterName}. PermissionLevel atribuído: {this.PermissionLevel}");
 
         Username = authInfo.Username;
         CharacterName = authInfo.CharacterName;
@@ -153,60 +156,70 @@ public class Player : ICombatEntity, IWorldEntity
         this.PlayerActionBar = characterData.PlayerActionBar;
         this.QuestLog = characterData.QuestLog;
         this.QuestLog.SetOwner(this);
-
-        this.PlayerEquipment.OnEquipmentChanged += OnEquipmentChanged;
         this.StatusEffectController = new StatusEffectController(this, server); // <-- INICIALIZAÇÃO
 
-        InitializeCharacter();
+        // this.PlayerEquipment.OnEquipmentChanged += OnEquipmentChanged;
+        // InitializeCharacter();
     }
 
-    private void InitializeCharacter()
+    // Renomeie para refletir melhor sua função.
+    // Em Servidor/Player.cs
+
+    public void FinalizeInitialization()
     {
+        Console.WriteLine($"[PlayerInit] Iniciando finalização para '{this.Username}'...");
+
+        // 1. Prepara todos os dados internos.
         this.KnownAbilityIDs = CalculateKnownAbilities();
+        Console.WriteLine($"[SKILL DEBUG] Habilidades para {this.Username} (Nível {this.Level}): {string.Join(", ", this.KnownAbilityIDs)}");
 
-        // RebuildStats agora irá recalcular stats E proficiências.
         RebuildStats();
-
         this.CurrentHealth = this.MaxHealth;
         this.CurrentResource = this.MaxResource;
-        Console.WriteLine($"[PlayerInit] '{this.Username}' inicializado com {this.MaxHealth} de vida.");
 
-        SendFullStateToClient();
+        // Console.WriteLine($"[PlayerInit] '{this.Username}' stats construídos. Vida Máxima: {this.MaxHealth}");
+
+        this.IsPendingInitialization = false;
+
+        // Console.WriteLine($"[PlayerInit] '{this.Username}' está totalmente inicializado e ativo no servidor.");
     }
 
     public void RebuildStats()
     {
-        if (!DataManager.Classes.TryGetValue(this.ClassID, out var classData)) return;
+        if (_server == null || !DataManager.Classes.TryGetValue(this.ClassID, out var classData)) return;
 
-        // 1. Cria uma nova instância de CharacterStats. Continua igual.
         this.Stats = new CharacterStats(classData, this.Level);
 
-        // 2. Aplica os stats de TODOS os itens equipados, mas sem recalcular a cada vez.
         foreach (ItemStack equippedStack in this.PlayerEquipment.equippedItems.Values)
         {
-            if (equippedStack != null && DataManager.Items.TryGetValue(equippedStack.ItemID, out var itemData))
+            if (equippedStack != null)
             {
-                ApplyItemStats_Internal(itemData);
+                var instanceData = _server.ItemInstanceManager.GetDataForInstance(equippedStack.InstanceID);
+                List<BaseStatData> itemStats = instanceData?.Stats;
+
+                if (itemStats == null || !itemStats.Any())
+                {
+                    if (DataManager.Items.TryGetValue(equippedStack.ItemID, out var itemTemplate))
+                    {
+                        itemStats = itemTemplate.Stats;
+                    }
+                }
+
+                ApplyItemStats_Internal(itemStats, equippedStack.InstanceID);
             }
         }
 
         this.Stats.CalculateAllDerivedStats();
-
-        // 4. Ajusta a vida/mana atuais para não excederem os novos máximos.
-        this.CurrentHealth = Math.Min(this.CurrentHealth, this.MaxHealth);
-        this.CurrentResource = Math.Min(this.CurrentResource, this.MaxResource);
-
-        // 5. Recalcula as proficiências (continua igual).
+        // A atualização da vida/mana agora é feita em HandleEquipmentChange
         RecalculateProficiencies();
     }
 
-    // Método auxiliar renomeado para uso interno
-    private void ApplyItemStats_Internal(ServerItemData itemData)
+    private void ApplyItemStats_Internal(List<BaseStatData> stats, object source)
     {
-        foreach (var statInfo in itemData.Stats)
+        if (stats == null) return;
+        foreach (var statInfo in stats)
         {
-            var modifier = new StatModifier(statInfo.Value, StatModifierType.Flat, itemData.itemID);
-            // Usa o novo método que não dispara o recálculo
+            var modifier = new StatModifier(statInfo.Value, StatModifierType.Flat, source);
             this.Stats.AddStatModifier_NoRecalculate(statInfo.Stat, modifier);
         }
     }
@@ -249,7 +262,7 @@ public class Player : ICombatEntity, IWorldEntity
                 _server.NetworkManager.BroadcastMessageToOthers(this, message);
             }
 
-            Console.WriteLine($"[Sync Equip] Transmitindo atualização de equipamento do jogador {this.Id} para os outros. (Disparo Único)");
+            // Console.WriteLine($"[Sync Equip] Transmitindo atualização de equipamento do jogador {this.Id} para os outros. (Disparo Único)");
         }
         finally
         {
@@ -354,7 +367,7 @@ public class Player : ICombatEntity, IWorldEntity
         if (!IsCasting) return;
 
         var abilityName = CurrentCastAbility?.Name ?? "desconhecida";
-        Console.WriteLine($"[Casting-Server] Casting de '{Username}' para a habilidade '{abilityName}' interrompido.");
+        // Console.WriteLine($"[Casting-Server] Casting de '{Username}' para a habilidade '{abilityName}' interrompido.");
 
         IsCasting = false;
         CurrentCastAbility = null;
@@ -512,9 +525,56 @@ public class Player : ICombatEntity, IWorldEntity
         };
     }
 
+    /// <summary>
+    /// Ação final de equipar um item. Este é o único lugar que deve alterar o equipamento.
+    /// </summary>
+    public void EquipItem(ItemStack itemToEquip, EquipmentSlot targetSlot)
+    {
+        PlayerEquipment.SetItemInSlot(targetSlot, itemToEquip);
+        // Após a mudança, chama o método central de recálculo.
+        HandleEquipmentChange();
+    }
+
+    /// <summary>
+    /// Ação final de desequipar um item.
+    /// </summary>
+    public void UnequipItem(EquipmentSlot slot)
+    {
+        PlayerEquipment.SetItemInSlot(slot, null);
+        // Após a mudança, chama o método central de recálculo.
+        HandleEquipmentChange();
+    }
+
+    /// <summary>
+    /// MÉTODO CENTRAL E ÚNICO para recalcular e sincronizar tudo após uma mudança de equipamento.
+    /// </summary>
+    private void HandleEquipmentChange()
+    {
+        // 1. Recalcula todos os stats com base no novo equipamento.
+        RebuildStats();
+
+        // 2. Garante que a vida atual não exceda a nova vida máxima.
+        this.CurrentHealth = Math.Min(this.CurrentHealth, this.MaxHealth);
+        this.CurrentResource = Math.Min(this.CurrentResource, this.MaxResource);
+
+        // 3. Notifica o PRÓPRIO jogador sobre TODAS as mudanças, de forma IMEDIATA.
+        _server.NetworkManager.SendVitalsUpdate(this, true);
+        _server.NetworkManager.SendStatsUpdate(this, true);
+        _server.NetworkManager.SendEquipmentUpdate(this, true);
+        _server.NetworkManager.SendInventoryUpdate(this, true);
+
+        // 4. Transmite a MUDANÇA VISUAL para os OUTROS jogadores (usando a fila normal).
+        string message = $"VISUAL_EQUIPMENT_UPDATE|{this.Id}|{GetEquipmentPayload()}";
+        _server.NetworkManager.BroadcastMessageToOthers(this, message);
+
+        Console.WriteLine($"[Equip] Stats do jogador {Username} recalculados e sincronizados.");
+    }
+
+    // Em Servidor/Player.cs
+
     public string GetSpawnMessage()
     {
-        // Formato: SPAWN_PLAYER | ID | Nome | Posição | RotaçãoY | PayloadEquipamento | JSONAparência | Nível | VidaAtual | VidaMáxima
+        // Formato NOVO:   SPAWN_PLAYER | ID | Nome | Posição | RotaçãoY | Equip | Aparência | Nível | VidaAtual | VidaMáxima | PermLevel | MoveSpeed
 
         string position = this.State.Position;
         string rotationY = this.State.RotationY;
@@ -524,7 +584,10 @@ public class Player : ICombatEntity, IWorldEntity
         string maxHealthStr = this.MaxHealth.ToString("F0", CultureInfo.InvariantCulture);
         string appearanceJson = JsonConvert.SerializeObject(this.Appearance);
 
-        // Juntamos tudo em uma única mensagem poderosa.
-        return $"SPAWN_PLAYER|{this.SessionId}|{this.CharacterId}|{this.CharacterName}|{position}|{rotationY}|{equipmentPayload}|{appearanceJson}|{this.Level}|{currentHealthStr}|{maxHealthStr}|{this.PermissionLevel}";
+        // <<< ADIÇÃO AQUI >>>
+        string moveSpeedStr = this.MovementSpeed.ToString("F2", CultureInfo.InvariantCulture);
+
+        // Juntamos tudo na nova mensagem poderosa.
+        return $"SPAWN_PLAYER|{this.SessionId}|{this.CharacterId}|{this.CharacterName}|{position}|{rotationY}|{equipmentPayload}|{appearanceJson}|{this.Level}|{currentHealthStr}|{maxHealthStr}|{this.PermissionLevel}|{moveSpeedStr}";
     }
 }

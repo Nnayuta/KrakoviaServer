@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Krakovia Server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fa7b5cdebbdd20c51d76bf243c5d822d05d0fdb2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+734ddbbe40a7ede7e13a07f751eef4a9c355cca7")]
 [assembly: System.Reflection.AssemblyProductAttribute("Krakovia Server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Krakovia Server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

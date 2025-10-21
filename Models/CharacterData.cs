@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
+using Newtonsoft.Json;
 
 /// <summary>
 /// Armazena os dados persistentes de um �nico personagem no servidor.
 /// </summary>
 public class CharacterData
 {
+    [JsonIgnore]
+    public Dictionary<string, ItemInstanceData> GeneratedItems { get; } = new();
+
     public string CharacterId { get; set; }
     public string ClassID { get; set; }
     public int Level { get; set; }
@@ -48,5 +52,10 @@ public class CharacterData
         this.PlayerInventory = new Inventory(this.InventorySize);
         this.PlayerEquipment = new Equipment();
         this.PlayerActionBar = new ActionBarData(12);
+    }
+
+    public void TrackGeneratedItem(string instanceId, ItemInstanceData data)
+    {
+        GeneratedItems[instanceId] = data;
     }
 }
