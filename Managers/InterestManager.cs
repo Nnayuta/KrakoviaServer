@@ -11,42 +11,29 @@ public class InterestManager
 
     // Raio para "acordar" a IA de um NPC. Geralmente maior que a visão do jogador.
     private const float AI_ACTIVATION_RANGE_SQR = 100f * 100f;
-
-    // --- Constantes para a Histerese de Visibilidade ---
-    // Raio MENOR: Se uma entidade entrar neste raio, ela se torna visível.
     private const float VISIBILITY_SPAWN_RADIUS = 80f;
-    // Raio MAIOR: Uma entidade só se torna invisível se sair deste raio.
-    private const float VISIBILITY_DESPAWN_RADIUS = 90f;
 
     public InterestManager(UDPServer server)
     {
         _server = server;
     }
 
-    public async Task UpdateInterestAndActivationAsync(CancellationToken cancellationToken)
+    private float _interestUpdateTimer = 0f;
+    private const float INTEREST_UPDATE_INTERVAL = 0.5f; // 500ms
+
+    public void Update()
     {
-        while (!cancellationToken.IsCancellationRequested)
+        _interestUpdateTimer += (float)UDPServer.SERVER_TICK_RATE_MS / 1000.0f;
+
+        if (_interestUpdateTimer >= INTEREST_UPDATE_INTERVAL)
         {
-            try
+            _interestUpdateTimer = 0f;
+
+            var players = _server.ConnectedPlayers.Values.Where(p => !p.IsPendingInitialization).ToList();
+            UpdateAiActivation(players);
+            foreach (var player in players)
             {
-                // Um intervalo de 500ms é um bom equilíbrio para responsividade.
-                await Task.Delay(500, cancellationToken);
-
-                var players = _server.ConnectedPlayers.Values.Where(p => !p.IsPendingInitialization).ToList();
-
-                // Passo 1: Gerencia a hibernação da IA (otimização de CPU do servidor).
-                UpdateAiActivation(players);
-
-                // Passo 2: Gerencia a visibilidade para cada cliente (o que eles renderizam).
-                foreach (var player in players)
-                {
-                    UpdatePlayerVisibility(player);
-                }
-            }
-            catch (TaskCanceledException)
-            {
-                Console.WriteLine("[InterestManager] Loop cancelado para shutdown.");
-                break;
+                UpdatePlayerVisibility(player);
             }
         }
     }

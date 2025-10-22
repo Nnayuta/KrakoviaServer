@@ -27,18 +27,10 @@ public class PlayerLifecycleManager
         _nextRegenTickTime = _server.CurrentTimeUtc;
     }
 
-    public async Task Action_LoopAsync(CancellationToken cancellationToken)
+    public void Update()
     {
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            try
-            {
-                await Task.Delay(ACTION_TICK_RATE_MS, cancellationToken);
-                ProcessPlayerActions();
-                CheckForLimboPlayers();
-            }
-            catch (TaskCanceledException) { break; }
-        }
+        ProcessPlayerActions();
+        CheckForLimboPlayers();
     }
 
     private void CheckForLimboPlayers()

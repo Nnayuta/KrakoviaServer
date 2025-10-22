@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -46,6 +47,7 @@ public class UDPServer
     private readonly ICharacterDatabase _characterDb;
     private readonly UdpClient _udpListener;
     private const int TIMEOUT_SECONDS = 30;
+    public const int SERVER_TICK_RATE_MS = 33; // ~30 ticks por segundo. Ajuste conforme necessário.
 
     private int _nextSessionId = 0;
     private int _nextNpcSessionId = 0;
@@ -96,49 +98,57 @@ public class UDPServer
         WorldManager.InitializeSpawns();
         GatherableManager.InitializeSpawns();
 
-
-        Console.WriteLine("STARTING NETWORK MANAGER");
+        // Tarefas que rodam de forma independente e LENTA
         Task listenTask = NetworkManager.ListenForPlayerMessagesAsync(cancellationToken);
-
-        Console.WriteLine("STARTING WORLD MANAGER");
-        Task worldTask = WorldManager.WorldManagement_LoopAsync(cancellationToken);
-
-        Console.WriteLine("STARTING NPCAI MANAGER");
-        Task fastAiTask = NpcAiManager.NpcAI_FastLoopAsync(cancellationToken);
-        Task slowAiTask = NpcAiManager.NpcAI_SlowLoopAsync(cancellationToken);
-
-        Console.WriteLine("STARTING INTEREST MANAGER");
-        Task interestAndActivationTask = InterestManager.UpdateInterestAndActivationAsync(cancellationToken);
-
-        Console.WriteLine("STARTING GATHERABLE MANAGER");
-        Task gatherableTask = GatherableManager.GatherableLoopAsync(cancellationToken);
-
-        Console.WriteLine("STARTING Scheduler");
-        Task schedulerTask = Scheduler.RunAsync(cancellationToken);
-
-        Console.WriteLine("STARTING PLAYER LIFECYCLE MANAGER");
-        Task playerLifecycleTask = PlayerLifecycleManager.Action_LoopAsync(cancellationToken);
-
+        Task timeoutTask = CheckForTimeoutsAsync(cancellationToken);
         Task autoSaveTask = PeriodicAutoSaveAsync(cancellationToken);
 
-        Task timeoutTask = CheckForTimeoutsAsync(cancellationToken);
-        Task timeUpdateTask = UpdateServerTimeAsync(cancellationToken);
+        // O NOVO LOOP PRINCIPAL QUE CONTROLA TUDO
+        Task serverTickTask = ServerTickLoopAsync(cancellationToken);
 
-        // Adiciona a nova tarefa 'playerLifecycleTask' ao WhenAll para que ela
-        // seja gerenciada pelo CancellationToken junto com as outras.
-        await Task.WhenAll(
-            autoSaveTask,
-            timeUpdateTask,
-            listenTask,
-            worldTask,
-            fastAiTask,
-            slowAiTask,
-            interestAndActivationTask,
-            playerLifecycleTask,
-            schedulerTask,
-            timeoutTask,
-            gatherableTask
-        );
+        await Task.WhenAll(listenTask, timeoutTask, autoSaveTask, serverTickTask);
+    }
+
+
+    private async Task ServerTickLoopAsync(CancellationToken cancellationToken)
+    {
+        Console.WriteLine($"[SERVER TICK] Loop principal iniciado com um tick de {SERVER_TICK_RATE_MS}ms.");
+        var stopwatch = new Stopwatch();
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            stopwatch.Restart();
+            CurrentTimeUtc = DateTime.UtcNow;
+
+            // --- ORDEM DE EXECUÇÃO DOS MANAGERS (A CADA TICK) ---
+            Scheduler.Update();
+            NpcAiManager.Update(SERVER_TICK_RATE_MS / 1000.0f); // Passa o deltaTime
+            PlayerLifecycleManager.Update();
+            WorldManager.Update();
+            GatherableManager.Update();
+            InterestManager.Update();
+
+            // Atualização de Status Effects (lógica movida de UpdateServerTimeAsync)
+            var players = ConnectedPlayers.Values.ToList();
+            foreach (var player in players) player.StatusEffectController.Update();
+            var npcs = ActiveNpcs.Values.ToList();
+            foreach (var npc in npcs) npc.StatusEffectController.Update();
+
+            await NetworkManager.DispatchQueuedMessages();
+
+            stopwatch.Stop();
+            int elapsedTime = (int)stopwatch.ElapsedMilliseconds;
+            int sleepTime = SERVER_TICK_RATE_MS - elapsedTime;
+
+            if (sleepTime > 0)
+            {
+                await Task.Delay(sleepTime, cancellationToken);
+            }
+            else if (elapsedTime > SERVER_TICK_RATE_MS)
+            {
+                Console.WriteLine($"[AVISO] Tick do servidor demorou mais que o esperado: {elapsedTime}ms");
+            }
+        }
     }
 
     public void Stop()
@@ -155,35 +165,6 @@ public class UDPServer
         if (ActiveNpcs.TryGetValue(id, out var npc)) return npc;
         if (GatherableManager.ActiveGatherables.TryGetValue(id, out var gatherable)) return gatherable;
         return null;
-    }
-
-    private async Task UpdateServerTimeAsync(CancellationToken cancellationToken)
-    {
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            CurrentTimeUtc = DateTime.UtcNow;
-
-            var players = ConnectedPlayers.Values.ToList();
-            foreach (var player in players)
-            {
-                player.StatusEffectController.Update();
-            }
-
-            var npcs = ActiveNpcs.Values.ToList();
-            foreach (var npc in npcs)
-            {
-                npc.StatusEffectController.Update();
-            }
-
-            NetworkManager.DispatchQueuedMessages();
-
-            try
-            {
-                // Atualiza o tempo e despacha mensagens a cada 50ms (20hz)
-                await Task.Delay(50, cancellationToken);
-            }
-            catch (TaskCanceledException) { break; }
-        }
     }
 
     private async Task CheckForTimeoutsAsync(CancellationToken cancellationToken)

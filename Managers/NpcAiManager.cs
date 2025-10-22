@@ -15,6 +15,8 @@ public class NpcAiManager
     private readonly Dictionary<NpcAiType, INpcBehavior> _behaviors;
     private readonly ConcurrentDictionary<string, Vector3> _lastSentPositions = new ConcurrentDictionary<string, Vector3>();
 
+    private int _tickCounter = 0;
+
     public NpcAiManager(UDPServer server)
     {
         _server = server;
@@ -64,46 +66,36 @@ public class NpcAiManager
         return _behaviors[NpcAiType.Wandering_Aggressive];
     }
 
-    public async Task NpcAI_FastLoopAsync(CancellationToken cancellationToken)
+    // Agora, substitua o método Update() simples pela versão abaixo:
+    public void Update(float deltaTime)
     {
-        const int AI_TICK_RATE_MS = 33; // ~30 Hz
-        const float DELTA_TIME = AI_TICK_RATE_MS / 1000.0f;
+        _tickCounter++; // Incrementa o contador a cada tick do servidor
 
-        while (!cancellationToken.IsCancellationRequested)
+        // --- NPCs Rápidos ---
+        // A cada tick, processamos os NPCs que precisam de alta frequência (ex: em combate)
+        var fastNpcs = _server.ActiveNpcs.Values
+            .Where(npc => npc.IsActive && !npc.IsDead && npc.UpdateTier == AiUpdateTier.Fast)
+            .ToList();
+
+        if (fastNpcs.Any())
         {
-            var npcsToUpdate = _server.ActiveNpcs.Values
-                .Where(npc => npc.IsActive && !npc.IsDead && npc.UpdateTier == AiUpdateTier.Fast)
-                .ToList();
-
-            if (npcsToUpdate.Any())
-            {
-                ProcessNpcUpdates(npcsToUpdate, DELTA_TIME);
-            }
-
-            // Use try-catch para evitar que o loop quebre no shutdown
-            try { await Task.Delay(AI_TICK_RATE_MS, cancellationToken); }
-            catch (TaskCanceledException) { break; }
+            ProcessNpcUpdates(fastNpcs, deltaTime);
         }
-    }
 
-    public async Task NpcAI_SlowLoopAsync(CancellationToken cancellationToken)
-    {
-        const int AI_TICK_RATE_MS = 100; // 10 Hz
-        const float DELTA_TIME = AI_TICK_RATE_MS / 1000.0f;
-
-        while (!cancellationToken.IsCancellationRequested)
+        // --- NPCs Lentos ---
+        // A cada 3 ticks (por exemplo), processamos os NPCs de baixa frequência.
+        // O operador '%' (módulo) é perfeito para isso.
+        if (_tickCounter % 3 == 0)
         {
-            var npcsToUpdate = _server.ActiveNpcs.Values
+            var slowNpcs = _server.ActiveNpcs.Values
                 .Where(npc => npc.IsActive && !npc.IsDead && npc.UpdateTier == AiUpdateTier.Slow)
                 .ToList();
 
-            if (npcsToUpdate.Any())
+            if (slowNpcs.Any())
             {
-                ProcessNpcUpdates(npcsToUpdate, DELTA_TIME);
+                // NPCs lentos são atualizados com um deltaTime maior para compensar.
+                ProcessNpcUpdates(slowNpcs, deltaTime * 3);
             }
-
-            try { await Task.Delay(AI_TICK_RATE_MS, cancellationToken); }
-            catch (TaskCanceledException) { break; }
         }
     }
 

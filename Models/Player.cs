@@ -171,7 +171,7 @@ public class Player : ICombatEntity, IWorldEntity
 
         // 1. Prepara todos os dados internos.
         this.KnownAbilityIDs = CalculateKnownAbilities();
-        Console.WriteLine($"[SKILL DEBUG] Habilidades para {this.Username} (Nível {this.Level}): {string.Join(", ", this.KnownAbilityIDs)}");
+        // Console.WriteLine($"[SKILL DEBUG] Habilidades para {this.Username} (Nível {this.Level}): {string.Join(", ", this.KnownAbilityIDs)}");
 
         RebuildStats();
         this.CurrentHealth = this.MaxHealth;

@@ -14,6 +14,20 @@ public class GatherableManager
         _server = server;
     }
 
+    private float _gatherableUpdateTimer = 0f;
+    private const float GATHERABLE_UPDATE_INTERVAL = 5.0f; // 5 segundos
+
+    public void Update()
+    {
+        _gatherableUpdateTimer += (float)UDPServer.SERVER_TICK_RATE_MS / 1000.0f;
+
+        if (_gatherableUpdateTimer >= GATHERABLE_UPDATE_INTERVAL)
+        {
+            _gatherableUpdateTimer = 0f;
+            CheckForRespawns();
+        }
+    }
+
     // Chamado na inicialização do servidor
     public void InitializeSpawns()
     {
@@ -33,23 +47,6 @@ public class GatherableManager
             }
         }
         Console.WriteLine($"[GatherableManager] Mundo populado com {ActiveGatherables.Count} itens coletáveis.");
-    }
-
-    public async Task GatherableLoopAsync(CancellationToken cancellationToken)
-    {
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            try
-            {
-                CheckForRespawns();
-                await Task.Delay(5000, cancellationToken); // Roda a cada 5 segundos
-            }
-            catch (TaskCanceledException)
-            {
-                Console.WriteLine("[GatherableManager] Loop cancelado para shutdown.");
-                break;
-            }
-        }
     }
 
     private void CheckForRespawns()

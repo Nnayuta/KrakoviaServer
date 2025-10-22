@@ -18,22 +18,23 @@ public class WorldManager
         _server = server;
     }
 
-    public async Task WorldManagement_LoopAsync(CancellationToken cancellationToken)
-    {
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            try
-            {
-                await Task.Delay(5000, cancellationToken);
 
-                CleanupExpiredCorpses();
-                CheckForRespawns();
-            }
-            catch (TaskCanceledException)
-            {
-                Console.WriteLine("[WorldManager] Loop de gerenciamento do mundo cancelado para shutdown.");
-                break;
-            }
+    private float _worldUpdateTimer = 0f;
+    private const float WORLD_UPDATE_INTERVAL = 5.0f; // 5 segundos
+
+    public void Update()
+    {
+        // Acumula o tempo do tick do servidor
+        // Supondo um tick de 33ms, o deltaTime seria ~0.033
+        _worldUpdateTimer += (float)UDPServer.SERVER_TICK_RATE_MS / 1000.0f;
+
+        // Só executa a lógica cara a cada 5 segundos
+        if (_worldUpdateTimer >= WORLD_UPDATE_INTERVAL)
+        {
+            _worldUpdateTimer = 0f; // Reseta o timer
+
+            CleanupExpiredCorpses();
+            CheckForRespawns();
         }
     }
 

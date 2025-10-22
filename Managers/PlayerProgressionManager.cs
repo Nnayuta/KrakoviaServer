@@ -44,7 +44,7 @@ public class PlayerProgressionManager
         // 3. Recalcula as habilidades conhecidas (pode ter aprendido novas)
         player.KnownAbilityIDs = player.CalculateKnownAbilities();
 
-        Console.WriteLine($"[SKILL DEBUG] Habilidades ATUALIZADAS para {player.Username} (Nível {player.Level}): {string.Join(", ", player.KnownAbilityIDs)}");
+        // Console.WriteLine($"[SKILL DEBUG] Habilidades ATUALIZADAS para {player.Username} (Nível {player.Level}): {string.Join(", ", player.KnownAbilityIDs)}");
 
         // --- NOTIFICAÇÕES PARA O CLIENTE ---
         // Notifica sobre o level up

@@ -34,6 +34,25 @@ public class Scheduler
         _server = server;
     }
 
+    public void Update()
+    {
+        List<ScheduledTask> tasksToRun;
+        lock (_taskLock)
+        {
+            tasksToRun = _tasks.Where(t => t.ExecutionTime <= _server.CurrentTimeUtc).ToList();
+            if (tasksToRun.Any())
+            {
+                _tasks.RemoveAll(t => tasksToRun.Contains(t));
+            }
+        }
+
+        foreach (var task in tasksToRun)
+        {
+            try { task.TaskAction.Invoke(); }
+            catch (Exception ex) { Console.WriteLine($"[SCHEDULER-ERROR] Erro: {ex.Message}"); }
+        }
+    }
+
     /// <summary>
     /// Agenda uma ação para ser executada após um determinado atraso.
     /// </summary>
@@ -46,47 +65,5 @@ public class Scheduler
         {
             _tasks.Add(scheduledTask);
         }
-    }
-
-    /// <summary>
-    /// O loop principal do agendador. Deve ser executado como uma tarefa de fundo.
-    /// </summary>
-    public async Task RunAsync(CancellationToken cancellationToken)
-    {
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            List<ScheduledTask> tasksToRun;
-            lock (_taskLock)
-            {
-                tasksToRun = _tasks.Where(t => t.ExecutionTime <= _server.CurrentTimeUtc).ToList();
-
-                if (tasksToRun.Any())
-                {
-                    _tasks.RemoveAll(t => tasksToRun.Contains(t));
-                }
-            }
-
-            foreach (var task in tasksToRun)
-            {
-                try
-                {
-                    task.TaskAction.Invoke();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"[SCHEDULER-ERROR] Erro ao executar tarefa agendada: {ex.Message}");
-                }
-            }
-
-            try
-            {
-                await Task.Delay(100, cancellationToken);
-            }
-            catch (TaskCanceledException)
-            {
-                break;
-            }
-        }
-        Console.WriteLine("[Scheduler] Agendador de tarefas encerrado.");
     }
 }
