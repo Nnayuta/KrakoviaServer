@@ -51,7 +51,7 @@ public class NetworkManager
             try
             {
                 var result = await _udpListener.ReceiveAsync();
-                await HandlePlayerMessageAsync(result.Buffer, result.RemoteEndPoint);
+                _ = Task.Run(() => HandlePlayerMessageAsync(result.Buffer, result.RemoteEndPoint), cancellationToken);
             }
             catch (ObjectDisposedException)
             {
@@ -86,7 +86,7 @@ public class NetworkManager
     /// Este método deve ser chamado a cada tick do servidor (ex: 20 vezes por segundo).
     /// Ele processa a fila de saída de cada jogador e envia os pacotes agrupados.
     /// </summary>
-    public void DispatchQueuedMessages()
+    public async Task DispatchQueuedMessages()
     {
         // Itera sobre uma cópia da lista de jogadores para evitar problemas de concorrência
         // se um jogador se conectar/desconectar durante o loop.
@@ -128,11 +128,20 @@ public class NetworkManager
                     }
                 }
 
-                // Se montamos um pacote com pelo menos uma mensagem, enviamos.
                 if (packageStream.Position > 0)
                 {
-                    byte[] finalPackage = packageStream.ToArray();
-                    _udpListener.Send(finalPackage, finalPackage.Length, player.EndPoint);
+                    try
+                    {
+                        byte[] finalPackage = packageStream.ToArray();
+                        // --- A MUDANÇA CRÍTICA ESTÁ AQUI ---
+                        // Usamos a versão assíncrona para não bloquear o tick do servidor.
+                        await _udpListener.SendAsync(finalPackage, finalPackage.Length, player.EndPoint);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Adicionar um log aqui é útil para depurar problemas de envio.
+                        Console.WriteLine($"[Dispatch] Erro ao enviar pacote para {player.Username}: {ex.Message}");
+                    }
                 }
             }
         }
@@ -236,40 +245,38 @@ public class NetworkManager
 
     private async Task HandlePlayerMessageAsync(byte[] buffer, IPEndPoint clientEndPoint)
     {
-        //Console.WriteLine($"[SERVER] {buffer.Length} bytes recebidos de {clientEndPoint}");
-
-        // Usamos um MemoryStream para ler o pacote recebido
-        using (var packageStream = new MemoryStream(buffer))
-        using (var reader = new BinaryReader(packageStream))
+        // --- A MUDANÇA CRÍTICA ESTÁ AQUI ---
+        // Um try-catch geral para garantir que uma mensagem ruim não mate a tarefa silenciosamente.
+        try
         {
-            // Enquanto houver dados para ler...
-            while (packageStream.Position < packageStream.Length)
+            using (var packageStream = new MemoryStream(buffer))
+            using (var reader = new BinaryReader(packageStream))
             {
-                try
+                while (packageStream.Position < packageStream.Length)
                 {
-                    // Lê o tamanho da próxima mensagem (ushort = 2 bytes)
-                    ushort messageSize = reader.ReadUInt16();
-
-                    // Garante que o buffer contém a mensagem inteira
-                    if (packageStream.Position + messageSize > packageStream.Length)
+                    try
                     {
-                        Console.WriteLine($"[NetworkManager] Erro: Pacote malformado de {clientEndPoint}. Tamanho de mensagem inválido.");
-                        break; // Sai do loop se o pacote estiver corrompido
+                        ushort messageSize = reader.ReadUInt16();
+                        if (packageStream.Position + messageSize > packageStream.Length)
+                        {
+                            Console.WriteLine($"[NetworkManager] Erro: Pacote malformado de {clientEndPoint}. Tamanho de mensagem inválido.");
+                            break;
+                        }
+
+                        byte[] messageBytes = reader.ReadBytes(messageSize);
+                        await ProcessSingleMessage(messageBytes, clientEndPoint);
                     }
-
-                    // Lê os bytes da mensagem
-                    byte[] messageBytes = reader.ReadBytes(messageSize);
-
-                    // Agora, processa a mensagem individual como antes
-                    await ProcessSingleMessage(messageBytes, clientEndPoint);
-                }
-                catch (EndOfStreamException)
-                {
-                    // Acontece se o pacote terminar inesperadamente. Apenas paramos de ler.
-                    Console.WriteLine($"[NetworkManager] Aviso: Fim do stream atingido ao desempacotar mensagem de {clientEndPoint}.");
-                    break;
+                    catch (EndOfStreamException)
+                    {
+                        Console.WriteLine($"[NetworkManager] Aviso: Fim do stream atingido ao desempacotar mensagem de {clientEndPoint}.");
+                        break;
+                    }
                 }
             }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[NetworkManager] Erro CRÍTICO ao processar pacote de {clientEndPoint}. Erro: {ex.Message}\nStack: {ex.StackTrace}");
         }
     }
 
