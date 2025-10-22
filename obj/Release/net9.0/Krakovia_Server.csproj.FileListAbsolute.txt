@@ -48,3 +48,12 @@ C:\GameDev\Krakovia Server\Krakovia Server\obj\Release\net9.0\refint\Krakovia_Se
 C:\GameDev\Krakovia Server\Krakovia Server\obj\Release\net9.0\Krakovia_Server.pdb
 C:\GameDev\Krakovia Server\Krakovia Server\obj\Release\net9.0\Krakovia_Server.genruntimeconfig.cache
 C:\GameDev\Krakovia Server\Krakovia Server\obj\Release\net9.0\ref\Krakovia_Server.dll
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\Microsoft.Extensions.Configuration.dll
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\Microsoft.Extensions.Configuration.Abstractions.dll
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\Microsoft.Extensions.Configuration.Binder.dll
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\Microsoft.Extensions.Configuration.FileExtensions.dll
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\Microsoft.Extensions.Configuration.Json.dll
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\Microsoft.Extensions.FileProviders.Abstractions.dll
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\Microsoft.Extensions.FileProviders.Physical.dll
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\Microsoft.Extensions.FileSystemGlobbing.dll
+C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\Microsoft.Extensions.Primitives.dll

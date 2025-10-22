@@ -214,13 +214,6 @@ public class UDPServer
     }
 
     /// <summary>
-    /// Desconecta um jogador do servidor, removendo-o da lista de conectados
-    /// e notificando os outros jogadores e sistemas (como o OnlineStatusManager).
-    /// </summary>
-    /// <param name="clientKey">A chave do jogador no dicionário (geralmente EndPoint.ToString()).</param>
-    // EM UDPServer.cs
-
-    /// <summary>
     /// Desconecta um jogador do servidor, SALVANDO SEUS DADOS, removendo-o da lista de conectados
     /// e notificando os outros jogadores e sistemas.
     /// </summary>

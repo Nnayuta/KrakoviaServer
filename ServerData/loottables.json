@@ -612,6 +612,23 @@
       ]
     },
     {
+      "LootTableID": "quest_raiz_problema_collect",
+      "Pools": [
+        {
+          "Chance": 1.0,
+          "Rolls": 0,
+          "Entries": [
+            {
+              "ItemID": "potato_glitch",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
       "LootTableID": "skeleton_drop",
       "Pools": [
         {

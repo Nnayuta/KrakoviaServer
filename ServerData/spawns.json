@@ -1,9 +1,89 @@
 {
   "SpawnPoints": [
     {
+      "NpcTypeId": "npc_Padre_Osvaldo",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 247.36,
+        "Y": 68.51,
+        "Z": 901.16
+      },
+      "AiType": 5,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "npc_Jaque_Martelo_Fino",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 234.6,
+        "Y": 68.47,
+        "Z": 898.66
+      },
+      "AiType": 5,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": -38.26,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "bandids_0003",
+      "Quantity": 20,
+      "SpawnRadius": 70.0,
+      "Position": {
+        "X": 586.0,
+        "Y": 92.08,
+        "Z": 349.2
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "21119d20",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 154.17,
+        "Y": 68.73,
+        "Z": 971.23
+      },
+      "AiType": 5,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 171.3,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "wolf_3fab7236_15",
+      "Quantity": 40,
+      "SpawnRadius": 150.0,
+      "Position": {
+        "X": 315.0,
+        "Y": 117.83,
+        "Z": 179.0
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
       "NpcTypeId": "skeleton_f0f73cb7_12",
       "Quantity": 10,
-      "SpawnRadius": 35.0,
+      "SpawnRadius": 20.0,
       "Position": {
         "X": 468.05,
         "Y": 83.3,
@@ -17,15 +97,271 @@
       }
     },
     {
+      "NpcTypeId": "21119d20",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 172.73,
+        "Y": 68.7,
+        "Z": 973.68
+      },
+      "AiType": 5,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 154.9,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "dummy_npc_7d47429f",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 247.28,
+        "Y": 68.82,
+        "Z": 951.13
+      },
+      "AiType": 8,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "npc_Cleberton",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 213.29,
+        "Y": 68.53,
+        "Z": 924.66
+      },
+      "AiType": 5,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 95.7,
+        "Z": 0.0
+      }
+    },
+    {
       "NpcTypeId": "elite_skeleton_f0f73cb7_15",
       "Quantity": 10,
       "SpawnRadius": 20.0,
       "Position": {
-        "X": 520.85,
+        "X": 541.85,
         "Y": 83.3,
-        "Z": 234.2
+        "Z": 92.7
       },
       "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "elite_bandids_0001",
+      "Quantity": 4,
+      "SpawnRadius": 40.0,
+      "Position": {
+        "X": 650.3,
+        "Y": 92.08,
+        "Z": 575.4
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "skeleton_f0f73cb7_12",
+      "Quantity": 10,
+      "SpawnRadius": 35.0,
+      "Position": {
+        "X": 371.65,
+        "Y": 83.3,
+        "Z": 466.5
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "elite_skeleton_f0f73cb7_12",
+      "Quantity": 10,
+      "SpawnRadius": 20.0,
+      "Position": {
+        "X": 725.85,
+        "Y": 121.83,
+        "Z": 816.13
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "dummy_npc_7d47429f",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 247.38,
+        "Y": 68.7,
+        "Z": 956.96
+      },
+      "AiType": 8,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "dummy_npc_7d47429f",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 251.79,
+        "Y": 68.59,
+        "Z": 951.06
+      },
+      "AiType": 8,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "elite_skeleton_f0f73cb7_12",
+      "Quantity": 10,
+      "SpawnRadius": 20.0,
+      "Position": {
+        "X": 371.65,
+        "Y": 83.3,
+        "Z": 466.5
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "dummy_npc_7d47429f",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 255.92,
+        "Y": 68.59,
+        "Z": 951.05
+      },
+      "AiType": 8,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "deer_npc_75448138",
+      "Quantity": 25,
+      "SpawnRadius": 200.0,
+      "Position": {
+        "X": 373.0,
+        "Y": 100.49,
+        "Z": 299.0
+      },
+      "AiType": 3,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "skeleton_f0f73cb7_6",
+      "Quantity": 10,
+      "SpawnRadius": 30.0,
+      "Position": {
+        "X": 575.35,
+        "Y": 120.98,
+        "Z": 722.9
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "dummy_npc_7d47429f",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 255.88,
+        "Y": 68.71,
+        "Z": 946.09
+      },
+      "AiType": 8,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "elite_bandids_0004",
+      "Quantity": 4,
+      "SpawnRadius": 40.0,
+      "Position": {
+        "X": 279.6,
+        "Y": 92.08,
+        "Z": 349.2
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "deer_npc_75448138",
+      "Quantity": 25,
+      "SpawnRadius": 200.0,
+      "Position": {
+        "X": 824.3,
+        "Y": 91.9,
+        "Z": 439.7
+      },
+      "AiType": 3,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "deer_npc_75448138",
+      "Quantity": 25,
+      "SpawnRadius": 200.0,
+      "Position": {
+        "X": 590.0,
+        "Y": 100.49,
+        "Z": 487.0
+      },
+      "AiType": 3,
       "InitialRotation": {
         "X": 0.0,
         "Y": 0.0,
@@ -40,6 +376,86 @@
         "X": 928.3,
         "Y": 105.53,
         "Z": 497.7
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "21119d20",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 258.34,
+        "Y": 68.54,
+        "Z": 911.1
+      },
+      "AiType": 5,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": -357.6,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "21119d19",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 255.97,
+        "Y": 68.56,
+        "Z": 907.64
+      },
+      "AiType": 5,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 270.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "npc_Valdisney",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 159.51,
+        "Y": 68.38,
+        "Z": 957.41
+      },
+      "AiType": 5,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": -193.9,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "dummy_npc_7d47429f",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 247.43,
+        "Y": 68.54,
+        "Z": 945.98
+      },
+      "AiType": 8,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "elite_wolf_3fab7236_15",
+      "Quantity": 10,
+      "SpawnRadius": 150.0,
+      "Position": {
+        "X": 370.0,
+        "Y": 117.83,
+        "Z": 57.0
       },
       "AiType": 2,
       "InitialRotation": {
@@ -65,15 +481,63 @@
       }
     },
     {
-      "NpcTypeId": "dummy_npc_7d47429f",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
+      "NpcTypeId": "bandids_0004",
+      "Quantity": 20,
+      "SpawnRadius": 70.0,
       "Position": {
-        "X": 247.28,
-        "Y": 68.82,
-        "Z": 951.13
+        "X": 279.6,
+        "Y": 92.08,
+        "Z": 349.2
       },
-      "AiType": 8,
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "deer_npc_75448138",
+      "Quantity": 25,
+      "SpawnRadius": 200.0,
+      "Position": {
+        "X": 814.3,
+        "Y": 125.09,
+        "Z": 762.26
+      },
+      "AiType": 3,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "bear_npc_090d7357",
+      "Quantity": 20,
+      "SpawnRadius": 150.0,
+      "Position": {
+        "X": 784.0,
+        "Y": 91.88,
+        "Z": 276.0
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "elite_bandids_0003",
+      "Quantity": 4,
+      "SpawnRadius": 40.0,
+      "Position": {
+        "X": 586.0,
+        "Y": 92.08,
+        "Z": 349.2
+      },
+      "AiType": 2,
       "InitialRotation": {
         "X": 0.0,
         "Y": 0.0,
@@ -149,303 +613,31 @@
       }
     },
     {
-      "NpcTypeId": "21119d20",
+      "NpcTypeId": "npc_Dona_Cleide",
       "Quantity": 1,
       "SpawnRadius": 0.0,
       "Position": {
-        "X": 190.93,
-        "Y": 68.56,
-        "Z": 883.66
+        "X": 212.99,
+        "Y": 68.68,
+        "Z": 896.98
       },
       "AiType": 5,
       "InitialRotation": {
         "X": 0.0,
-        "Y": 0.0,
+        "Y": 47.42,
         "Z": 0.0
       }
     },
     {
-      "NpcTypeId": "wolf_3fab7236_15",
-      "Quantity": 40,
-      "SpawnRadius": 150.0,
-      "Position": {
-        "X": 315.0,
-        "Y": 117.83,
-        "Z": 179.0
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "npc_Seu_Armando_Martelada",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 239.25,
-        "Y": 68.54,
-        "Z": 931.36
-      },
-      "AiType": 5,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": -130.13,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "21119d20",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 172.73,
-        "Y": 68.7,
-        "Z": 973.68
-      },
-      "AiType": 5,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 154.9,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "skeleton_f0f73cb7_6",
-      "Quantity": 10,
-      "SpawnRadius": 30.0,
-      "Position": {
-        "X": 575.35,
-        "Y": 120.98,
-        "Z": 722.9
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "21119d20",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 190.88,
-        "Y": 68.53,
-        "Z": 911.17
-      },
-      "AiType": 5,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 91.4,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "dummy_npc_7d47429f",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 255.92,
-        "Y": 68.59,
-        "Z": 951.05
-      },
-      "AiType": 8,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "074a36b5",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 530.1,
-        "Y": 76.21,
-        "Z": 184.5
-      },
-      "AiType": 1,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "elite_skeleton_f0f73cb7_12",
-      "Quantity": 10,
-      "SpawnRadius": 20.0,
-      "Position": {
-        "X": 725.85,
-        "Y": 121.83,
-        "Z": 816.13
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "npc_ze_pescador",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 213.47,
-        "Y": 68.71,
-        "Z": 909.89
-      },
-      "AiType": 5,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 97.9,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "21119d20",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 258.34,
-        "Y": 68.54,
-        "Z": 911.1
-      },
-      "AiType": 5,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": -357.6,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "dummy_npc_7d47429f",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 251.79,
-        "Y": 68.59,
-        "Z": 951.06
-      },
-      "AiType": 8,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "bandids_0004",
-      "Quantity": 20,
-      "SpawnRadius": 70.0,
+      "NpcTypeId": "mage_bandids_0004",
+      "Quantity": 2,
+      "SpawnRadius": 40.0,
       "Position": {
         "X": 279.6,
         "Y": 92.08,
         "Z": 349.2
       },
       "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "21119d20",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 134.61,
-        "Y": 63.95,
-        "Z": 889.75
-      },
-      "AiType": 5,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": -180.61,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "deer_npc_75448138",
-      "Quantity": 25,
-      "SpawnRadius": 200.0,
-      "Position": {
-        "X": 548.0,
-        "Y": 109.28,
-        "Z": 790.7
-      },
-      "AiType": 3,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "wolf_3fab7236",
-      "Quantity": 60,
-      "SpawnRadius": 200.0,
-      "Position": {
-        "X": 488.3,
-        "Y": 117.83,
-        "Z": 814.7
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "skeleton_f0f73cb7_12",
-      "Quantity": 10,
-      "SpawnRadius": 35.0,
-      "Position": {
-        "X": 725.85,
-        "Y": 121.83,
-        "Z": 816.13
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "skeleton_f0f73cb7_12",
-      "Quantity": 10,
-      "SpawnRadius": 20.0,
-      "Position": {
-        "X": 468.05,
-        "Y": 83.3,
-        "Z": 182.4
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "deer_npc_75448138",
-      "Quantity": 25,
-      "SpawnRadius": 200.0,
-      "Position": {
-        "X": 373.0,
-        "Y": 100.49,
-        "Z": 299.0
-      },
-      "AiType": 3,
       "InitialRotation": {
         "X": 0.0,
         "Y": 0.0,
@@ -469,66 +661,114 @@
       }
     },
     {
+      "NpcTypeId": "elite_skeleton_f0f73cb7_15",
+      "Quantity": 10,
+      "SpawnRadius": 20.0,
+      "Position": {
+        "X": 520.85,
+        "Y": 83.3,
+        "Z": 234.2
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "bandids_0002",
+      "Quantity": 30,
+      "SpawnRadius": 90.0,
+      "Position": {
+        "X": 848.4,
+        "Y": 128.9,
+        "Z": 720.8
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "074a36b5",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 530.1,
+        "Y": 76.21,
+        "Z": 184.5
+      },
+      "AiType": 1,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "elite_bandids_0002",
+      "Quantity": 5,
+      "SpawnRadius": 60.0,
+      "Position": {
+        "X": 848.4,
+        "Y": 128.9,
+        "Z": 720.8
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "bear_npc_090d7357",
+      "Quantity": 5,
+      "SpawnRadius": 70.0,
+      "Position": {
+        "X": 629.0,
+        "Y": 105.53,
+        "Z": 693.0
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "dummy_npc_7d47429f",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 256.1,
+        "Y": 68.5,
+        "Z": 956.74
+      },
+      "AiType": 8,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
       "NpcTypeId": "21119d20",
       "Quantity": 1,
       "SpawnRadius": 0.0,
       "Position": {
-        "X": 256.35,
-        "Y": 68.57,
-        "Z": 972.5
+        "X": 190.88,
+        "Y": 68.53,
+        "Z": 911.17
       },
       "AiType": 5,
       "InitialRotation": {
         "X": 0.0,
-        "Y": -129.5,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "mage_bandids_0004",
-      "Quantity": 2,
-      "SpawnRadius": 40.0,
-      "Position": {
-        "X": 279.6,
-        "Y": 92.08,
-        "Z": 349.2
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "elite_wolf_3fab7236",
-      "Quantity": 20,
-      "SpawnRadius": 100.0,
-      "Position": {
-        "X": 498.03,
-        "Y": 106.98,
-        "Z": 753.85
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "npc_Padre_Osvaldo",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 247.36,
-        "Y": 68.51,
-        "Z": 901.16
-      },
-      "AiType": 5,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
+        "Y": 91.4,
         "Z": 0.0
       }
     },
@@ -601,29 +841,13 @@
       }
     },
     {
-      "NpcTypeId": "deer_npc_75448138",
-      "Quantity": 25,
-      "SpawnRadius": 200.0,
+      "NpcTypeId": "bear_npc_090d7357",
+      "Quantity": 20,
+      "SpawnRadius": 150.0,
       "Position": {
-        "X": 824.3,
-        "Y": 91.9,
-        "Z": 439.7
-      },
-      "AiType": 3,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "bandids_0002",
-      "Quantity": 30,
-      "SpawnRadius": 90.0,
-      "Position": {
-        "X": 848.4,
-        "Y": 128.9,
-        "Z": 720.8
+        "X": 853.3,
+        "Y": 91.88,
+        "Z": 497.7
       },
       "AiType": 2,
       "InitialRotation": {
@@ -633,18 +857,34 @@
       }
     },
     {
-      "NpcTypeId": "deer_npc_75448138",
-      "Quantity": 25,
-      "SpawnRadius": 200.0,
+      "NpcTypeId": "npc_Seu_Armando_Martelada",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
       "Position": {
-        "X": 590.0,
-        "Y": 100.49,
-        "Z": 487.0
+        "X": 239.25,
+        "Y": 68.54,
+        "Z": 931.36
       },
-      "AiType": 3,
+      "AiType": 5,
       "InitialRotation": {
         "X": 0.0,
-        "Y": 0.0,
+        "Y": -130.13,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "21119d20",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 256.51,
+        "Y": 68.81,
+        "Z": 929.74
+      },
+      "AiType": 5,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 101.5,
         "Z": 0.0
       }
     },
@@ -665,11 +905,155 @@
       }
     },
     {
-      "NpcTypeId": "elite_bandids_0004",
-      "Quantity": 4,
+      "NpcTypeId": "deer_npc_75448138",
+      "Quantity": 25,
+      "SpawnRadius": 200.0,
+      "Position": {
+        "X": 792.3,
+        "Y": 100.49,
+        "Z": 190.7
+      },
+      "AiType": 3,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "21119d20",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 256.35,
+        "Y": 68.57,
+        "Z": 972.5
+      },
+      "AiType": 5,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": -129.5,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "dummy_npc_7d47429f",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 251.82,
+        "Y": 68.78,
+        "Z": 946.08
+      },
+      "AiType": 8,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "skeleton_f0f73cb7_12",
+      "Quantity": 10,
+      "SpawnRadius": 35.0,
+      "Position": {
+        "X": 725.85,
+        "Y": 121.83,
+        "Z": 816.13
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "21119d20",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 241.55,
+        "Y": 68.64,
+        "Z": 958.3
+      },
+      "AiType": 5,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 79.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "21119d20",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 190.93,
+        "Y": 68.56,
+        "Z": 883.66
+      },
+      "AiType": 5,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "npc_ze_pescador",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
+      "Position": {
+        "X": 213.47,
+        "Y": 68.71,
+        "Z": 909.89
+      },
+      "AiType": 5,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 97.9,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "bandids_0001",
+      "Quantity": 20,
+      "SpawnRadius": 70.0,
+      "Position": {
+        "X": 650.3,
+        "Y": 92.08,
+        "Z": 575.4
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "elite_wolf_3fab7236",
+      "Quantity": 20,
+      "SpawnRadius": 100.0,
+      "Position": {
+        "X": 498.03,
+        "Y": 106.98,
+        "Z": 753.85
+      },
+      "AiType": 2,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "mage_bandids_0003",
+      "Quantity": 2,
       "SpawnRadius": 40.0,
       "Position": {
-        "X": 279.6,
+        "X": 586.0,
         "Y": 92.08,
         "Z": 349.2
       },
@@ -697,61 +1081,13 @@
       }
     },
     {
-      "NpcTypeId": "elite_bandids_0003",
-      "Quantity": 4,
-      "SpawnRadius": 40.0,
-      "Position": {
-        "X": 586.0,
-        "Y": 92.08,
-        "Z": 349.2
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "npc_Cleberton",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 213.29,
-        "Y": 68.53,
-        "Z": 924.66
-      },
-      "AiType": 5,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 95.7,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "elite_bandids_0002",
-      "Quantity": 5,
-      "SpawnRadius": 60.0,
-      "Position": {
-        "X": 848.4,
-        "Y": 128.9,
-        "Z": 720.8
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "elite_skeleton_f0f73cb7_12",
+      "NpcTypeId": "skeleton_f0f73cb7_12",
       "Quantity": 10,
-      "SpawnRadius": 20.0,
+      "SpawnRadius": 35.0,
       "Position": {
-        "X": 371.65,
+        "X": 468.05,
         "Y": 83.3,
-        "Z": 466.5
+        "Z": 182.4
       },
       "AiType": 2,
       "InitialRotation": {
@@ -765,334 +1101,14 @@
       "Quantity": 25,
       "SpawnRadius": 200.0,
       "Position": {
-        "X": 792.3,
-        "Y": 100.49,
-        "Z": 190.7
+        "X": 548.0,
+        "Y": 109.28,
+        "Z": 790.7
       },
       "AiType": 3,
       "InitialRotation": {
         "X": 0.0,
         "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "elite_skeleton_f0f73cb7_15",
-      "Quantity": 10,
-      "SpawnRadius": 20.0,
-      "Position": {
-        "X": 541.85,
-        "Y": 83.3,
-        "Z": 92.7
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "bandids_0003",
-      "Quantity": 20,
-      "SpawnRadius": 70.0,
-      "Position": {
-        "X": 586.0,
-        "Y": 92.08,
-        "Z": 349.2
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "dummy_npc_7d47429f",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 247.43,
-        "Y": 68.54,
-        "Z": 945.98
-      },
-      "AiType": 8,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "skeleton_f0f73cb7_12",
-      "Quantity": 10,
-      "SpawnRadius": 35.0,
-      "Position": {
-        "X": 371.65,
-        "Y": 83.3,
-        "Z": 466.5
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "skeleton_f0f73cb7_18",
-      "Quantity": 10,
-      "SpawnRadius": 71.45,
-      "Position": {
-        "X": 552.6,
-        "Y": 83.3,
-        "Z": 137.4
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "dummy_npc_7d47429f",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 255.88,
-        "Y": 68.71,
-        "Z": 946.09
-      },
-      "AiType": 8,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "bear_npc_090d7357",
-      "Quantity": 5,
-      "SpawnRadius": 70.0,
-      "Position": {
-        "X": 629.0,
-        "Y": 105.53,
-        "Z": 693.0
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "elite_bandids_0001",
-      "Quantity": 4,
-      "SpawnRadius": 40.0,
-      "Position": {
-        "X": 650.3,
-        "Y": 92.08,
-        "Z": 575.4
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "bandids_0001",
-      "Quantity": 20,
-      "SpawnRadius": 70.0,
-      "Position": {
-        "X": 650.3,
-        "Y": 92.08,
-        "Z": 575.4
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "dummy_npc_7d47429f",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 251.82,
-        "Y": 68.78,
-        "Z": 946.08
-      },
-      "AiType": 8,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "npc_Dona_Cleide",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 212.99,
-        "Y": 68.68,
-        "Z": 896.98
-      },
-      "AiType": 5,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 47.42,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "bear_npc_090d7357",
-      "Quantity": 20,
-      "SpawnRadius": 150.0,
-      "Position": {
-        "X": 784.0,
-        "Y": 91.88,
-        "Z": 276.0
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "21119d20",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 256.51,
-        "Y": 68.81,
-        "Z": 929.74
-      },
-      "AiType": 5,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 101.5,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "npc_Valdisney",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 159.51,
-        "Y": 68.38,
-        "Z": 957.41
-      },
-      "AiType": 5,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": -193.9,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "elite_wolf_3fab7236_15",
-      "Quantity": 10,
-      "SpawnRadius": 150.0,
-      "Position": {
-        "X": 370.0,
-        "Y": 117.83,
-        "Z": 57.0
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "dummy_npc_7d47429f",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 247.38,
-        "Y": 68.7,
-        "Z": 956.96
-      },
-      "AiType": 8,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "21119d19",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 255.97,
-        "Y": 68.56,
-        "Z": 907.64
-      },
-      "AiType": 5,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 270.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "dummy_npc_7d47429f",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 256.1,
-        "Y": 68.5,
-        "Z": 956.74
-      },
-      "AiType": 8,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "mage_bandids_0003",
-      "Quantity": 2,
-      "SpawnRadius": 40.0,
-      "Position": {
-        "X": 586.0,
-        "Y": 92.08,
-        "Z": 349.2
-      },
-      "AiType": 2,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 0.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "21119d20",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 154.17,
-        "Y": 68.73,
-        "Z": 971.23
-      },
-      "AiType": 5,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 171.3,
         "Z": 0.0
       }
     },
@@ -1113,45 +1129,13 @@
       }
     },
     {
-      "NpcTypeId": "21119d20",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
+      "NpcTypeId": "wolf_3fab7236",
+      "Quantity": 60,
+      "SpawnRadius": 200.0,
       "Position": {
-        "X": 241.55,
-        "Y": 68.64,
-        "Z": 958.3
-      },
-      "AiType": 5,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": 79.0,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "npc_Jaque_Martelo_Fino",
-      "Quantity": 1,
-      "SpawnRadius": 0.0,
-      "Position": {
-        "X": 234.6,
-        "Y": 68.47,
-        "Z": 898.66
-      },
-      "AiType": 5,
-      "InitialRotation": {
-        "X": 0.0,
-        "Y": -38.26,
-        "Z": 0.0
-      }
-    },
-    {
-      "NpcTypeId": "bear_npc_090d7357",
-      "Quantity": 20,
-      "SpawnRadius": 150.0,
-      "Position": {
-        "X": 853.3,
-        "Y": 91.88,
-        "Z": 497.7
+        "X": 488.3,
+        "Y": 117.83,
+        "Z": 814.7
       },
       "AiType": 2,
       "InitialRotation": {
@@ -1161,15 +1145,31 @@
       }
     },
     {
-      "NpcTypeId": "deer_npc_75448138",
-      "Quantity": 25,
-      "SpawnRadius": 200.0,
+      "NpcTypeId": "21119d20",
+      "Quantity": 1,
+      "SpawnRadius": 0.0,
       "Position": {
-        "X": 814.3,
-        "Y": 125.09,
-        "Z": 762.26
+        "X": 134.61,
+        "Y": 63.95,
+        "Z": 889.75
       },
-      "AiType": 3,
+      "AiType": 5,
+      "InitialRotation": {
+        "X": 0.0,
+        "Y": -180.61,
+        "Z": 0.0
+      }
+    },
+    {
+      "NpcTypeId": "skeleton_f0f73cb7_18",
+      "Quantity": 10,
+      "SpawnRadius": 71.45,
+      "Position": {
+        "X": 552.6,
+        "Y": 83.3,
+        "Z": 137.4
+      },
+      "AiType": 2,
       "InitialRotation": {
         "X": 0.0,
         "Y": 0.0,

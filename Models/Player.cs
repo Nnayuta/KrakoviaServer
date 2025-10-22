@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 // A classe PlayerState permanece a mesma.
 public class PlayerState
 {
-    public string Position { get; set; } = "174,7,476";
+    public string Position { get; set; } = "160, 70, 944";
     public string RotationY { get; set; } = "0";
     public string VelocityX { get; set; } = "0";
     public string VelocityY { get; set; } = "0";
@@ -367,7 +367,7 @@ public class Player : ICombatEntity, IWorldEntity
         if (!IsCasting) return;
 
         var abilityName = CurrentCastAbility?.Name ?? "desconhecida";
-        // Console.WriteLine($"[Casting-Server] Casting de '{Username}' para a habilidade '{abilityName}' interrompido.");
+        Console.WriteLine($"[Casting-Server] Casting de '{Username}' para a habilidade '{abilityName}' interrompido.");
 
         IsCasting = false;
         CurrentCastAbility = null;
