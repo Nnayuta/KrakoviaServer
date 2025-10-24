@@ -8,86 +8,31 @@
           "Rolls": 1,
           "MinQuality": "Common",
           "Entries": [
-            {
-              "ItemID": "Adaga_Cega",
-              "Weight": 100,
-              "MinQuantity": 1,
-              "MaxQuantity": 4
-            },
-            {
-              "ItemID": "Bolsa_Rasgada",
-              "Weight": 70,
-              "MinQuantity": 2,
-              "MaxQuantity": 3
-            },
-            {
-              "ItemID": "Trapo_Sujo",
-              "Weight": 60,
-              "MinQuantity": 2,
-              "MaxQuantity": 5
-            }
+            { "ItemID": "Adaga_Cega", "Weight": 100, "MinQuantity": 1, "MaxQuantity": 3 },
+            { "ItemID": "Bolsa_Rasgada", "Weight": 70, "MinQuantity": 1, "MaxQuantity": 2 },
+            { "ItemID": "Trapo_Sujo", "Weight": 60, "MinQuantity": 1, "MaxQuantity": 4 }
           ]
         },
         {
-          "Chance": 0.05,
+          "Chance": 0.20,
           "Rolls": 1,
           "MinQuality": "Common",
           "Entries": [
-            {
-              "ItemID": "cloth_template_hands_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "cloth_template_legs_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "cloth_template_boots_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "plate_template_feet_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "plate_template_legs_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            }
+            { "ItemID": "cloth_template_hands_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_legs_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_boots_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "plate_template_feet_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "plate_template_legs_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 }
           ]
         },
         {
-          "Chance": 0.05,
+          "Chance": 0.15,
           "Rolls": 1,
           "MinQuality": "Common",
           "Entries": [
-            {
-              "ItemID": "sword_01",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "sword_02",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "priest_staff_wood_01",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            }
+            { "ItemID": "sword_01", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "sword_02", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "priest_staff_wood_01", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 }
           ]
         }
       ]
@@ -100,104 +45,24 @@
           "Rolls": 1,
           "MinQuality": "Common",
           "Entries": [
-            {
-              "ItemID": "Trapo_Sujo",
-              "Weight": 100,
-              "MinQuantity": 1,
-              "MaxQuantity": 5
-            },
-            {
-              "ItemID": "Bolsa_Rasgada",
-              "Weight": 70,
-              "MinQuantity": 1,
-              "MaxQuantity": 5
-            },
-            {
-              "ItemID": "Moeda_Enferrujada",
-              "Weight": 70,
-              "MinQuantity": 1,
-              "MaxQuantity": 2
-            }
+            { "ItemID": "Trapo_Sujo", "Weight": 100, "MinQuantity": 3, "MaxQuantity": 8 },
+            { "ItemID": "Bolsa_Rasgada", "Weight": 70, "MinQuantity": 2, "MaxQuantity": 6 },
+            { "ItemID": "Moeda_Enferrujada", "Weight": 70, "MinQuantity": 1, "MaxQuantity": 3 }
           ]
         },
         {
-          "Chance": 0.1,
+          "Chance": 0.50,
           "Rolls": 1,
           "MinQuality": "Uncommon",
           "Entries": [
-            {
-              "ItemID": "cloth_template_boots_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "cloth_template_chest_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "cloth_template_hands_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "cloth_template_head_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "cloth_template_legs_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "plate_template_chest_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "plate_template_feet_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "plate_template_head_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "plate_template_head_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            }
-          ]
-        },
-        {
-          "Chance": 0.05,
-          "Rolls": 1,
-          "MinQuality": "Common",
-          "Entries": [
-            {
-              "ItemID": "sword_03",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "priest_staff_wood_01",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            }
+            { "ItemID": "cloth_template_boots_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_chest_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_hands_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_head_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_legs_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "plate_template_chest_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "plate_template_feet_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "plate_template_head_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 }
           ]
         }
       ]
@@ -210,80 +75,18 @@
           "Rolls": 1,
           "MinQuality": "Common",
           "Entries": [
-            {
-              "ItemID": "Moeda_Enferrujada",
-              "Weight": 100,
-              "MinQuantity": 5,
-              "MaxQuantity": 15
-            },
-            {
-              "ItemID": "Bolsa_Rasgada",
-              "Weight": 70,
-              "MinQuantity": 1,
-              "MaxQuantity": 5
-            }
+            { "ItemID": "Moeda_Enferrujada", "Weight": 100, "MinQuantity": 2, "MaxQuantity": 8 },
+            { "ItemID": "Bolsa_Rasgada", "Weight": 70, "MinQuantity": 1, "MaxQuantity": 3 }
           ]
         },
         {
-          "Chance": 0.05,
-          "Rolls": 1,
-          "MinQuality": "Uncommon",
-          "Entries": [
-            {
-              "ItemID": "cloth_template_hands_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "cloth_template_legs_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "cloth_template_boots_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "plate_template_feet_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "plate_template_legs_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            }
-          ]
-        },
-        {
-          "Chance": 0.08,
+          "Chance": 0.25,
           "Rolls": 1,
           "MinQuality": "Common",
           "Entries": [
-            {
-              "ItemID": "sword_03",
-              "Weight": 3,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "sword_04",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "priest_staff_wood_02",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            }
+            { "ItemID": "sword_03", "Weight": 3, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "sword_04", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "priest_staff_wood_02", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 }
           ]
         }
       ]
@@ -296,98 +99,23 @@
           "Rolls": 1,
           "MinQuality": "Common",
           "Entries": [
-            {
-              "ItemID": "Moeda_Enferrujada",
-              "Weight": 1,
-              "MinQuantity": 5,
-              "MaxQuantity": 20
-            },
-            {
-              "ItemID": "Trapo_Sujo",
-              "Weight": 1,
-              "MinQuantity": 5,
-              "MaxQuantity": 20
-            }
+            { "ItemID": "Moeda_Enferrujada", "Weight": 1, "MinQuantity": 5, "MaxQuantity": 15 },
+            { "ItemID": "Trapo_Sujo", "Weight": 1, "MinQuantity": 3, "MaxQuantity": 10 }
           ]
         },
         {
-          "Chance": 0.1,
+          "Chance": 0.60,
           "Rolls": 1,
-          "MinQuality": "Rare",
+          "MinQuality": "Uncommon",
           "Entries": [
-            {
-              "ItemID": "cloth_template_boots_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "cloth_template_chest_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "cloth_template_hands_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "cloth_template_head_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "cloth_template_legs_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "plate_template_chest_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "plate_template_feet_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "plate_template_head_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "plate_template_head_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            }
-          ]
-        },
-        {
-          "Chance": 0.05,
-          "Rolls": 1,
-          "MinQuality": "Common",
-          "Entries": [
-            {
-              "ItemID": "sword_04",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "priest_staff_wood_02",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            }
+            { "ItemID": "cloth_template_boots_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_chest_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_hands_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_head_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_legs_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "plate_template_chest_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "plate_template_feet_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "plate_template_head_cloth", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 }
           ]
         }
       ]
@@ -400,97 +128,27 @@
           "Rolls": 1,
           "MinQuality": "Common",
           "Entries": [
-            {
-              "ItemID": "Moeda_Enferrujada",
-              "Weight": 1,
-              "MinQuantity": 5,
-              "MaxQuantity": 20
-            },
-            {
-              "ItemID": "Trapo_Sujo",
-              "Weight": 1,
-              "MinQuantity": 5,
-              "MaxQuantity": 20
-            }
+            { "ItemID": "Moeda_Enferrujada", "Weight": 1, "MinQuantity": 5, "MaxQuantity": 20 },
+            { "ItemID": "Trapo_Sujo", "Weight": 1, "MinQuantity": 5, "MaxQuantity": 20 }
           ]
         },
         {
-          "Chance": 0.01,
+          "Chance": 0.30,
           "Rolls": 1,
           "MinQuality": "Uncommon",
           "Entries": [
-            {
-              "ItemID": "plate_template_boots",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "plate_template_chest",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "plate_template_cloak",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "plate_template_hands",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "plate_template_head",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "plate_template_legs",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "cloth_template_boots_end",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "cloth_template_chest_end",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "cloth_template_cloak_end",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "cloth_template_hands_end",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "cloth_template_head_end",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "cloth_template_legs_end",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            }
+            { "ItemID": "plate_template_boots", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "plate_template_chest", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "plate_template_cloak", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "plate_template_hands", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "plate_template_head", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "plate_template_legs", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_boots_end", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_chest_end", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_cloak_end", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_hands_end", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_head_end", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_legs_end", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 }
           ]
         }
       ]
@@ -503,37 +161,17 @@
           "Rolls": 1,
           "MinQuality": "Common",
           "Entries": [
-            {
-              "ItemID": "Moeda_Enferrujada",
-              "Weight": 1,
-              "MinQuantity": 5,
-              "MaxQuantity": 20
-            },
-            {
-              "ItemID": "Trapo_Sujo",
-              "Weight": 1,
-              "MinQuantity": 5,
-              "MaxQuantity": 20
-            }
+            { "ItemID": "Moeda_Enferrujada", "Weight": 1, "MinQuantity": 10, "MaxQuantity": 30 },
+            { "ItemID": "Trapo_Sujo", "Weight": 1, "MinQuantity": 10, "MaxQuantity": 30 }
           ]
         },
         {
-          "Chance": 0.01,
+          "Chance": 0.75,
           "Rolls": 1,
-          "MinQuality": "Uncommon",
+          "MinQuality": "Rare",
           "Entries": [
-            {
-              "ItemID": "priest_staff_wood_04",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "sword_07",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            }
+            { "ItemID": "priest_staff_wood_04", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "sword_07", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 }
           ]
         }
       ]
@@ -546,86 +184,9 @@
           "Rolls": 1,
           "MinQuality": "Common",
           "Entries": [
-            {
-              "ItemID": "common_hide",
-              "Weight": 70,
-              "MinQuantity": 1,
-              "MaxQuantity": 4
-            },
-            {
-              "ItemID": "Dente_de_Urso",
-              "Weight": 100,
-              "MinQuantity": 1,
-              "MaxQuantity": 4
-            },
-            {
-              "ItemID": "Garra_Quebrada",
-              "Weight": 50,
-              "MinQuantity": 1,
-              "MaxQuantity": 4
-            },
-            {
-              "ItemID": "Pedaco_de_Pele_Grossa",
-              "Weight": 30,
-              "MinQuantity": 1,
-              "MaxQuantity": 4
-            }
-          ]
-        },
-        {
-          "Chance": 0.01,
-          "Rolls": 1,
-          "MinQuality": "Rare",
-          "Entries": [
-            {
-              "ItemID": "cloth_template_hands_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "cloth_template_legs_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "cloth_template_boots_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "plate_template_feet_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            },
-            {
-              "ItemID": "plate_template_legs_cloth",
-              "Weight": 0,
-              "MinQuantity": 0,
-              "MaxQuantity": 0
-            }
-          ]
-        },
-        {
-          "Chance": 0.01,
-          "Rolls": 1,
-          "MinQuality": "Uncommon",
-          "Entries": [
-            {
-              "ItemID": "sword_02",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "priest_staff_wood_01",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            }
+            { "ItemID": "common_hide", "Weight": 70, "MinQuantity": 1, "MaxQuantity": 3 },
+            { "ItemID": "Dente_de_Urso", "Weight": 100, "MinQuantity": 1, "MaxQuantity": 2 },
+            { "ItemID": "Garra_Quebrada", "Weight": 50, "MinQuantity": 1, "MaxQuantity": 2 }
           ]
         }
       ]
@@ -634,113 +195,33 @@
       "LootTableID": "giant_loot_boos",
       "Pools": [
         {
-          "Chance": 0.5,
+          "Chance": 1.0,
           "Rolls": 2,
           "MinQuality": "Rare",
           "Entries": [
-            {
-              "ItemID": "sword_07",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "sword_06",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "guard_plate_boots_01",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "guard_plate_chest_01",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "guard_plate_cloak_01",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "guard_plate_hands_01",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "guard_plate_head_01",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "guard_plate_legs_01",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            }
+            { "ItemID": "sword_07", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "sword_06", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "guard_plate_boots_01", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "guard_plate_chest_01", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "guard_plate_cloak_01", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "guard_plate_hands_01", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "guard_plate_head_01", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "guard_plate_legs_01", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 }
           ]
         },
         {
-          "Chance": 0.5,
+          "Chance": 1.0,
           "Rolls": 2,
           "MinQuality": "Rare",
           "Entries": [
-            {
-              "ItemID": "priest_staff_wood_05",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "priest_staff_wood_04",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "cloth_template_boots_end",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "cloth_template_chest_end",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "cloth_template_cloak_end",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "cloth_template_hands_end",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "cloth_template_head_end",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "cloth_template_legs_end",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            }
+            { "ItemID": "priest_staff_wood_05", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "priest_staff_wood_04", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_boots_end", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_chest_end", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_cloak_end", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_hands_end", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_head_end", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "cloth_template_legs_end", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 }
           ]
         }
       ]
@@ -750,15 +231,10 @@
       "Pools": [
         {
           "Chance": 1.0,
-          "Rolls": 0,
-          "MinQuality": "Legendary",
+          "Rolls": 1,
+          "MinQuality": "Common",
           "Entries": [
-            {
-              "ItemID": "potato_glitch",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            }
+            { "ItemID": "potato_glitch", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 }
           ]
         }
       ]
@@ -771,37 +247,17 @@
           "Rolls": 1,
           "MinQuality": "Common",
           "Entries": [
-            {
-              "ItemID": "femur_trincado",
-              "Weight": 70,
-              "MinQuantity": 1,
-              "MaxQuantity": 4
-            },
-            {
-              "ItemID": "fragmento_de_osso",
-              "Weight": 100,
-              "MinQuantity": 1,
-              "MaxQuantity": 4
-            }
+            { "ItemID": "femur_trincado", "Weight": 70, "MinQuantity": 1, "MaxQuantity": 2 },
+            { "ItemID": "fragmento_de_osso", "Weight": 100, "MinQuantity": 1, "MaxQuantity": 3 }
           ]
         },
         {
-          "Chance": 0.01,
+          "Chance": 0.15,
           "Rolls": 1,
           "MinQuality": "Common",
           "Entries": [
-            {
-              "ItemID": "sword_03",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "priest_staff_wood_01",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            }
+            { "ItemID": "sword_03", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "priest_staff_wood_01", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 }
           ]
         }
       ]
@@ -814,43 +270,18 @@
           "Rolls": 1,
           "MinQuality": "Common",
           "Entries": [
-            {
-              "ItemID": "bone_drop",
-              "Weight": 70,
-              "MinQuantity": 1,
-              "MaxQuantity": 7
-            },
-            {
-              "ItemID": "fragmento_de_osso",
-              "Weight": 100,
-              "MinQuantity": 1,
-              "MaxQuantity": 6
-            },
-            {
-              "ItemID": "po_de_ossos",
-              "Weight": 100,
-              "MinQuantity": 1,
-              "MaxQuantity": 6
-            }
+            { "ItemID": "bone_drop", "Weight": 70, "MinQuantity": 1, "MaxQuantity": 7 },
+            { "ItemID": "fragmento_de_osso", "Weight": 100, "MinQuantity": 1, "MaxQuantity": 6 },
+            { "ItemID": "po_de_ossos", "Weight": 100, "MinQuantity": 1, "MaxQuantity": 6 }
           ]
         },
         {
-          "Chance": 0.01,
+          "Chance": 0.20,
           "Rolls": 1,
           "MinQuality": "Uncommon",
           "Entries": [
-            {
-              "ItemID": "sword_06",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "priest_staff_wood_02",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            }
+            { "ItemID": "sword_06", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "priest_staff_wood_02", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 }
           ]
         }
       ]
@@ -863,55 +294,20 @@
           "Rolls": 1,
           "MinQuality": "Common",
           "Entries": [
-            {
-              "ItemID": "bone_drop",
-              "Weight": 70,
-              "MinQuantity": 1,
-              "MaxQuantity": 3
-            },
-            {
-              "ItemID": "fragmento_de_osso",
-              "Weight": 100,
-              "MinQuantity": 1,
-              "MaxQuantity": 5
-            },
-            {
-              "ItemID": "po_de_ossos",
-              "Weight": 100,
-              "MinQuantity": 1,
-              "MaxQuantity": 5
-            },
-            {
-              "ItemID": "femur_trincado",
-              "Weight": 100,
-              "MinQuantity": 1,
-              "MaxQuantity": 8
-            }
+            { "ItemID": "bone_drop", "Weight": 70, "MinQuantity": 2, "MaxQuantity": 5 },
+            { "ItemID": "fragmento_de_osso", "Weight": 100, "MinQuantity": 3, "MaxQuantity": 8 },
+            { "ItemID": "po_de_ossos", "Weight": 100, "MinQuantity": 3, "MaxQuantity": 8 },
+            { "ItemID": "femur_trincado", "Weight": 100, "MinQuantity": 2, "MaxQuantity": 6 }
           ]
         },
         {
-          "Chance": 0.01,
+          "Chance": 0.65,
           "Rolls": 1,
           "MinQuality": "Rare",
           "Entries": [
-            {
-              "ItemID": "sword_05",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "sword_03",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "priest_staff_wood_03",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            }
+            { "ItemID": "sword_05", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "sword_03", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "priest_staff_wood_03", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 }
           ]
         }
       ]
@@ -924,37 +320,17 @@
           "Rolls": 1,
           "MinQuality": "Common",
           "Entries": [
-            {
-              "ItemID": "femur_trincado",
-              "Weight": 70,
-              "MinQuantity": 1,
-              "MaxQuantity": 7
-            },
-            {
-              "ItemID": "fragmento_de_osso",
-              "Weight": 100,
-              "MinQuantity": 1,
-              "MaxQuantity": 10
-            }
+            { "ItemID": "femur_trincado", "Weight": 70, "MinQuantity": 2, "MaxQuantity": 5 },
+            { "ItemID": "fragmento_de_osso", "Weight": 100, "MinQuantity": 3, "MaxQuantity": 7 }
           ]
         },
         {
-          "Chance": 0.01,
+          "Chance": 0.40,
           "Rolls": 1,
           "MinQuality": "Uncommon",
           "Entries": [
-            {
-              "ItemID": "sword_01",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            },
-            {
-              "ItemID": "priest_staff_wood_01",
-              "Weight": 1,
-              "MinQuantity": 1,
-              "MaxQuantity": 1
-            }
+            { "ItemID": "sword_01", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 },
+            { "ItemID": "priest_staff_wood_01", "Weight": 1, "MinQuantity": 1, "MaxQuantity": 1 }
           ]
         }
       ]

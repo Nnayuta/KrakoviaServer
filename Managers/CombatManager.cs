@@ -426,7 +426,6 @@ public class CombatManager
     }
 
     #region Métodos Auxiliares para Efeitos
-
     private List<ICombatEntity> FindTargetsInRadius(Vector3 center, float radius, ICombatEntity source, AbilityIntent intent)
     {
         var radiusSqr = radius * radius;
@@ -435,9 +434,7 @@ public class CombatManager
                                     .ToList();
 
         return allPossibleTargets.Where(target =>
-            target.Id != source.Id &&
             !target.IsDead &&
-            // <<< MUDANÇA >>> Usa o helper para comparar a distância quadrada no plano XZ.
             Vector3Helper.Distance2DSquared(target.Position, center) <= radiusSqr &&
             ((intent == AbilityIntent.Harmful && !AreEntitiesFriendly(source, target)) ||
              (intent == AbilityIntent.Helpful && AreEntitiesFriendly(source, target)))

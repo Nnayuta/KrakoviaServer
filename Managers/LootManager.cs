@@ -20,6 +20,8 @@ public class LootManager
         var itemsToDrop = new List<ItemStack>();
         if (string.IsNullOrEmpty(lootTableId) || !DataManager.LootTables.TryGetValue(lootTableId, out var table))
         {
+            // NOVO LOG DE ERRO
+            Console.WriteLine($"[LootManager-WARN] LootTableID '{lootTableId}' not found or is null.");
             return itemsToDrop;
         }
 
@@ -32,6 +34,7 @@ public class LootManager
             for (int i = 0; i < pool.Rolls; i++)
             {
                 int totalWeight = pool.Entries.Sum(e => e.Weight);
+                Console.WriteLine($"[LootManager-DEBUG] Processing LootTable '{lootTableId}', Pool Chance '{pool.Chance}', Rolls '{pool.Rolls}'. Total Weight in Pool: {totalWeight}. Entries count: {pool.Entries.Count}");
                 if (totalWeight <= 0) continue;
 
                 int randomWeight = _random.Next(1, totalWeight + 1);
