@@ -19,6 +19,7 @@ public class PlayerState
 public class Player : ICombatEntity, IWorldEntity
 {
     private readonly UDPServer? _server;
+    private static readonly Random _random = new Random();
 
     #region IWorldEntity & Session (Sem mudanças significativas)
     public HashSet<string> KnownPlayerIds { get; } = new HashSet<string>();
@@ -398,6 +399,21 @@ public class Player : ICombatEntity, IWorldEntity
     {
         if (source.Id == this.Id) return;
         if (IsDead) return;
+
+        float avoidanceChance = this.Stats.GetStatValue(StatType.Avoidance);
+        if (_random.NextDouble() * 100 < avoidanceChance)
+        {
+            // O jogador evitou o dano!
+            // Enviamos um evento de combate para notificar os clientes.
+            string message = $"COMBAT_EVENT|{this.SessionId}|{CombatEventType.Avoid}|0|false";
+            server.NetworkManager.BroadcastMessageToRelevantPlayers(this.Position, message);
+
+            // Interrompemos a execução do método, pois nenhum dano será sofrido.
+            Console.WriteLine($"[COMBAT] Jogador {this.CharacterName} evitou um ataque com {avoidanceChance}% de chance.");
+            return;
+        }
+        // --- LÓGICA DE AVOIDANCE (FIM) ---
+
         EnterCombat(server);
 
         if (CurrentGatheringTokenSource != null)

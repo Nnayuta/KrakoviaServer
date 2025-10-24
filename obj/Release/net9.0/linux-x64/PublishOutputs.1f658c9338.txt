@@ -1,2 +1,0 @@
-C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\Krakovia_Server.pdb
-C:\GameDev\Krakovia Server\Krakovia Server\bin\Release\net9.0\publish\linux-x64\Krakovia_Server

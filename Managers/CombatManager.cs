@@ -10,7 +10,7 @@ using System.Numerics;
 /// <summary>
 /// Define os tipos de eventos de combate que podem ser enviados aos clientes para exibição.
 /// </summary>
-public enum CombatEventType { PhysicalDamage, CriticalDamage, Heal, CriticalHeal }
+public enum CombatEventType { PhysicalDamage, CriticalDamage, Heal, CriticalHeal, Avoid }
 
 /// <summary>
 /// Gerencia toda a lógica de combate, incluindo validação e execução de habilidades.
@@ -338,9 +338,8 @@ public class CombatManager
         }
     }
 
-    // =================================================================================
-    // >> MÉTODO AUXILIAR ATUALIZADO (COM O FIX DO NAMEPLATE) <<
-    // =================================================================================
+    // Em Servidor/Managers/CombatManager.cs
+
     public void ApplySingleEffect(ICombatEntity caster, ICombatEntity target, ServerAbilityEffectData effectData, AbilityData sourceAbility)
     {
         if (caster.Stats == null) return;
@@ -354,11 +353,26 @@ public class CombatManager
             bool isCritical = _random.NextDouble() * 100 < caster.Stats.GetStatValue(StatType.CriticalStrikeChance);
             if (isCritical) rawDamage *= 2.0f;
 
-            // --- LOG DE DEPURAÇÃO ---
-            // Console.ForegroundColor = ConsoleColor.Yellow;
-            // Console.WriteLine($"[DAMAGE DEBUG] Caster: {caster.Id} ({caster.GetType().Name}) | Target: {target.Id} ({target.GetType().Name})");
-            // Console.ResetColor();
-            // --- FIM DO LOG ---
+            // --- LÓGICA DE LEECH (INÍCIO) ---
+            // Verificamos se quem causou o dano tem a stat Leech.
+            float leechPercent = caster.Stats.GetStatValue(StatType.Leech);
+            if (leechPercent > 0)
+            {
+                // Calculamos a quantidade de cura com base no dano causado.
+                float leechAmount = rawDamage * (leechPercent / 100.0f);
+
+                // Aplicamos a cura ao caster.
+                caster.ReceiveHealing(leechAmount, _server);
+
+                // (Opcional, mas recomendado) Envia um evento de combate para o caster ver a cura do Leech.
+                // Usamos o evento de cura normal.
+                string leechMessage = $"COMBAT_EVENT|{caster.SessionId}|{CombatEventType.Heal}|{(int)leechAmount}|false";
+                _server.NetworkManager.BroadcastMessageToRelevantPlayers(caster.Position, leechMessage);
+
+                Console.WriteLine($"[COMBAT] {caster.Id} curou {(int)leechAmount} via Leech ({leechPercent}%).");
+            }
+            // --- LÓGICA DE LEECH (FIM) ---
+
 
             target.TakeDamage(rawDamage, caster, _server);
 

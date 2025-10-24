@@ -72,9 +72,6 @@ public class StatusEffectController
         SendFullEffectListToClient();
     }
 
-    // =========================================================
-    // NOVO MÉTODO PRINCIPAL PARA SINCRONIZAÇÃO
-    // =========================================================
     /// <summary>
     /// Compila a lista atual de efeitos ativos em uma única mensagem de rede e a envia ao cliente.
     /// Formato: STATUS_EFFECT_LIST_UPDATE|id1,duração1,éBuff1;id2,duração2,éBuff2;...
