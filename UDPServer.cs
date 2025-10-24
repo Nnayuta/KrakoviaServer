@@ -48,6 +48,7 @@ public class UDPServer
     private readonly UdpClient _udpListener;
     private const int TIMEOUT_SECONDS = 30;
     public const int SERVER_TICK_RATE_MS = 33; // ~30 ticks por segundo. Ajuste conforme necessário.
+    private float _statusEffectUpdateTimer = 0f;
 
     private int _nextSessionId = 0;
     private int _nextNpcSessionId = 0;
@@ -57,7 +58,7 @@ public class UDPServer
         Instance = this;
 
         this._characterDb = characterDatabase;
-        IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Any, port);
+        IPEndPoint serverEndPoint = new(IPAddress.Any, port);
         this._udpListener = new UdpClient(serverEndPoint);
         DataManager.LoadAllData();
 
@@ -119,20 +120,26 @@ public class UDPServer
         {
             stopwatch.Restart();
             CurrentTimeUtc = DateTime.UtcNow;
+            float deltaTime = SERVER_TICK_RATE_MS / 1000.0f;
 
-            // --- ORDEM DE EXECUÇÃO DOS MANAGERS (A CADA TICK) ---
+            // --- ORDEM DE EXECUÇÃO ---
             Scheduler.Update();
-            NpcAiManager.Update(SERVER_TICK_RATE_MS / 1000.0f); // Passa o deltaTime
+            NpcAiManager.Update(deltaTime);
             PlayerLifecycleManager.Update();
             WorldManager.Update();
             GatherableManager.Update();
             InterestManager.Update();
 
-            // Atualização de Status Effects (lógica movida de UpdateServerTimeAsync)
-            var players = ConnectedPlayers.Values.ToList();
-            foreach (var player in players) player.StatusEffectController.Update();
-            var npcs = ActiveNpcs.Values.ToList();
-            foreach (var npc in npcs) npc.StatusEffectController.Update();
+            // --- OTIMIZAÇÃO DE STATUS EFFECT ---
+            _statusEffectUpdateTimer += deltaTime;
+            if (_statusEffectUpdateTimer >= 0.2f) // Roda a cada 200ms (5x por segundo)
+            {
+                _statusEffectUpdateTimer = 0f;
+                var players = ConnectedPlayers.Values.ToList();
+                foreach (var player in players) player.StatusEffectController.Update();
+                var npcs = ActiveNpcs.Values.ToList();
+                foreach (var npc in npcs) npc.StatusEffectController.Update();
+            }
 
             await NetworkManager.DispatchQueuedMessages();
 

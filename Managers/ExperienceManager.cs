@@ -13,7 +13,7 @@ public static class ExperienceManager
     /// Multiplicador global de XP. 1.0f = normal, 2.0f = dobro de XP, etc.
     /// Ótimo para eventos de "Double XP".
     /// </summary>
-    public const float SERVER_XP_RATE = 1.0f;
+    public const float SERVER_XP_RATE = 37.5f;
 
     /// <summary>
     /// A base de XP que um monstro "padrão" do mesmo nível do jogador concede.

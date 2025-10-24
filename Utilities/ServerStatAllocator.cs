@@ -147,8 +147,6 @@ public static class ServerStatAllocator
             if (tertiaryValue > 0) generatedStats[chosenTertiary] = tertiaryValue;
         }
 
-        Console.WriteLine("NOVO ITEM GERADO");
-
         // 6. Finalizar e retornar a tupla.
         var finalList = generatedStats
             .Where(kvp => kvp.Value > 0)

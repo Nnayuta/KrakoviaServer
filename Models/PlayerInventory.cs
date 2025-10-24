@@ -66,41 +66,68 @@ public class Inventory
     }
 
     /// <summary>
-    /// <<< MÉTODO NOVO E CRUCIAL >>>
-    /// Adiciona um ItemStack pré-existente ao inventário, preservando seu InstanceID.
-    /// Ideal para loot de monstros, trocas entre jogadores, etc.
+    /// Adiciona um ItemStack pré-existente ao inventário, preservando seu InstanceID e empilhando quando possível.
+    /// Ideal para loot de monstros.
     /// </summary>
-    /// <param name="stackToAdd">O ItemStack a ser adicionado.</param>
-    /// <returns>True se o item foi adicionado com sucesso.</returns>
     public bool AddItemStack(ItemStack stackToAdd)
     {
-        if (stackToAdd == null) return false;
+        if (stackToAdd == null || stackToAdd.Quantity <= 0) return false;
         if (!DataManager.Items.TryGetValue(stackToAdd.ItemID, out var itemData)) return false;
 
-        // Para itens não empilháveis (como equipamentos), simplesmente encontra um slot vazio.
-        if (!itemData.isStackable)
+        // --- LÓGICA PARA ITENS EMPILHÁVEIS ---
+        if (itemData.isStackable)
         {
-            int? emptySlot = FindEmptySlot();
-            if (emptySlot.HasValue)
+            // 1. Tenta empilhar em stacks existentes do mesmo item.
+            foreach (var slot in slots)
             {
-                slots[emptySlot.Value] = stackToAdd;
+                if (slot != null && slot.ItemID == stackToAdd.ItemID && slot.Quantity < itemData.maxStackSize)
+                {
+                    int spaceAvailable = itemData.maxStackSize - slot.Quantity;
+                    int amountToAdd = Math.Min(stackToAdd.Quantity, spaceAvailable);
+
+                    slot.Quantity += amountToAdd;
+                    stackToAdd.Quantity -= amountToAdd;
+
+                    // Se empilhamos tudo, o trabalho acabou.
+                    if (stackToAdd.Quantity <= 0)
+                    {
+                        // Como o item original foi "consumido", podemos remover seus dados de instância.
+                        // Isso evita que dados de itens "fantasmas" fiquem na memória.
+                        UDPServer.Instance?.ItemInstanceManager.UnregisterItem(stackToAdd.InstanceID);
+                        return true;
+                    }
+                }
+            }
+
+            // 2. Se ainda restam itens no stackToAdd, ele precisa de um novo slot.
+            if (stackToAdd.Quantity > 0)
+            {
+                int? emptySlot = FindEmptySlot();
+                if (emptySlot.HasValue)
+                {
+                    slots[emptySlot.Value] = stackToAdd;
+                    return true;
+                }
+            }
+            else
+            {
+                // Isso acontece se a quantidade foi totalmente empilhada.
                 return true;
             }
-            return false; // Inventário cheio
         }
+        // --- LÓGICA PARA ITENS NÃO EMPILHÁVEIS (EQUIPAMENTOS) ---
         else
         {
-            // Para itens empilháveis, primeiro tenta adicionar ao stack existente (se houver).
-            // (Esta é uma lógica mais complexa que podemos simplificar por enquanto)
-            // Por simplicidade na jam, vamos assumir que loot empilhável também vai para um novo slot.
             int? emptySlot = FindEmptySlot();
             if (emptySlot.HasValue)
             {
                 slots[emptySlot.Value] = stackToAdd;
                 return true;
             }
-            return false;
         }
+
+        // Se chegamos aqui, o inventário está cheio.
+        return false;
     }
 
     // --- O RESTO DA CLASSE CONTINUA IGUAL ---

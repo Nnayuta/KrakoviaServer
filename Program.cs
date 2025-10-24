@@ -41,8 +41,7 @@ $@"
 ");
 
         Console.WriteLine("Conectando ao banco de dados MariaDB...");
-        //  string connectionString = "Server=127.0.0.1;Database=krakovia;User=kakovia;Password=s3@>C6U3K5£:;";
-
+        //    string connectionString = "Server=127.0.0.1;Database=krakovia;User=kakovia;Password=s3@>C6U3K5£:;";
         string connectionString = "Server=127.0.0.1;Database=krakovia;User=root;Password=;";
 
         IAccountDatabase accountDatabase = new MariaDBAccountDatabase(connectionString);

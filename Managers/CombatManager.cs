@@ -26,11 +26,36 @@ public class CombatManager
     }
 
 
+    // Em CombatManager.cs
+
     public void HandleLootRequest(Player player, string targetNpcId)
     {
-        if (!_server.DeadNpcCor_pses.TryGetValue(targetNpcId, out var npc)) return;
 
-        // Validações
+        Console.WriteLine("[VERIFICAÇÃO] HandleLootRequest foi chamado com o novo código!");
+        NpcInstance? npc = null;
+
+        // --- CORREÇÃO PRINCIPAL AQUI ---
+        // Primeiro, tentamos buscar o NPC pelo SessionId, que é um inteiro.
+        if (int.TryParse(targetNpcId, out int npcSessionId))
+        {
+            _server.NpcsBySessionId.TryGetValue(npcSessionId, out npc);
+        }
+
+        // Se a busca por SessionId falhar (ou se o ID não era um número),
+        // tentamos buscar pelo InstanceId (GUID/string) como fallback.
+        if (npc == null)
+        {
+            // Busca tanto na lista de ativos quanto na de mortos.
+            if (!_server.ActiveNpcs.TryGetValue(targetNpcId, out npc))
+            {
+                _server.DeadNpcCor_pses.TryGetValue(targetNpcId, out npc);
+            }
+        }
+
+        // Se, após todas as tentativas, o NPC não for encontrado, saímos.
+        if (npc == null) return;
+
+        // O resto da sua lógica de validação e loot continua EXATAMENTE IGUAL
         if (!npc.IsDead) return;
         if (!npc.HasLoot)
         {
@@ -43,17 +68,14 @@ public class CombatManager
             return;
         }
 
-        // Delega a tarefa de dar os itens para o PlayerInventoryManager.
-        // O npc.Loot contém a lista de ItemStacks com os InstanceIDs corretos.
         _server.PlayerInventoryManager.GrantLootToPlayer(player, npc.Loot);
-
-        // Se a lógica acima for bem-sucedida (o PlayerInventoryManager lida com inventário cheio),
-        // podemos limpar o loot do NPC.
         npc.ClearLoot();
-
-        // Notifica o cliente que o saque foi concluído (para fechar a janela, etc.)
         _server.NetworkManager.SendMessageToPlayer(player, "LOOT_SUCCESSFUL");
+
+        string message = $"ENTITY_DIED|{npc.SessionId}|{npc.HasLoot}";
+        _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, message, player);
     }
+
 
     /// <summary>
     /// PONTO DE ENTRADA PRINCIPAL. Valida uma requisição de habilidade e decide se a

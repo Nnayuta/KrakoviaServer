@@ -701,6 +701,7 @@ public class NetworkManager
             SendMessageToPlayer(player, message);
         }
     }
+
     public void SendMessageToPlayer(Player player, string message)
     {
         if (player == null)

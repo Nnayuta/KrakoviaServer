@@ -101,8 +101,20 @@ public class NpcAiManager
 
     private void ProcessNpcUpdates(List<NpcInstance> npcs, float deltaTime)
     {
-        var partitioner = Partitioner.Create(npcs);
-        Parallel.ForEach(partitioner, (npc) =>
+        // var partitioner = Partitioner.Create(npcs);
+        // Parallel.ForEach(partitioner, (npc) =>
+        // {
+        //     npc.Behavior?.Update(npc, deltaTime);
+
+        //     if (!npc.IsStationary)
+        //     {
+        //         UpdateNpcPosition(npc, deltaTime);
+        //         CheckIfNpcIsStuck(npc);
+        //     }
+        // });
+
+        // ADICIONE UM FOREACH SIMPLES E SEQUENCIAL NO LUGAR:
+        foreach (var npc in npcs)
         {
             npc.Behavior?.Update(npc, deltaTime);
 
@@ -111,7 +123,7 @@ public class NpcAiManager
                 UpdateNpcPosition(npc, deltaTime);
                 CheckIfNpcIsStuck(npc);
             }
-        });
+        }
     }
 
     private void UpdateNpcPosition(NpcInstance npc, float deltaTime)

@@ -1,5 +1,5 @@
-﻿// Managers/WorldManager.cs
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
@@ -38,74 +38,99 @@ public class WorldManager
         }
     }
 
-    public Player? GetCreditPlayer(NpcInstance npc, ICombatEntity? killer)
+    /// <summary>
+    /// (NOVO) Identifica todos os jogadores que atacaram o NPC, baseado na tabela de ameaça e no atacante final.
+    /// </summary>
+    /// <param name="npc">O NPC que morreu.</param>
+    /// <param name="killer">A entidade que deu o último golpe.</param>
+    /// <returns>Uma lista de jogadores únicos envolvidos no combate.</returns>
+    private List<Player> GetInvolvedPlayers(NpcInstance npc, ICombatEntity? killer)
     {
-        if (npc.ThreatTable.Any())
+        var involvedPlayers = new HashSet<Player>();
+
+        // 1. Adiciona todos os jogadores da tabela de ameaça (quem atacou o NPC)
+        foreach (var threatEntry in npc.ThreatTable)
         {
-            var topThreatPlayerId = npc.ThreatTable.OrderByDescending(kvp => kvp.Value).FirstOrDefault().Key;
-            if (_server.ConnectedPlayers.TryGetValue(topThreatPlayerId, out var playerFromThreat))
+            // A chave da tabela é o ID da entidade (ex: CharacterId do jogador)
+            var player = _server.ConnectedPlayers.Values.FirstOrDefault(p => p.Id == threatEntry.Key);
+            if (player != null)
             {
-                return playerFromThreat;
+                involvedPlayers.Add(player);
             }
         }
+
+        // 2. Adiciona o "killer" se ele for um jogador e ainda não estiver na lista
         if (killer is Player killerPlayer)
         {
-            return killerPlayer;
+            involvedPlayers.Add(killerPlayer);
         }
-        return null;
+
+        return involvedPlayers.ToList();
     }
 
+    /// <summary>
+    /// Processa a morte de um NPC, distribuindo recompensas para os jogadores envolvidos.
+    /// </summary>
     public void ProcessNpcDeath(NpcInstance npc, ICombatEntity? killer)
     {
         npc.IsActive = false; // Desativa a IA imediatamente
         npc.RespawnTime = _server.CurrentTimeUtc.AddSeconds(npc.BaseData.RespawnTimeSeconds);
         npc.SetCorpseDespawnTimer(120.0f, _server.CurrentTimeUtc);
 
-        Player? creditPlayer = this.GetCreditPlayer(npc, killer);
-        if (creditPlayer != null)
+        // --- LÓGICA DE RECOMPENSA COMPARTILHADA ---
+        List<Player> involvedPlayers = GetInvolvedPlayers(npc, killer);
+
+        if (involvedPlayers.Any())
         {
-            // --- LÓGICA DE XP DINÂMICA ---
-            // 1. Calcula a quantidade de XP a ser concedida usando a nova lógica.
-            int experienceToGrant = ExperienceManager.CalculateExperienceReward(creditPlayer, npc);
-
-            // 2. Concede a experiência calculada.
-            if (experienceToGrant > 0)
+            // --- Distribuição de Experiência ---
+            foreach (var player in involvedPlayers)
             {
-                _server.PlayerProgressionManager.GrantExperience(creditPlayer, experienceToGrant);
-                _server.NetworkManager.SendMessageToPlayer(creditPlayer, $"SHOW_FEEDBACK|+{experienceToGrant} EXP");
-            }
-            // --- FIM DA LÓGICA DE XP ---
+                // Calcula a XP individualmente, pois depende da diferença de nível de cada jogador
+                int experienceToGrant = ExperienceManager.CalculateExperienceReward(player, npc);
 
+                if (experienceToGrant > 0)
+                {
+                    _server.PlayerProgressionManager.GrantExperience(player, experienceToGrant);
+                    _server.NetworkManager.SendMessageToPlayer(player, $"SHOW_FEEDBACK|+{experienceToGrant} EXP");
+                }
+            }
+
+            // --- Divisão da Moeda ---
             if (npc.BaseData.CurrencyReward > 0)
             {
-                creditPlayer.TotalBronze += npc.BaseData.CurrencyReward;
+                // Divide a recompensa igualmente, garantindo que cada um receba pelo menos 1
+                int currencyShare = Math.Max(1, npc.BaseData.CurrencyReward / involvedPlayers.Count);
 
-                _server.NetworkManager.SendCurrencyUpdate(creditPlayer);
-                _server.NetworkManager.SendMessageToPlayer(creditPlayer, $"SHOW_FEEDBACK|+{npc.BaseData.CurrencyReward} Moedas");
+                foreach (var player in involvedPlayers)
+                {
+                    player.TotalBronze += currencyShare;
+                    _server.NetworkManager.SendCurrencyUpdate(player);
+                    _server.NetworkManager.SendMessageToPlayer(player, $"SHOW_FEEDBACK|+{currencyShare} Moedas");
+                }
+            }
+
+            // --- Crédito de Missão (Quest) ---
+            // Concede crédito pela morte do NPC a todos os jogadores envolvidos que tiverem a missão.
+            foreach (var player in involvedPlayers)
+            {
+                _server.QuestManager.OnEntitySlain(player, npc);
             }
         }
 
+        // --- LÓGICA DE LOOT (inalterada) ---
+        // O loot é gerado no corpo do NPC e pode ser saqueado por quem chegar primeiro.
         if (!string.IsNullOrEmpty(npc.BaseData.LootTableID))
         {
-            // O LootManager GERA os stats e REGISTRA no ItemInstanceManager. CORRETO.
             List<ItemStack> generatedLoot = _server.LootManager.GenerateLootForNpc(npc.BaseData.LootTableID, npc.Level);
-
-            // O loot é atribuído ao CORPO do NPC. CORRETO.
             npc.SetLoot(generatedLoot);
         }
 
-        // 4. Move o NPC da lista de vivos para a lista de mortos
+        // --- LÓGICA PÓS-MORTE (inalterada) ---
         _server.DeadNpcCor_pses.TryAdd(npc.InstanceId, npc);
-
-        if (killer is Player killerPlayer)
-        {
-            _server.QuestManager.OnEntitySlain(killerPlayer, npc);
-        }
 
         string message = $"ENTITY_DIED|{npc.SessionId}|{npc.HasLoot}";
         _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, message);
 
-        // 6. Agenda o RESPAWN (lógica antiga de OnNpcDied)
         lock (_spawnLock)
         {
             var spawnPoint = FindSpawnPointForNpc(npc.InstanceId);
@@ -282,7 +307,6 @@ public class WorldManager
         _server.Scheduler.ScheduleTask(tickAction, TimeSpan.FromSeconds(tickRate));
     }
 
-    // (NOVO) Adicione este método auxiliar ao seu WorldManager.cs para evitar duplicação de código.
     private bool AreEntitiesFriendly(ICombatEntity entityA, ICombatEntity entityB)
     {
         if (entityA is Player && entityB is Player) return true;
