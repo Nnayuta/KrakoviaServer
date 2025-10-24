@@ -1,7 +1,4 @@
-// Servidor/Data/LootData.cs
 using System.Collections.Generic;
-
-// Estas classes devem corresponder exatamente à estrutura do JSON exportado
 
 public class ServerLootEntry
 {
@@ -15,6 +12,7 @@ public class ServerLootPool
 {
     public float Chance { get; set; }
     public int Rolls { get; set; }
+    public ItemQuality MinQuality { get; set; } // <-- ADICIONADO
     public List<ServerLootEntry> Entries { get; set; }
 }
 

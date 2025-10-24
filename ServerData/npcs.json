@@ -28,6 +28,7 @@
       ],
       "Level": 5,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 10.0,
       "LeashRange": 20.0,
       "RespawnTimeSeconds": 30,
@@ -37,7 +38,7 @@
         "warrior_herostrike",
         "warrior_whirlwind"
       ],
-      "CurrencyReward": 28,
+      "CurrencyReward": 21,
       "ExperienceReward": 10,
       "LootTableID": "bandids_0001"
     },
@@ -69,6 +70,7 @@
       ],
       "Level": 6,
       "IsBoss": true,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
@@ -79,7 +81,7 @@
         "warrior_herostrike",
         "warrior_enragedregeneration"
       ],
-      "CurrencyReward": 540,
+      "CurrencyReward": 480,
       "ExperienceReward": 10,
       "LootTableID": "bandids_0001_elite"
     },
@@ -111,13 +113,14 @@
       ],
       "Level": 5,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 10.0,
       "LeashRange": 20.0,
       "RespawnTimeSeconds": 30,
       "SwingTimer": 3.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 28,
+      "CurrencyReward": 23,
       "ExperienceReward": 10,
       "LootTableID": null
     },
@@ -149,6 +152,7 @@
       ],
       "Level": 10,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 10.0,
       "LeashRange": 20.0,
       "RespawnTimeSeconds": 30,
@@ -158,7 +162,7 @@
         "warrior_herostrike",
         "warrior_whirlwind"
       ],
-      "CurrencyReward": 66,
+      "CurrencyReward": 56,
       "ExperienceReward": 10,
       "LootTableID": "bandids_0002"
     },
@@ -190,6 +194,7 @@
       ],
       "Level": 11,
       "IsBoss": true,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
@@ -201,7 +206,7 @@
         "warrior_enragedregeneration",
         "warrior_mortalstrike"
       ],
-      "CurrencyReward": 1050,
+      "CurrencyReward": 1140,
       "ExperienceReward": 10,
       "LootTableID": "bandids_0002_elite"
     },
@@ -233,6 +238,7 @@
       ],
       "Level": 10,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 10.0,
       "LeashRange": 20.0,
       "RespawnTimeSeconds": 30,
@@ -271,6 +277,7 @@
       ],
       "Level": 15,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 10.0,
       "LeashRange": 20.0,
       "RespawnTimeSeconds": 30,
@@ -280,7 +287,7 @@
         "warrior_herostrike",
         "warrior_whirlwind"
       ],
-      "CurrencyReward": 113,
+      "CurrencyReward": 117,
       "ExperienceReward": 10,
       "LootTableID": "bandids_15_20"
     },
@@ -312,6 +319,7 @@
       ],
       "Level": 16,
       "IsBoss": true,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
@@ -323,7 +331,7 @@
         "warrior_enragedregeneration",
         "warrior_mortalstrike"
       ],
-      "CurrencyReward": 1950,
+      "CurrencyReward": 1725,
       "ExperienceReward": 10,
       "LootTableID": "bandids_15_20"
     },
@@ -355,13 +363,14 @@
       ],
       "Level": 15,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 10.0,
       "LeashRange": 20.0,
       "RespawnTimeSeconds": 30,
       "SwingTimer": 3.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 99,
+      "CurrencyReward": 103,
       "ExperienceReward": 10,
       "LootTableID": "bandids_15_20"
     },
@@ -393,6 +402,7 @@
       ],
       "Level": 20,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 10.0,
       "LeashRange": 20.0,
       "RespawnTimeSeconds": 30,
@@ -402,7 +412,7 @@
         "warrior_herostrike",
         "warrior_whirlwind"
       ],
-      "CurrencyReward": 162,
+      "CurrencyReward": 174,
       "ExperienceReward": 10,
       "LootTableID": "bandids_0002"
     },
@@ -434,6 +444,7 @@
       ],
       "Level": 20,
       "IsBoss": true,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
@@ -445,7 +456,7 @@
         "warrior_enragedregeneration",
         "warrior_mortalstrike"
       ],
-      "CurrencyReward": 1875,
+      "CurrencyReward": 2325,
       "ExperienceReward": 10,
       "LootTableID": "bandids_15-20_elite"
     },
@@ -477,13 +488,14 @@
       ],
       "Level": 20,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 10.0,
       "LeashRange": 20.0,
       "RespawnTimeSeconds": 30,
       "SwingTimer": 3.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 161,
+      "CurrencyReward": 158,
       "ExperienceReward": 10,
       "LootTableID": "bandids_15_20"
     },
@@ -515,6 +527,7 @@
       ],
       "Level": 13,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
@@ -524,7 +537,7 @@
         "bear_attack_02",
         "bear_attack_03"
       ],
-      "CurrencyReward": 89,
+      "CurrencyReward": 74,
       "ExperienceReward": 50,
       "LootTableID": "bear_common_drops"
     },
@@ -556,6 +569,7 @@
       ],
       "Level": 15,
       "IsBoss": true,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
@@ -566,7 +580,7 @@
         "bear_attack_03",
         "bear_buff_01"
       ],
-      "CurrencyReward": 1230,
+      "CurrencyReward": 1470,
       "ExperienceReward": 50,
       "LootTableID": "bear_common_drops"
     },
@@ -598,13 +612,14 @@
       ],
       "Level": 5,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 27,
+      "CurrencyReward": 25,
       "ExperienceReward": 0,
       "LootTableID": null
     },
@@ -636,13 +651,14 @@
       ],
       "Level": 10,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 60,
+      "CurrencyReward": 66,
       "ExperienceReward": 0,
       "LootTableID": null
     },
@@ -674,13 +690,14 @@
       ],
       "Level": 4,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 16,
+      "CurrencyReward": 15,
       "ExperienceReward": 0,
       "LootTableID": null
     },
@@ -712,13 +729,14 @@
       ],
       "Level": 5,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 25,
+      "CurrencyReward": 26,
       "ExperienceReward": 0,
       "LootTableID": null
     },
@@ -750,14 +768,54 @@
       ],
       "Level": 6,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 24,
+      "CurrencyReward": 34,
       "ExperienceReward": 10,
+      "LootTableID": null
+    },
+    {
+      "TypeId": "npc_ze_pescador",
+      "Faction": "Friendly",
+      "AiType": "Passive_Aggressive",
+      "Stats": [
+        {
+          "Stat": "Stamina",
+          "Value": 12
+        },
+        {
+          "Stat": "Strength",
+          "Value": 12
+        },
+        {
+          "Stat": "Agility",
+          "Value": 12
+        },
+        {
+          "Stat": "Intellect",
+          "Value": 12
+        },
+        {
+          "Stat": "Armor",
+          "Value": 31
+        }
+      ],
+      "Level": 5,
+      "IsBoss": false,
+      "IsWorldBoss": false,
+      "AggroRange": 15.0,
+      "LeashRange": 30.0,
+      "RespawnTimeSeconds": 60,
+      "SwingTimer": 2.0,
+      "AutoAttackAbilityID": null,
+      "AbilityIDs": [],
+      "CurrencyReward": 23,
+      "ExperienceReward": 0,
       "LootTableID": null
     },
     {
@@ -788,6 +846,7 @@
       ],
       "Level": 20,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
@@ -797,7 +856,7 @@
         "priest_flashheal",
         "priest_circleofhealing"
       ],
-      "CurrencyReward": 176,
+      "CurrencyReward": 145,
       "ExperienceReward": 0,
       "LootTableID": null
     },
@@ -829,13 +888,14 @@
       ],
       "Level": 10,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 68,
+      "CurrencyReward": 67,
       "ExperienceReward": 10,
       "LootTableID": null
     },
@@ -867,51 +927,14 @@
       ],
       "Level": 5,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 20,
-      "ExperienceReward": 0,
-      "LootTableID": null
-    },
-    {
-      "TypeId": "npc_ze_pescador",
-      "Faction": "Friendly",
-      "AiType": "Passive_Aggressive",
-      "Stats": [
-        {
-          "Stat": "Stamina",
-          "Value": 12
-        },
-        {
-          "Stat": "Strength",
-          "Value": 12
-        },
-        {
-          "Stat": "Agility",
-          "Value": 12
-        },
-        {
-          "Stat": "Intellect",
-          "Value": 12
-        },
-        {
-          "Stat": "Armor",
-          "Value": 31
-        }
-      ],
-      "Level": 5,
-      "IsBoss": false,
-      "AggroRange": 15.0,
-      "LeashRange": 30.0,
-      "RespawnTimeSeconds": 60,
-      "SwingTimer": 2.0,
-      "AutoAttackAbilityID": null,
-      "AbilityIDs": [],
-      "CurrencyReward": 22,
+      "CurrencyReward": 19,
       "ExperienceReward": 0,
       "LootTableID": null
     },
@@ -943,13 +966,14 @@
       ],
       "Level": 1,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 4.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 3,
+      "CurrencyReward": 2,
       "ExperienceReward": 10,
       "LootTableID": null
     },
@@ -981,13 +1005,14 @@
       ],
       "Level": 20,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 4.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 175,
+      "CurrencyReward": 168,
       "ExperienceReward": 10,
       "LootTableID": null
     },
@@ -1019,13 +1044,14 @@
       ],
       "Level": 20,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 10,
       "SwingTimer": 4.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 122,
+      "CurrencyReward": 120,
       "ExperienceReward": 0,
       "LootTableID": null
     },
@@ -1057,17 +1083,20 @@
       ],
       "Level": 25,
       "IsBoss": true,
+      "IsWorldBoss": true,
       "AggroRange": 20.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 120,
       "SwingTimer": 4.0,
       "AutoAttackAbilityID": "giant_cb536791",
       "AbilityIDs": [
-        "giant_cb536791_2"
+        "giant_cb536791_2",
+        "warrior_mortalstrike",
+        "warrior_herostrike"
       ],
-      "CurrencyReward": 2820,
+      "CurrencyReward": 3465,
       "ExperienceReward": 500,
-      "LootTableID": null
+      "LootTableID": "giant_loot_boos"
     },
     {
       "TypeId": "21119d20",
@@ -1097,13 +1126,14 @@
       ],
       "Level": 20,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 4.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 121,
+      "CurrencyReward": 164,
       "ExperienceReward": 10,
       "LootTableID": null
     },
@@ -1135,13 +1165,14 @@
       ],
       "Level": 20,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 4.0,
       "AutoAttackAbilityID": null,
       "AbilityIDs": [],
-      "CurrencyReward": 164,
+      "CurrencyReward": 130,
       "ExperienceReward": 10,
       "LootTableID": null
     },
@@ -1173,6 +1204,7 @@
       ],
       "Level": 7,
       "IsBoss": true,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
@@ -1181,7 +1213,7 @@
       "AbilityIDs": [
         "warrior_herostrike"
       ],
-      "CurrencyReward": 555,
+      "CurrencyReward": 615,
       "ExperienceReward": 10,
       "LootTableID": "skeleton_drop_elite"
     },
@@ -1213,6 +1245,7 @@
       ],
       "Level": 12,
       "IsBoss": true,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
@@ -1221,7 +1254,7 @@
       "AbilityIDs": [
         "warrior_whirlwind"
       ],
-      "CurrencyReward": 1200,
+      "CurrencyReward": 915,
       "ExperienceReward": 10,
       "LootTableID": "skeleton_drop_10_elite"
     },
@@ -1253,6 +1286,7 @@
       ],
       "Level": 15,
       "IsBoss": true,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
@@ -1261,7 +1295,7 @@
       "AbilityIDs": [
         "warrior_whirlwind"
       ],
-      "CurrencyReward": 1635,
+      "CurrencyReward": 1410,
       "ExperienceReward": 10,
       "LootTableID": "skeleton_drop_10_elite"
     },
@@ -1293,6 +1327,7 @@
       ],
       "Level": 6,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
@@ -1331,13 +1366,14 @@
       ],
       "Level": 12,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": "0_warrior_autoattack",
       "AbilityIDs": [],
-      "CurrencyReward": 90,
+      "CurrencyReward": 63,
       "ExperienceReward": 10,
       "LootTableID": "skeleton_drop_10"
     },
@@ -1369,13 +1405,14 @@
       ],
       "Level": 15,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": "0_warrior_autoattack",
       "AbilityIDs": [],
-      "CurrencyReward": 87,
+      "CurrencyReward": 112,
       "ExperienceReward": 10,
       "LootTableID": "skeleton_drop_10"
     },
@@ -1407,13 +1444,14 @@
       ],
       "Level": 18,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 60,
       "SwingTimer": 2.0,
       "AutoAttackAbilityID": "0_warrior_autoattack",
       "AbilityIDs": [],
-      "CurrencyReward": 131,
+      "CurrencyReward": 138,
       "ExperienceReward": 27,
       "LootTableID": "skeleton_drop_10"
     },
@@ -1445,6 +1483,7 @@
       ],
       "Level": 2,
       "IsBoss": true,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 35,
@@ -1486,6 +1525,7 @@
       ],
       "Level": 6,
       "IsBoss": true,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 35,
@@ -1527,6 +1567,7 @@
       ],
       "Level": 18,
       "IsBoss": true,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 35,
@@ -1536,7 +1577,7 @@
         "wolf_ability_029ab43c",
         "wolf_ability_73e22c18"
       ],
-      "CurrencyReward": 1965,
+      "CurrencyReward": 2130,
       "ExperienceReward": 35,
       "LootTableID": "bear_common_drops"
     },
@@ -1568,6 +1609,7 @@
       ],
       "Level": 1,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 35,
@@ -1609,6 +1651,7 @@
       ],
       "Level": 6,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 35,
@@ -1618,7 +1661,7 @@
         "wolf_ability_029ab43c",
         "wolf_ability_73e22c18"
       ],
-      "CurrencyReward": 28,
+      "CurrencyReward": 29,
       "ExperienceReward": 35,
       "LootTableID": "bear_common_drops"
     },
@@ -1650,6 +1693,7 @@
       ],
       "Level": 15,
       "IsBoss": false,
+      "IsWorldBoss": false,
       "AggroRange": 15.0,
       "LeashRange": 30.0,
       "RespawnTimeSeconds": 35,
@@ -1659,7 +1703,7 @@
         "wolf_ability_029ab43c",
         "wolf_ability_73e22c18"
       ],
-      "CurrencyReward": 116,
+      "CurrencyReward": 99,
       "ExperienceReward": 35,
       "LootTableID": "bear_common_drops"
     }

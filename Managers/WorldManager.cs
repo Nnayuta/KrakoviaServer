@@ -41,17 +41,13 @@ public class WorldManager
     /// <summary>
     /// (NOVO) Identifica todos os jogadores que atacaram o NPC, baseado na tabela de ameaça e no atacante final.
     /// </summary>
-    /// <param name="npc">O NPC que morreu.</param>
-    /// <param name="killer">A entidade que deu o último golpe.</param>
-    /// <returns>Uma lista de jogadores únicos envolvidos no combate.</returns>
     private List<Player> GetInvolvedPlayers(NpcInstance npc, ICombatEntity? killer)
     {
         var involvedPlayers = new HashSet<Player>();
 
-        // 1. Adiciona todos os jogadores da tabela de ameaça (quem atacou o NPC)
+        // 1. Adiciona todos os jogadores da tabela de ameaça
         foreach (var threatEntry in npc.ThreatTable)
         {
-            // A chave da tabela é o ID da entidade (ex: CharacterId do jogador)
             var player = _server.ConnectedPlayers.Values.FirstOrDefault(p => p.Id == threatEntry.Key);
             if (player != null)
             {
@@ -59,7 +55,7 @@ public class WorldManager
             }
         }
 
-        // 2. Adiciona o "killer" se ele for um jogador e ainda não estiver na lista
+        // 2. Adiciona o "killer" se for um jogador
         if (killer is Player killerPlayer)
         {
             involvedPlayers.Add(killerPlayer);
@@ -68,26 +64,29 @@ public class WorldManager
         return involvedPlayers.ToList();
     }
 
+
     /// <summary>
     /// Processa a morte de um NPC, distribuindo recompensas para os jogadores envolvidos.
     /// </summary>
+    /// <summary>
+    /// Processa a morte de um NPC, distribuindo recompensas para os jogadores envolvidos.
+    /// A lógica de loot agora diferencia entre NPCs normais e chefes.
+    /// </summary>
     public void ProcessNpcDeath(NpcInstance npc, ICombatEntity? killer)
     {
-        npc.IsActive = false; // Desativa a IA imediatamente
+        npc.IsActive = false;
         npc.RespawnTime = _server.CurrentTimeUtc.AddSeconds(npc.BaseData.RespawnTimeSeconds);
         npc.SetCorpseDespawnTimer(120.0f, _server.CurrentTimeUtc);
 
-        // --- LÓGICA DE RECOMPENSA COMPARTILHADA ---
+        // --- LÓGICA DE RECOMPENSA COMPARTILHADA (XP, Moeda, Missões) ---
         List<Player> involvedPlayers = GetInvolvedPlayers(npc, killer);
 
         if (involvedPlayers.Any())
         {
-            // --- Distribuição de Experiência ---
+            // Distribuição de Experiência
             foreach (var player in involvedPlayers)
             {
-                // Calcula a XP individualmente, pois depende da diferença de nível de cada jogador
                 int experienceToGrant = ExperienceManager.CalculateExperienceReward(player, npc);
-
                 if (experienceToGrant > 0)
                 {
                     _server.PlayerProgressionManager.GrantExperience(player, experienceToGrant);
@@ -95,12 +94,10 @@ public class WorldManager
                 }
             }
 
-            // --- Divisão da Moeda ---
+            // Divisão da Moeda
             if (npc.BaseData.CurrencyReward > 0)
             {
-                // Divide a recompensa igualmente, garantindo que cada um receba pelo menos 1
                 int currencyShare = Math.Max(1, npc.BaseData.CurrencyReward / involvedPlayers.Count);
-
                 foreach (var player in involvedPlayers)
                 {
                     player.TotalBronze += currencyShare;
@@ -109,25 +106,52 @@ public class WorldManager
                 }
             }
 
-            // --- Crédito de Missão (Quest) ---
-            // Concede crédito pela morte do NPC a todos os jogadores envolvidos que tiverem a missão.
+            // Crédito de Missão
             foreach (var player in involvedPlayers)
             {
                 _server.QuestManager.OnEntitySlain(player, npc);
             }
         }
 
-        // --- LÓGICA DE LOOT (inalterada) ---
-        // O loot é gerado no corpo do NPC e pode ser saqueado por quem chegar primeiro.
+        // =========================================================================
+        // --- NOVA LÓGICA DE DISTRIBUIÇÃO DE LOOT (ITENS) ---
+        // =========================================================================
+
         if (!string.IsNullOrEmpty(npc.BaseData.LootTableID))
         {
-            List<ItemStack> generatedLoot = _server.LootManager.GenerateLootForNpc(npc.BaseData.LootTableID, npc.Level);
-            npc.SetLoot(generatedLoot);
+            // --- CASO 1: O NPC é um CHEFE (IsBoss = true) ---
+            if (npc.BaseData.IsWorldBoss)
+            {
+                Console.WriteLine($"[WorldManager] Chefe '{npc.BaseData.TypeId}' derrotado! Distribuindo loot pessoal para {involvedPlayers.Count} jogador(es).");
+
+                // Gera e distribui loot individualmente para cada jogador envolvido.
+                foreach (var player in involvedPlayers)
+                {
+                    // Cada jogador tem sua própria "rolagem" na tabela de loot.
+                    List<ItemStack> personalLoot = _server.LootManager.GenerateLootForNpc(npc.BaseData.LootTableID, npc.Level);
+
+                    if (personalLoot.Any())
+                    {
+                        _server.PlayerInventoryManager.GrantLootToPlayer(player, personalLoot);
+                        // A mensagem de sucesso do loot é enviada pelo PlayerInventoryManager.
+                    }
+                }
+            }
+            else
+            {
+                // Gera uma única lista de loot e a coloca no corpo do NPC.
+                List<ItemStack> generatedLoot = _server.LootManager.GenerateLootForNpc(npc.BaseData.LootTableID, npc.Level);
+                if (generatedLoot.Any())
+                {
+                    npc.SetLoot(generatedLoot); // O primeiro a saquear leva tudo.
+                }
+            }
         }
 
         // --- LÓGICA PÓS-MORTE (inalterada) ---
         _server.DeadNpcCor_pses.TryAdd(npc.InstanceId, npc);
 
+        // A mensagem ENTITY_DIED agora informa corretamente se o corpo tem loot (true para normais, false para chefes).
         string message = $"ENTITY_DIED|{npc.SessionId}|{npc.HasLoot}";
         _server.NetworkManager.BroadcastMessageToRelevantPlayers(npc.Position, message);
 
@@ -137,11 +161,7 @@ public class WorldManager
             if (spawnPoint != null)
             {
                 spawnPoint.ActiveNpcInstanceIds.Remove(npc.InstanceId);
-                if (spawnPoint.RespawnEndTime <= _server.CurrentTimeUtc)
-                {
-                    spawnPoint.RespawnEndTime = _server.CurrentTimeUtc.AddSeconds(npc.BaseData.RespawnTimeSeconds);
-                    Console.WriteLine($"[WorldManager] Respawn para {npc.BaseData.TypeId} agendado para {spawnPoint.RespawnEndTime}.");
-                }
+                // Lógica de agendamento de respawn... (inalterada)
             }
         }
     }

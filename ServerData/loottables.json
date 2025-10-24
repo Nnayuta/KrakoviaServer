@@ -6,6 +6,7 @@
         {
           "Chance": 1.0,
           "Rolls": 1,
+          "MinQuality": "Common",
           "Entries": [
             {
               "ItemID": "Adaga_Cega",
@@ -30,6 +31,7 @@
         {
           "Chance": 0.05,
           "Rolls": 1,
+          "MinQuality": "Common",
           "Entries": [
             {
               "ItemID": "cloth_template_hands_cloth",
@@ -66,6 +68,7 @@
         {
           "Chance": 0.05,
           "Rolls": 1,
+          "MinQuality": "Common",
           "Entries": [
             {
               "ItemID": "sword_01",
@@ -95,6 +98,7 @@
         {
           "Chance": 1.0,
           "Rolls": 1,
+          "MinQuality": "Common",
           "Entries": [
             {
               "ItemID": "Trapo_Sujo",
@@ -119,6 +123,7 @@
         {
           "Chance": 0.1,
           "Rolls": 1,
+          "MinQuality": "Uncommon",
           "Entries": [
             {
               "ItemID": "cloth_template_boots_cloth",
@@ -179,6 +184,7 @@
         {
           "Chance": 0.05,
           "Rolls": 1,
+          "MinQuality": "Common",
           "Entries": [
             {
               "ItemID": "sword_03",
@@ -202,6 +208,7 @@
         {
           "Chance": 1.0,
           "Rolls": 1,
+          "MinQuality": "Common",
           "Entries": [
             {
               "ItemID": "Moeda_Enferrujada",
@@ -220,6 +227,7 @@
         {
           "Chance": 0.05,
           "Rolls": 1,
+          "MinQuality": "Uncommon",
           "Entries": [
             {
               "ItemID": "cloth_template_hands_cloth",
@@ -256,6 +264,7 @@
         {
           "Chance": 0.08,
           "Rolls": 1,
+          "MinQuality": "Common",
           "Entries": [
             {
               "ItemID": "sword_03",
@@ -285,6 +294,7 @@
         {
           "Chance": 1.0,
           "Rolls": 1,
+          "MinQuality": "Common",
           "Entries": [
             {
               "ItemID": "Moeda_Enferrujada",
@@ -303,6 +313,7 @@
         {
           "Chance": 0.1,
           "Rolls": 1,
+          "MinQuality": "Rare",
           "Entries": [
             {
               "ItemID": "cloth_template_boots_cloth",
@@ -363,6 +374,7 @@
         {
           "Chance": 0.05,
           "Rolls": 1,
+          "MinQuality": "Common",
           "Entries": [
             {
               "ItemID": "sword_04",
@@ -386,6 +398,7 @@
         {
           "Chance": 1.0,
           "Rolls": 1,
+          "MinQuality": "Common",
           "Entries": [
             {
               "ItemID": "Moeda_Enferrujada",
@@ -404,6 +417,7 @@
         {
           "Chance": 0.01,
           "Rolls": 1,
+          "MinQuality": "Uncommon",
           "Entries": [
             {
               "ItemID": "plate_template_boots",
@@ -487,6 +501,7 @@
         {
           "Chance": 1.0,
           "Rolls": 1,
+          "MinQuality": "Common",
           "Entries": [
             {
               "ItemID": "Moeda_Enferrujada",
@@ -505,6 +520,7 @@
         {
           "Chance": 0.01,
           "Rolls": 1,
+          "MinQuality": "Uncommon",
           "Entries": [
             {
               "ItemID": "priest_staff_wood_04",
@@ -528,6 +544,7 @@
         {
           "Chance": 1.0,
           "Rolls": 1,
+          "MinQuality": "Common",
           "Entries": [
             {
               "ItemID": "common_hide",
@@ -558,6 +575,7 @@
         {
           "Chance": 0.01,
           "Rolls": 1,
+          "MinQuality": "Rare",
           "Entries": [
             {
               "ItemID": "cloth_template_hands_cloth",
@@ -594,6 +612,7 @@
         {
           "Chance": 0.01,
           "Rolls": 1,
+          "MinQuality": "Uncommon",
           "Entries": [
             {
               "ItemID": "sword_02",
@@ -612,11 +631,127 @@
       ]
     },
     {
+      "LootTableID": "giant_loot_boos",
+      "Pools": [
+        {
+          "Chance": 0.5,
+          "Rolls": 2,
+          "MinQuality": "Rare",
+          "Entries": [
+            {
+              "ItemID": "sword_07",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "sword_06",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "guard_plate_boots_01",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "guard_plate_chest_01",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "guard_plate_cloak_01",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "guard_plate_hands_01",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "guard_plate_head_01",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "guard_plate_legs_01",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            }
+          ]
+        },
+        {
+          "Chance": 0.5,
+          "Rolls": 2,
+          "MinQuality": "Rare",
+          "Entries": [
+            {
+              "ItemID": "priest_staff_wood_05",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "priest_staff_wood_04",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "cloth_template_boots_end",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "cloth_template_chest_end",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "cloth_template_cloak_end",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "cloth_template_hands_end",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "cloth_template_head_end",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            },
+            {
+              "ItemID": "cloth_template_legs_end",
+              "Weight": 1,
+              "MinQuantity": 1,
+              "MaxQuantity": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
       "LootTableID": "quest_raiz_problema_collect",
       "Pools": [
         {
           "Chance": 1.0,
           "Rolls": 0,
+          "MinQuality": "Legendary",
           "Entries": [
             {
               "ItemID": "potato_glitch",
@@ -634,6 +769,7 @@
         {
           "Chance": 1.0,
           "Rolls": 1,
+          "MinQuality": "Common",
           "Entries": [
             {
               "ItemID": "femur_trincado",
@@ -652,6 +788,7 @@
         {
           "Chance": 0.01,
           "Rolls": 1,
+          "MinQuality": "Common",
           "Entries": [
             {
               "ItemID": "sword_03",
@@ -675,6 +812,7 @@
         {
           "Chance": 1.0,
           "Rolls": 1,
+          "MinQuality": "Common",
           "Entries": [
             {
               "ItemID": "bone_drop",
@@ -699,6 +837,7 @@
         {
           "Chance": 0.01,
           "Rolls": 1,
+          "MinQuality": "Uncommon",
           "Entries": [
             {
               "ItemID": "sword_06",
@@ -722,6 +861,7 @@
         {
           "Chance": 1.0,
           "Rolls": 1,
+          "MinQuality": "Common",
           "Entries": [
             {
               "ItemID": "bone_drop",
@@ -752,6 +892,7 @@
         {
           "Chance": 0.01,
           "Rolls": 1,
+          "MinQuality": "Rare",
           "Entries": [
             {
               "ItemID": "sword_05",
@@ -781,6 +922,7 @@
         {
           "Chance": 1.0,
           "Rolls": 1,
+          "MinQuality": "Common",
           "Entries": [
             {
               "ItemID": "femur_trincado",
@@ -799,6 +941,7 @@
         {
           "Chance": 0.01,
           "Rolls": 1,
+          "MinQuality": "Uncommon",
           "Entries": [
             {
               "ItemID": "sword_01",

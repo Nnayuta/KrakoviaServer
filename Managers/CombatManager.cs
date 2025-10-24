@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
+using System.Threading.Tasks; // Adicionado para Task.Delay, se necessário no futuro
 
 /// <summary>
 /// Define os tipos de eventos de combate que podem ser enviados aos clientes para exibição.
@@ -31,7 +32,6 @@ public class CombatManager
     public void HandleLootRequest(Player player, string targetNpcId)
     {
 
-        Console.WriteLine("[VERIFICAÇÃO] HandleLootRequest foi chamado com o novo código!");
         NpcInstance? npc = null;
 
         // --- CORREÇÃO PRINCIPAL AQUI ---

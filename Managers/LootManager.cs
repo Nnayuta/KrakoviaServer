@@ -14,6 +14,7 @@ public class LootManager
         _server = server;
     }
 
+
     public List<ItemStack> GenerateLootForNpc(string lootTableId, int npcLevel)
     {
         var itemsToDrop = new List<ItemStack>();
@@ -24,8 +25,10 @@ public class LootManager
 
         foreach (var pool in table.Pools)
         {
+            // Pula este pool se o sorteio de chance falhar
             if (_random.NextDouble() >= pool.Chance) continue;
 
+            // Roda os dados para este pool o número de vezes definido em 'Rolls'
             for (int i = 0; i < pool.Rolls; i++)
             {
                 int totalWeight = pool.Entries.Sum(e => e.Weight);
@@ -45,11 +48,19 @@ public class LootManager
                             var itemStack = new ItemStack(entry.ItemID, quantity);
                             var itemTemplate = DataManager.Items[entry.ItemID];
 
+                            // Se o item for um equipamento, gere seus stats e instância
                             if (itemTemplate is ServerEquipmentData eqItemTemplate)
                             {
                                 int itemLevel = ItemLevelConverter.GetItemLevelForCreature(npcLevel);
                                 int requiredLevel = ItemLevelConverter.GetRequiredLevelForItemLevel(itemLevel);
-                                var (generatedStats, finalQuality) = ServerStatAllocator.GenerateStatsForItem(eqItemTemplate, itemLevel);
+
+                                // --- MUDANÇA PRINCIPAL AQUI ---
+                                // Agora passamos a qualidade mínima do pool para o gerador de stats.
+                                var (generatedStats, finalQuality) = ServerStatAllocator.GenerateStatsForItem(
+                                    eqItemTemplate,
+                                    itemLevel,
+                                    pool.MinQuality // Passando o novo parâmetro!
+                                );
 
                                 var instanceData = new ItemInstanceData
                                 {
@@ -57,10 +68,10 @@ public class LootManager
                                     ItemLevel = itemLevel,
                                     RequiredLevel = requiredLevel,
                                     Stats = generatedStats,
-                                    SellPrice = 0 // O preço de venda será calculado a seguir
+                                    SellPrice = 0 // Será calculado a seguir
                                 };
 
-                                // Calcula o preço de venda com base nos dados que acabamos de gerar.
+                                // Calcula o preço de venda com base nos dados gerados.
                                 instanceData.SellPrice = ServerStatAllocator.CalculateSellPrice(instanceData);
 
                                 _server.ItemInstanceManager.RegisterGeneratedItem(itemStack.InstanceID, instanceData);
@@ -68,6 +79,7 @@ public class LootManager
 
                             itemsToDrop.Add(itemStack);
                         }
+                        // Item foi escolhido, pare de procurar neste 'roll'
                         break;
                     }
                 }

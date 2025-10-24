@@ -599,7 +599,7 @@
       "CastTime": 0.0,
       "CanMoveWhileCasting": false,
       "ProjectileSpeed": 0.0,
-      "TargetType": "AreaOfEffectTarget",
+      "TargetType": "SingleTarget",
       "AoeRadius": 8.0,
       "ConeAngle": 0.0
     },
@@ -617,7 +617,7 @@
           "Intent": "Harmful"
         }
       ],
-      "Cooldown": 1.0,
+      "Cooldown": 10.0,
       "Range": 10.0,
       "ResourceCost": 0.0,
       "RequiresTarget": true,

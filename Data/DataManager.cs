@@ -161,7 +161,7 @@ public static class DataManager
             float maxRange = 0f;
             foreach (var abilityId in npcData.AbilityIDs)
             {
-                if (Abilities.TryGetValue(abilityId, out AbilityData ability) && ability.Range > maxRange)
+                if (Abilities.TryGetValue(abilityId, out AbilityData? ability) && ability.Range > maxRange)
                 {
                     maxRange = ability.Range;
                 }

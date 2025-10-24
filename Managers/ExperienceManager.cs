@@ -73,7 +73,7 @@ public static class ExperienceManager
         levelDifferenceModifier = Math.Max(0, levelDifferenceModifier);
 
         // Passo 3: Aplicar o modificador de monstro "Boss".
-        float qualityModifier = npc.BaseData.IsBoss ? BOSS_XP_MULTIPLIER : 1.0f;
+        float qualityModifier = npc.BaseData.IsWorldBoss ? BOSS_XP_MULTIPLIER : 1.0f;
 
         // Passo 4: Calcular o XP final.
         float finalXp = baseNpcXp * levelDifferenceModifier * qualityModifier * SERVER_XP_RATE;

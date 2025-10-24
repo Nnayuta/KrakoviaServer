@@ -128,23 +128,23 @@
       "Items": [
         {
           "ItemID": "plate_template_chest_cloth",
-          "BuyPrice": 562
+          "BuyPrice": 42
         },
         {
           "ItemID": "plate_template_feet_cloth",
-          "BuyPrice": 350
+          "BuyPrice": 25
         },
         {
           "ItemID": "plate_template_gloves_cloth",
-          "BuyPrice": 350
+          "BuyPrice": 25
         },
         {
           "ItemID": "plate_template_head_cloth",
-          "BuyPrice": 462
+          "BuyPrice": 35
         },
         {
           "ItemID": "plate_template_legs_cloth",
-          "BuyPrice": 550
+          "BuyPrice": 42
         },
         {
           "ItemID": "cloth_template_boots_cloth",

@@ -537,7 +537,7 @@
         "Value": 4
       },
       {
-        "Stat": "HasteRating",
+        "Stat": "MasteryRating",
         "Value": 2
       },
       {
@@ -636,7 +636,7 @@
         "Value": 4
       },
       {
-        "Stat": "MasteryRating",
+        "Stat": "HasteRating",
         "Value": 2
       },
       {
@@ -675,6 +675,10 @@
       {
         "Stat": "Strength",
         "Value": 3
+      },
+      {
+        "Stat": "Avoidance",
+        "Value": 1
       }
     ]
   },
@@ -702,16 +706,12 @@
         "Value": 6
       },
       {
-        "Stat": "CriticalStrikeRating",
+        "Stat": "HasteRating",
         "Value": 3
       },
       {
         "Stat": "Strength",
         "Value": 4
-      },
-      {
-        "Stat": "MovementSpeed",
-        "Value": 1
       }
     ]
   },
@@ -791,10 +791,10 @@
     "equipmentSlot": "Chest",
     "itemID": "plate_template_chest_cloth",
     "itemName": "Armadura de Ferro",
-    "quality": "Rare",
+    "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 225,
+    "sellPrice": 17,
     "Durability": null,
     "IsIndestructible": false,
     "isStackable": false,
@@ -807,10 +807,10 @@
     "equipmentSlot": "Feet",
     "itemID": "plate_template_feet_cloth",
     "itemName": "Botas de Ferro",
-    "quality": "Rare",
+    "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 140,
+    "sellPrice": 10,
     "Durability": null,
     "IsIndestructible": false,
     "isStackable": false,
@@ -823,10 +823,10 @@
     "equipmentSlot": "Hands",
     "itemID": "plate_template_gloves_cloth",
     "itemName": "Luvas de Ferro",
-    "quality": "Rare",
+    "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 140,
+    "sellPrice": 10,
     "Durability": null,
     "IsIndestructible": false,
     "isStackable": false,
@@ -839,10 +839,10 @@
     "equipmentSlot": "Head",
     "itemID": "plate_template_head_cloth",
     "itemName": "Capacete de Ferro",
-    "quality": "Rare",
+    "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 185,
+    "sellPrice": 14,
     "Durability": null,
     "IsIndestructible": false,
     "isStackable": false,
@@ -855,10 +855,10 @@
     "equipmentSlot": "Legs",
     "itemID": "plate_template_legs_cloth",
     "itemName": "Perneiras de Ferro",
-    "quality": "Rare",
+    "quality": "Common",
     "maxStackSize": 1,
     "requiredLevel": 1,
-    "sellPrice": 220,
+    "sellPrice": 17,
     "Durability": null,
     "IsIndestructible": false,
     "isStackable": false,

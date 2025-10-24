@@ -26,7 +26,7 @@ public class NpcData
 
     public int Level { get; set; }
     public bool IsBoss { get; set; }
-
+    public bool IsWorldBoss { get; set; }
     // Propriedades de Comportamento
     public float AggroRange { get; set; }
     public float LeashRange { get; set; }

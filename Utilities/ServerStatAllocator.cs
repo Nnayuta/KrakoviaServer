@@ -1,4 +1,4 @@
-// ARQUIVO ATUALIZADO: Server/Utilities/ServerStatAllocator.cs
+// ARQUIVO COMPLETO E CORRIGIDO: Server/Utilities/ServerStatAllocator.cs
 
 using System;
 using System.Collections.Generic;
@@ -13,8 +13,6 @@ public static class ServerStatAllocator
     // ================================================================================================
 
     // --- CHANCES DE QUALIDADE ---
-    // A soma não precisa ser 100. Funciona como "pesos".
-    // 70 de chance de ser Comum, 25 de Incomum, 4.5 de Raro, etc.
     private static readonly Dictionary<ItemQuality, float> qualityWeights = new Dictionary<ItemQuality, float>
     {
         { ItemQuality.Common, 70f },
@@ -25,7 +23,7 @@ public static class ServerStatAllocator
     };
     private static readonly float totalQualityWeight = qualityWeights.Values.Sum();
 
-    // --- Multiplicadores e Pesos (como antes) ---
+    // --- Multiplicadores e Pesos ---
     private static readonly Dictionary<ItemQuality, float> qualityStatMultipliers = new Dictionary<ItemQuality, float>
     {
         { ItemQuality.Common, 1.0f }, { ItemQuality.Uncommon, 1.15f }, { ItemQuality.Rare, 1.30f },
@@ -70,34 +68,43 @@ public static class ServerStatAllocator
     }
 
     /// <summary>
-    /// Gera stats para uma instância de item, incluindo o sorteio da qualidade.
+    /// Gera stats para uma instância de item, garantindo uma qualidade mínima.
     /// Retorna tanto os stats gerados quanto a qualidade final do item.
     /// </summary>
-    public static (List<BaseStatData> stats, ItemQuality finalQuality) GenerateStatsForItem(ServerEquipmentData eqItemTemplate, int itemLevel)
+    /// <param name="eqItemTemplate">O template do item de equipamento.</param>
+    /// <param name="itemLevel">O nível do item a ser gerado.</param>
+    /// <param name="minQuality">A qualidade mínima garantida para este item.</param>
+    public static (List<BaseStatData> stats, ItemQuality finalQuality) GenerateStatsForItem(
+        ServerEquipmentData eqItemTemplate,
+        int itemLevel,
+        ItemQuality minQuality = ItemQuality.Common) // Adicionado novo parâmetro
     {
-        // 1. SORTEIA A QUALIDADE!
-        ItemQuality finalQuality = RollItemQuality();
+        // --- MUDANÇA PRINCIPAL ---
+        // 1. SORTEIA A QUALIDADE como de costume.
+        ItemQuality rolledQuality = RollItemQuality();
 
-        // O "itemLevel" é dinâmico, baseado no nível de quem dropou o item.
-        // int itemLevel = entityLevel;
+        // 2. GARANTE A QUALIDADE MÍNIMA.
+        // O resultado final será a qualidade sorteada ou a mínima exigida, o que for MAIOR.
+        ItemQuality finalQuality = (ItemQuality)Math.Max((int)rolledQuality, (int)minQuality);
+        // -------------------------
+
         var generatedStats = new Dictionary<StatType, int>();
 
-        // Determina o stat primário com base no primaryStatFocus do template.
-        StatType chosenPrimaryStat;
-        switch (eqItemTemplate.primaryStatFocus)
+        // Determina o stat primário
+        StatType chosenPrimaryStat = eqItemTemplate.primaryStatFocus switch
         {
-            case PrimaryStatFocus.Agility: chosenPrimaryStat = StatType.Agility; break;
-            case PrimaryStatFocus.Intellect: chosenPrimaryStat = StatType.Intellect; break;
-            default: chosenPrimaryStat = StatType.Strength; break;
-        }
+            PrimaryStatFocus.Agility => StatType.Agility,
+            PrimaryStatFocus.Intellect => StatType.Intellect,
+            _ => StatType.Strength,
+        };
 
-        // 2. CALCULAR ORÇAMENTO (BUDGET) USANDO A QUALIDADE SORTEADA
-        float baseBudget = (float)(STAT_BUDGET_BASE * Math.Exp(STAT_BUDGET_EXP_RATE * (itemLevel - 1)));
+        // 3. CALCULAR ORÇAMENTO (BUDGET) USANDO A 'finalQuality'
+        float baseBudget = CalculateStatBudget(itemLevel);
         float qualityMultiplier = qualityStatMultipliers[finalQuality];
-        float slotMultiplier = slotWeights.ContainsKey(eqItemTemplate.equipmentSlot) ? slotWeights[eqItemTemplate.equipmentSlot] : 1.0f;
+        float slotMultiplier = slotWeights.GetValueOrDefault(eqItemTemplate.equipmentSlot, 1.0f);
         int totalStatBudget = (int)Math.Round(baseBudget * qualityMultiplier * slotMultiplier);
 
-        // 3. GERAR ARMADURA
+        // 4. GERAR ARMADURA
         if (eqItemTemplate is ServerArmorData armorItem)
         {
             float baseArmor = armorBaseMultiplier[armorItem.armorType];
@@ -105,7 +112,7 @@ public static class ServerStatAllocator
             if (armorValue > 0) generatedStats[StatType.Armor] = armorValue;
         }
 
-        // 4. DISTRIBUIR BUDGET PRINCIPAL
+        // 5. DISTRIBUIR BUDGET PRINCIPAL
         int staminaBudget = (int)Math.Round(totalStatBudget * 0.5f);
         if (staminaBudget > 0) generatedStats[StatType.Stamina] = staminaBudget;
 
@@ -113,7 +120,6 @@ public static class ServerStatAllocator
 
         List<StatType> possibleSecondaries = new List<StatType> { StatType.CriticalStrikeRating, StatType.HasteRating, StatType.MasteryRating };
 
-        // Número de stats secundários AGORA DEPENDE DA QUALIDADE SORTEADA
         int secondaryStatCount = (finalQuality >= ItemQuality.Rare) ? 2 : (finalQuality >= ItemQuality.Uncommon ? 1 : 0);
         secondaryStatCount = Math.Min(secondaryStatCount, possibleSecondaries.Count);
 
@@ -126,7 +132,12 @@ public static class ServerStatAllocator
             int randIndex = _random.Next(0, possibleSecondaries.Count);
             StatType chosenStat = possibleSecondaries[randIndex];
             possibleSecondaries.RemoveAt(randIndex);
-            int valueToAllocate = (i == secondaryStatCount - 1) ? remainingSecondaryBudget : (int)Math.Round((float)remainingSecondaryBudget / (secondaryStatCount - i));
+
+            // Distribuição mais justa do budget
+            int valueToAllocate = (i == secondaryStatCount - 1)
+                ? remainingSecondaryBudget
+                : (int)Math.Round((float)remainingSecondaryBudget / (secondaryStatCount - i));
+
             if (valueToAllocate > 0)
             {
                 generatedStats[chosenStat] = valueToAllocate;
@@ -137,17 +148,17 @@ public static class ServerStatAllocator
         int primaryStatBudget = remainingBudgetForOthers - (secondaryBudgetTotal - remainingSecondaryBudget);
         if (primaryStatBudget > 0) generatedStats[chosenPrimaryStat] = primaryStatBudget;
 
-        // 5. GERAR STATS TERCIÁRIOS (BÔNUS)
-        var possibleTertiaries = new List<StatType> { StatType.MovementSpeed, StatType.Leech, StatType.Avoidance };
-        if (_random.NextDouble() < TERTIARY_STAT_CHANCE)
+        // 6. GERAR STATS TERCIÁRIOS (BÔNUS)
+        if (finalQuality >= ItemQuality.Rare && _random.NextDouble() < TERTIARY_STAT_CHANCE)
         {
+            var possibleTertiaries = new List<StatType> { StatType.MovementSpeed, StatType.Leech, StatType.Avoidance };
             StatType chosenTertiary = possibleTertiaries[_random.Next(0, possibleTertiaries.Count)];
             float secondaryStatEquivalentBudget = (float)secondaryBudgetTotal / Math.Max(1, secondaryStatCount);
             int tertiaryValue = (int)Math.Round(secondaryStatEquivalentBudget * TERTIARY_BUDGET_RATIO);
             if (tertiaryValue > 0) generatedStats[chosenTertiary] = tertiaryValue;
         }
 
-        // 6. Finalizar e retornar a tupla.
+        // 7. Finalizar e retornar a tupla.
         var finalList = generatedStats
             .Where(kvp => kvp.Value > 0)
             .Select(kvp => new BaseStatData { Stat = kvp.Key, Value = kvp.Value })
@@ -163,44 +174,25 @@ public static class ServerStatAllocator
 
     public static int CalculateBuyPrice(ServerEquipmentData eqItem, int playerLevel)
     {
-        // Usa o nível do jogador como o iLvl para o cálculo do preço.
-        float baseBudget = (float)(STAT_BUDGET_BASE * Math.Exp(STAT_BUDGET_EXP_RATE * (playerLevel - 1)));
-
-        // Itens de vendedor geralmente são de qualidade Incomum (verde), podemos fixar isso.
+        float baseBudget = CalculateStatBudget(playerLevel);
         float qualityMultiplier = qualityStatMultipliers[ItemQuality.Uncommon];
-        float slotMultiplier = slotWeights.ContainsKey(eqItem.equipmentSlot) ? slotWeights[eqItem.equipmentSlot] : 1.0f;
+        float slotMultiplier = slotWeights.GetValueOrDefault(eqItem.equipmentSlot, 1.0f);
         int totalBudget = (int)Math.Round(baseBudget * qualityMultiplier * slotMultiplier);
 
-        const float bronzePerBudgetPoint = 30.0f; // Vendedores cobram mais caro
+        const float bronzePerBudgetPoint = 30.0f;
         float priceQualityMultiplier = 1.0f + ((int)ItemQuality.Uncommon * 0.75f);
         int finalPrice = (int)(totalBudget * bronzePerBudgetPoint * priceQualityMultiplier);
 
-        // Arredondamento para preços "limpos"
-        if (finalPrice > 100)
-        {
-            return (int)(Math.Round(finalPrice / 5.0) * 5);
-        }
-        return Math.Max(1, finalPrice);
+        return (finalPrice > 100) ? ((int)Math.Round(finalPrice / 5.0) * 5) : Math.Max(1, finalPrice);
     }
 
     public static int CalculateSellPrice(ItemInstanceData instanceData)
     {
-        // O preço de venda é uma fração do "budget" de stats do item.
-        // Primeiro, calculamos o budget total que este item teria.
         float baseBudget = CalculateStatBudget(instanceData.ItemLevel);
-        float qualityMultiplier = qualityStatMultipliers[instanceData.Quality];
-        // Precisamos do slot, que não está no ItemInstanceData. Isso é um problema.
-        // Solução: O preço de venda é simplesmente 1/4 do preço de compra. É mais simples.
-
-        // Vamos criar um método de preço de venda genérico.
-        // Por simplicidade, o preço de venda será 25% do que custaria para comprar um item
-        // Incomum do mesmo nível.
-        float buyPriceBudget = (float)(STAT_BUDGET_BASE * Math.Exp(STAT_BUDGET_EXP_RATE * (instanceData.ItemLevel - 1)));
         const float bronzePerBudgetPoint = 5.0f;
         float priceQualityMultiplier = 1.0f + ((int)instanceData.Quality * 0.75f);
-        int simulatedBuyPrice = (int)(buyPriceBudget * bronzePerBudgetPoint * priceQualityMultiplier);
+        int itemValue = (int)(baseBudget * bronzePerBudgetPoint * priceQualityMultiplier);
 
-        // O preço de venda é 25% do preço de "valor" do item.
-        return Math.Max(1, (int)(simulatedBuyPrice * 0.25f));
+        return Math.Max(1, (int)(itemValue * 0.25f));
     }
 }
