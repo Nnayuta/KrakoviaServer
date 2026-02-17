@@ -1,5 +1,0 @@
-IA De monstros:
-
-Fazer o monstro perseguir por x metros apartir do local e agroo e depois resetar para onde estava quando foi agrado
-
-Resolver bug onde ao mover item pra slots errados o item pode acabar sumindo pra sempre!hel

@@ -110,9 +110,9 @@ public class Player : ICombatEntity, IWorldEntity
     public float CurrentResource { get; set; }
 
     // --- Propriedades de Conveniência (Lêem do sistema de Stats) ---
-    public float MaxHealth => Stats.GetStatValue(StatType.Health);
-    public float MaxResource => Stats.GetStatValue(StatType.Mana);
-    public float MovementSpeed => Stats.GetStatValue(StatType.MovementSpeed);
+    public float MaxHealth => Stats?.GetStatValue(StatType.Health) ?? 0;
+    public float MaxResource => Stats?.GetStatValue(StatType.Mana) ?? 0;
+    public float MovementSpeed => Stats?.GetStatValue(StatType.MovementSpeed) ?? 0;
     public CharacterAppearance Appearance { get; private set; }
 
 
@@ -202,7 +202,10 @@ public class Player : ICombatEntity, IWorldEntity
                 {
                     if (DataManager.Items.TryGetValue(equippedStack.ItemID, out var itemTemplate))
                     {
-                        itemStats = itemTemplate.Stats;
+                        if (itemTemplate != null)
+                        {
+                            itemStats = itemTemplate.Stats;
+                        }
                     }
                 }
 
@@ -211,17 +214,17 @@ public class Player : ICombatEntity, IWorldEntity
         }
 
         this.Stats.CalculateAllDerivedStats();
-        // A atualização da vida/mana agora é feita em HandleEquipmentChange
         RecalculateProficiencies();
     }
 
-    private void ApplyItemStats_Internal(List<BaseStatData> stats, object source)
+    private void ApplyItemStats_Internal(List<BaseStatData>? stats, object source)
     {
         if (stats == null) return;
+
         foreach (var statInfo in stats)
         {
             var modifier = new StatModifier(statInfo.Value, StatModifierType.Flat, source);
-            this.Stats.AddStatModifier_NoRecalculate(statInfo.Stat, modifier);
+            this.Stats?.AddStatModifier_NoRecalculate(statInfo.Stat, modifier);
         }
     }
 
@@ -409,7 +412,7 @@ public class Player : ICombatEntity, IWorldEntity
             server.NetworkManager.BroadcastMessageToRelevantPlayers(this.Position, message);
 
             // Interrompemos a execução do método, pois nenhum dano será sofrido.
-            Console.WriteLine($"[COMBAT] Jogador {this.CharacterName} evitou um ataque com {avoidanceChance}% de chance.");
+            // Console.WriteLine($"[COMBAT] Jogador {this.CharacterName} evitou um ataque com {avoidanceChance}% de chance.");
             return;
         }
         // --- LÓGICA DE AVOIDANCE (FIM) ---
@@ -566,22 +569,22 @@ public class Player : ICombatEntity, IWorldEntity
     /// </summary>
     private void HandleEquipmentChange()
     {
-        // 1. Recalcula todos os stats com base no novo equipamento.
         RebuildStats();
 
-        // 2. Garante que a vida atual não exceda a nova vida máxima.
         this.CurrentHealth = Math.Min(this.CurrentHealth, this.MaxHealth);
         this.CurrentResource = Math.Min(this.CurrentResource, this.MaxResource);
 
-        // 3. Notifica o PRÓPRIO jogador sobre TODAS as mudanças, de forma IMEDIATA.
-        _server.NetworkManager.SendVitalsUpdate(this, true);
-        _server.NetworkManager.SendStatsUpdate(this, true);
-        _server.NetworkManager.SendEquipmentUpdate(this, true);
-        _server.NetworkManager.SendInventoryUpdate(this, true);
+        // <<< CORREÇÃO 5: Usamos o operador '?' para segurança e o método correto >>>
+        // O _server pode ser nulo, então usamos ?.
+        // SendInventoryUpdate foi substituído por SendFullInventory, que é o correto
+        // neste contexto de uma grande mudança de estado.
+        _server?.NetworkManager.SendVitalsUpdate(this, true);
+        _server?.NetworkManager.SendStatsUpdate(this, true);
+        _server?.NetworkManager.SendEquipmentUpdate(this, true);
+        _server?.NetworkManager.SendFullInventory(this, true); // <--- MUDANÇA FINAL
 
-        // 4. Transmite a MUDANÇA VISUAL para os OUTROS jogadores (usando a fila normal).
         string message = $"VISUAL_EQUIPMENT_UPDATE|{this.Id}|{GetEquipmentPayload()}";
-        _server.NetworkManager.BroadcastMessageToOthers(this, message);
+        _server?.NetworkManager.BroadcastMessageToOthers(this, message);
 
         Console.WriteLine($"[Equip] Stats do jogador {Username} recalculados e sincronizados.");
     }

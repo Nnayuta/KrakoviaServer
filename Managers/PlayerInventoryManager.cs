@@ -24,8 +24,6 @@ public class PlayerInventoryManager
     /// </summary>
     /// <param name="player">O jogador que receberá o loot.</param>
     /// <param name="lootItems">A lista de itens a serem concedidos.</param>
-    // ARQUIVO ATUALIZADO: Managers/PlayerInventoryManager.cs
-
     public void GrantLootToPlayer(Player player, List<ItemStack> lootItems)
     {
         if (lootItems == null || !lootItems.Any())
@@ -36,34 +34,47 @@ public class PlayerInventoryManager
 
         foreach (var itemStack in lootItems)
         {
-            // <<< A CORREÇÃO >>>
-            // Usamos o novo método AddItemStack que preserva o InstanceID.
-            if (player.PlayerInventory.AddItemStack(itemStack))
+            var originalQuantity = itemStack.Quantity;
+
+            // Agora 'changedSlots' é um Dicionário, como esperado.
+            var changedSlots = player.PlayerInventory.AddItemStack(itemStack);
+
+            // A verificação .Any() agora funciona corretamente.
+            if (changedSlots.Any())
             {
-                // Sucesso!
-                var itemData = DataManager.Items[itemStack.ItemID];
-                string feedback = itemStack.Quantity > 1 ? $"+{itemStack.Quantity} {itemData.itemName}" : $"+{itemData.itemName}";
+                // Pegamos o primeiro item alterado para mostrar o feedback.
+                var firstChangedStack = changedSlots.First().Value;
+                if (firstChangedStack == null) continue; // Segurança extra
+
+                var itemData = DataManager.Items[firstChangedStack.ItemID];
+                string feedback = originalQuantity > 1 ? $"+{originalQuantity} {itemData.itemName}" : $"+{itemData.itemName}";
                 _server.NetworkManager.SendMessageToPlayer(player, $"SHOW_FEEDBACK|{feedback}");
 
-                // AGORA, enviamos os dados da instância para o cliente, pois o item foi adicionado com sucesso.
-                var instanceData = _server.ItemInstanceManager.GetDataForInstance(itemStack.InstanceID);
+                // Envia os dados da instância.
+                var instanceData = _server.ItemInstanceManager.GetDataForInstance(firstChangedStack.InstanceID);
                 if (instanceData != null)
                 {
-                    _server.NetworkManager.SendItemInstanceData(player, itemStack.InstanceID, instanceData);
+                    _server.NetworkManager.SendItemInstanceData(player, firstChangedStack.InstanceID, instanceData);
+                }
+
+                // O loop foreach agora funciona corretamente.
+                // Notifica o cliente sobre CADA slot que foi modificado.
+                foreach (var kvp in changedSlots)
+                {
+                    // kvp.Key é o índice do slot (int)
+                    // kvp.Value é o ItemStack (nunca será null aqui)
+                    _server.NetworkManager.SendInventorySlotUpdate(player, kvp.Key, kvp.Value);
                 }
             }
             else
             {
-                // Falha! O inventário está cheio.
+                // Se AddItemStack retornou um dicionário vazio, o inventário está cheio.
                 _server.NetworkManager.SendMessageToPlayer(player, "ERROR|Inventário cheio.");
-                // TODO: Lógica de correio ou dropar no chão.
                 break;
             }
         }
-
-        // Após a tentativa de adicionar, sempre envia a atualização do inventário.
-        _server.NetworkManager.SendInventoryUpdate(player);
     }
+
     /// <summary>
     /// Handler principal para a movimentação de itens. Cobre arrastar e soltar,
     /// trocar, mover para slot vazio, e empilhar.
@@ -71,48 +82,54 @@ public class PlayerInventoryManager
     public void HandleMoveItemRequest(Player player, int fromSlot, int toSlot)
     {
         var inventory = player.PlayerInventory;
-
-        // Validação básica
         if (!IsValidSlot(inventory, fromSlot) || !IsValidSlot(inventory, toSlot) || fromSlot == toSlot) return;
 
-        ItemStack? fromItemStack = inventory.slots[fromSlot];
-        ItemStack? toItemStack = inventory.slots[toSlot];
+        ItemStack fromItemStack = inventory.slots[fromSlot];
+        ItemStack toItemStack = inventory.slots[toSlot];
 
-        // Caso 1: Movendo para um slot vazio (ou trocando com um slot vazio)
-        if (toItemStack == null)
+        // Se estamos movendo um item para um slot vazio, é uma troca simples.
+        if (fromItemStack != null && toItemStack == null)
         {
             inventory.slots[toSlot] = fromItemStack;
             inventory.slots[fromSlot] = null;
+
+            // <<< MUDANÇA AQUI >>>
+            // Notifica o cliente da troca exata.
+            _server.NetworkManager.SendInventorySlotSwap(player, fromSlot, toSlot);
+            return; // Fim da operação
         }
-        // Caso 2: Os dois slots têm itens. Tentamos trocar ou empilhar.
-        else
+
+        // Se ambos os slots têm itens.
+        if (fromItemStack != null && toItemStack != null)
         {
-            // Se os itens são do mesmo tipo e empilháveis...
-            if (fromItemStack != null && fromItemStack.ItemID == toItemStack.ItemID &&
-                DataManager.Items.TryGetValue(fromItemStack.ItemID, out var itemData) && itemData.isStackable)
+            // Se são itens iguais e empilháveis, tentamos empilhar.
+            if (fromItemStack.ItemID == toItemStack.ItemID && DataManager.Items.TryGetValue(fromItemStack.ItemID, out var itemData) && itemData.isStackable)
             {
-                // Empilha os itens
                 int spaceInStack = itemData.maxStackSize - toItemStack.Quantity;
                 int amountToMove = Math.Min(fromItemStack.Quantity, spaceInStack);
 
                 toItemStack.Quantity += amountToMove;
                 fromItemStack.Quantity -= amountToMove;
 
-                // Se o stack de origem ficou vazio, remove-o.
                 if (fromItemStack.Quantity <= 0)
                 {
                     inventory.slots[fromSlot] = null;
                 }
-            }
-            else
-            {
-                // Se não puder empilhar, simplesmente troca os slots.
-                (inventory.slots[fromSlot], inventory.slots[toSlot]) = (inventory.slots[toSlot], inventory.slots[fromSlot]);
-            }
-        }
 
-        // Após qualquer modificação, envia o estado atualizado para o cliente.
-        _server.NetworkManager.SendInventoryUpdate(player);
+                // <<< MUDANÇA AQUI >>>
+                // Notificamos a atualização dos dois slots afetados.
+                _server.NetworkManager.SendInventorySlotUpdate(player, fromSlot, inventory.slots[fromSlot]);
+                _server.NetworkManager.SendInventorySlotUpdate(player, toSlot, inventory.slots[toSlot]);
+            }
+            else // Se não, simplesmente trocamos.
+            {
+                (inventory.slots[fromSlot], inventory.slots[toSlot]) = (inventory.slots[toSlot], inventory.slots[fromSlot]);
+                // <<< MUDANÇA AQUI >>>
+                _server.NetworkManager.SendInventorySlotSwap(player, fromSlot, toSlot);
+            }
+            return; // Fim da operação
+        }
+        // A chamada antiga para SendInventoryUpdate() foi completamente removida.
     }
 
     public void HandleUseItemRequest(Player player, int inventorySlot)
@@ -159,8 +176,8 @@ public class PlayerInventoryManager
         // --- Feedback para o Cliente ---
         // A notificação de stats/vitals já é tratada dentro do StatusEffectController
         // e dos métodos ReceiveHealing. Só precisamos atualizar o inventário.
-        _server.NetworkManager.SendInventoryUpdate(player);
-        _server.NetworkManager.SendVitalsUpdate(player); // É bom garantir a atualização dos vitals também.
+        _server.NetworkManager.SendInventorySlotUpdate(player, inventorySlot, player.PlayerInventory.slots[inventorySlot]);
+        _server.NetworkManager.SendVitalsUpdate(player);
     }
 
 
@@ -241,7 +258,7 @@ public class PlayerInventoryManager
         }
 
         // --- ATUALIZAÇÕES FINAIS PARA O CLIENTE ---
-        _server.NetworkManager.SendInventoryUpdate(player, true);
+        _server.NetworkManager.SendFullInventory(player, true);
         _server.NetworkManager.SendCurrencyUpdate(player, true);
     }
 
@@ -278,9 +295,8 @@ public class PlayerInventoryManager
 
         player.TotalBronze += totalValueInBronze;
 
-        Console.WriteLine($"[Loja] {player.Username} vendeu {sellQuantity}x {itemData.itemName}. Saldo restante: {new Currency(player.TotalBronze)}");
-        _server.NetworkManager.SendInventoryUpdate(player);
-        _server.NetworkManager.SendMessageToPlayer(player, $"CURRENCY_UPDATE|{player.TotalBronze}");
+        _server.NetworkManager.SendInventorySlotUpdate(player, inventorySlot, player.PlayerInventory.slots[inventorySlot]);
+        _server.NetworkManager.SendCurrencyUpdate(player, true);
     }
 
     #endregion

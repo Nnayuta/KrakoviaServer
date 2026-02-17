@@ -39,10 +39,8 @@ $@"
         Server is starting...
         Version: {ServerConfig.GAME_VERSION}
 ");
-
         Console.WriteLine("Conectando ao banco de dados MariaDB...");
-        // string connectionString = "Server=127.0.0.1;Database=krakovia;User=kakovia;Password=s3@>C6U3K5£:;";
-        string connectionString = "Server=127.0.0.1;Database=krakovia;User=root;Password=;";
+        string connectionString = $"Server=127.0.0.1;Database=krakovia;User={ServerConfig.DATABASE_USER};Password={ServerConfig.DATABASE_PASS};";
 
         IAccountDatabase accountDatabase = new MariaDBAccountDatabase(connectionString);
         ICharacterDatabase characterDatabase = new MariaDBCharacterDatabase(connectionString);

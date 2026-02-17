@@ -22,13 +22,7 @@ public class PlayerEquipmentManager
         // Pega o template para informações genéricas (tipo de slot, etc.)
         if (!DataManager.Items.TryGetValue(itemToEquipStack.ItemID, out ServerItemData itemTemplate)) return;
         if (itemTemplate is not ServerEquipmentData eqTemplate || eqTemplate.equipmentSlot != equipmentSlot) return;
-
-        // =================================================================================
-        // <<< A CORREÇÃO QUE FALTAVA ESTÁ AQUI >>>
-        // =================================================================================
-        int requiredLevel = eqTemplate.requiredLevel; // Começa com o nível do template como fallback.
-
-        // Tenta pegar os dados da instância para este item específico.
+        int requiredLevel = eqTemplate.requiredLevel;
         var instanceData = _server.ItemInstanceManager.GetDataForInstance(itemToEquipStack.InstanceID);
         if (instanceData != null)
         {
@@ -81,10 +75,11 @@ public class PlayerEquipmentManager
     // O resto da classe (HandleUnequipItemRequest, UnequipSlot) pode continuar exatamente como está.
     public void HandleUnequipItemRequest(Player player, EquipmentSlot equipmentSlot)
     {
-        ItemStack itemToUnequipStack = player.PlayerEquipment.GetItemInSlot(equipmentSlot);
+        ItemStack? itemToUnequipStack = player.PlayerEquipment.GetItemInSlot(equipmentSlot);
         if (itemToUnequipStack == null) return;
 
-        if (player.PlayerInventory.AddItemStack(itemToUnequipStack))
+        var changedSlots = player.PlayerInventory.AddItemStack(itemToUnequipStack);
+        if (changedSlots.Any())
         {
             player.UnequipItem(equipmentSlot);
         }
@@ -100,7 +95,8 @@ public class PlayerEquipmentManager
         ItemStack itemStack = player.PlayerEquipment.GetItemInSlot(slot);
         if (itemStack == null) return;
 
-        if (player.PlayerInventory.AddItemStack(itemStack))
+        var changedSlots = player.PlayerInventory.AddItemStack(itemStack);
+        if (changedSlots.Any())
         {
             player.PlayerEquipment.SetItemInSlot(slot, null);
         }

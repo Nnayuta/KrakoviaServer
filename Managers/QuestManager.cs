@@ -43,6 +43,10 @@ public class QuestManager
 
     private void GiveRewards(Player player, ServerQuestData quest)
     {
+        // <<< MUDANÇA >>>
+        // Cria um dicionário para agrupar todas as mudanças de inventário.
+        var allChangedSlots = new Dictionary<int, ItemStack>();
+
         foreach (var reward in quest.GuaranteedRewards)
         {
             switch (reward.Type)
@@ -52,22 +56,32 @@ public class QuestManager
                     break;
                 case QuestRewardType.Currency:
                     player.TotalBronze += reward.Amount;
-                    _server.NetworkManager.SendCurrencyUpdate(player); // Notifica o cliente
+                    _server.NetworkManager.SendCurrencyUpdate(player);
                     break;
                 case QuestRewardType.Item:
                     if (!string.IsNullOrEmpty(reward.ItemID))
                     {
-                        player.PlayerInventory.AddItem(reward.ItemID, (int)reward.Amount);
+                        // Adiciona os slots alterados por este item ao nosso dicionário geral.
+                        var changed = player.PlayerInventory.AddItem(reward.ItemID, (int)reward.Amount);
+                        foreach (var kvp in changed)
+                        {
+                            allChangedSlots[kvp.Key] = kvp.Value;
+                        }
                     }
                     break;
                 case QuestRewardType.Ability:
-                    // TODO: Adicionar lógica para ensinar habilidades
+                    // TODO
                     break;
             }
         }
-        _server.NetworkManager.SendInventoryUpdate(player); // Envia o inventário atualizado
-    }
 
+        // <<< MUDANÇA >>>
+        // Agora, itera sobre o dicionário de todas as mudanças e notifica o cliente.
+        foreach (var kvp in allChangedSlots)
+        {
+            _server.NetworkManager.SendInventorySlotUpdate(player, kvp.Key, kvp.Value);
+        }
+    }
 
     public void HandleAbandonQuestRequest(Player player, string questId)
     {

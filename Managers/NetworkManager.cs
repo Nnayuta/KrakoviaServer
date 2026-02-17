@@ -149,14 +149,13 @@ public class NetworkManager
 
     public void SendFullStateToPlayer(Player player)
     {
-        // Envia todas as mensagens de estado imediatamente.
-        SendInventoryUpdate(player, true);
+        SendFullInventory(player, true);
         SendEquipmentUpdate(player, true);
         SendCurrencyUpdate(player, true);
         SendStatsUpdate(player, true);
         SendFullQuestLog(player, true);
         SendVitalsUpdate(player, true);
-        player.StatusEffectController.SendFullEffectListToClient(); // Este já envia direto, está ok.
+        player.StatusEffectController.SendFullEffectListToClient();
     }
 
     public void SendFullQuestLog(Player player, bool immediate = false)
@@ -198,23 +197,47 @@ public class NetworkManager
         string message = string.Format(CultureInfo.InvariantCulture, "PLAYER_VITALS_UPDATE|{0:F0}|{1:F0}|{2:F0}|{3:F0}",
             player.CurrentHealth, player.MaxHealth, player.CurrentResource, player.MaxResource);
 
-        if (immediate)
-            SendImmediateMessageToEndpoint(message, player.EndPoint);
-        else
-            SendMessageToPlayer(player, message);
+        if (immediate) SendImmediateMessageToEndpoint(message, player.EndPoint);
+        else SendMessageToPlayer(player, message);
     }
 
-    public void SendInventoryUpdate(Player player, bool immediate = false)
+    /// <summary>
+    /// (NOVO MÉTODO) Envia o estado completo do inventário. Usado APENAS no login.
+    /// </summary>
+    public void SendFullInventory(Player player, bool immediate = false)
     {
-        var inventoryParts = player.PlayerInventory.slots.Select(stack =>
-            stack == null ? "null" : $"{stack.InstanceID},{stack.ItemID},{stack.Quantity}"
+        // O formato agora inclui o índice do slot para robustez.
+        var inventoryParts = player.PlayerInventory.slots.Select((stack, index) =>
+            stack == null ? $"{index},null" : $"{index},{stack.InstanceID},{stack.ItemID},{stack.Quantity}"
         );
-        string inventoryMessage = "INVENTORY_UPDATE|" + string.Join("|", inventoryParts);
+        // O comando mudou para INVENTORY_INIT para que o cliente saiba que é uma carga completa.
+        string inventoryMessage = "INVENTORY_INIT|" + string.Join("|", inventoryParts);
 
         if (immediate)
             SendImmediateMessageToEndpoint(inventoryMessage, player.EndPoint);
         else
             SendMessageToPlayer(player, inventoryMessage);
+    }
+
+    /// <summary>
+    /// (NOVO MÉTODO OTIMIZADO) Informa ao cliente que dois slots trocaram de lugar.
+    /// É mais leve do que enviar os dados de dois itens completos.
+    /// </summary>
+    public void SendInventorySlotSwap(Player player, int fromIndex, int toIndex)
+    {
+        string message = $"INV_SLOTS_SWAP|{fromIndex}|{toIndex}";
+        SendMessageToPlayer(player, message);
+    }
+
+    /// <summary>
+    /// (NOVO MÉTODO) Envia a atualização de um ÚNICO slot do inventário.
+    /// Esta é a principal otimização.
+    /// </summary>
+    public void SendInventorySlotUpdate(Player player, int slotIndex, ItemStack stack)
+    {
+        string itemData = (stack == null) ? "null" : $"{stack.InstanceID},{stack.ItemID},{stack.Quantity}";
+        string message = $"INV_SLOT_UPDATE|{slotIndex}|{itemData}";
+        SendMessageToPlayer(player, message);
     }
 
     public void SendEquipmentUpdate(Player player, bool immediate = false)

@@ -28,109 +28,96 @@ public class Inventory
     }
 
     /// <summary>
-    /// Adiciona um item ao inventário pelo seu ID, criando novos stacks.
-    /// Ideal para itens de quest, itens comprados, ou qualquer item que não tenha uma instância pré-existente.
+    /// (MÉTODO ATUALIZADO) Adiciona um item e retorna os slots que foram alterados.
     /// </summary>
-    public bool AddItem(string itemID, int quantity = 1)
+    /// <returns>Um dicionário com [índice do slot, novo ItemStack] para cada slot modificado.</returns>
+    public Dictionary<int, ItemStack> AddItem(string itemID, int quantity = 1)
     {
-        if (!DataManager.Items.TryGetValue(itemID, out var itemData)) return false;
+        var changedSlots = new Dictionary<int, ItemStack>();
+        if (!DataManager.Items.TryGetValue(itemID, out var itemData)) return changedSlots;
 
         // 1. Tenta empilhar em stacks existentes.
         if (itemData.isStackable)
         {
-            foreach (var slot in slots)
+            for (int i = 0; i < slots.Count; i++)
             {
+                var slot = slots[i];
                 if (slot != null && slot.ItemID == itemID && slot.Quantity < itemData.maxStackSize)
                 {
                     int spaceAvailable = itemData.maxStackSize - slot.Quantity;
                     int amountToAdd = Math.Min(quantity, spaceAvailable);
                     slot.Quantity += amountToAdd;
+                    changedSlots[i] = slot; // Registra a mudança
+
                     quantity -= amountToAdd;
-                    if (quantity <= 0) return true;
+                    if (quantity <= 0) return changedSlots;
                 }
             }
         }
 
-        // 2. Se ainda restarem itens, tenta adicioná-los a slots vazios, criando novos stacks.
+        // 2. Se ainda restarem itens, adiciona a slots vazios.
         while (quantity > 0)
         {
-            int? emptySlot = FindEmptySlot();
-            if (!emptySlot.HasValue) return false; // Inventário cheio
+            int? emptySlotIndex = FindEmptySlot();
+            if (!emptySlotIndex.HasValue) return changedSlots; // Inventário cheio
 
             int amountToAdd = Math.Min(quantity, itemData.maxStackSize);
-            slots[emptySlot.Value] = new ItemStack(itemID, amountToAdd);
+            var newStack = new ItemStack(itemID, amountToAdd);
+            slots[emptySlotIndex.Value] = newStack;
+            changedSlots[emptySlotIndex.Value] = newStack; // Registra a mudança
+
             quantity -= amountToAdd;
         }
 
-        return true;
+        return changedSlots;
     }
 
     /// <summary>
-    /// Adiciona um ItemStack pré-existente ao inventário, preservando seu InstanceID e empilhando quando possível.
-    /// Ideal para loot de monstros.
+    /// (MÉTODO ATUALIZADO) Adiciona um ItemStack pré-existente e retorna os slots alterados.
     /// </summary>
-    public bool AddItemStack(ItemStack stackToAdd)
+    /// <returns>Um dicionário com [índice do slot, novo ItemStack] para cada slot modificado.</returns>
+    public Dictionary<int, ItemStack> AddItemStack(ItemStack stackToAdd)
     {
-        if (stackToAdd == null || stackToAdd.Quantity <= 0) return false;
-        if (!DataManager.Items.TryGetValue(stackToAdd.ItemID, out var itemData)) return false;
+        var changedSlots = new Dictionary<int, ItemStack>();
+        if (stackToAdd == null || stackToAdd.Quantity <= 0) return changedSlots;
+        if (!DataManager.Items.TryGetValue(stackToAdd.ItemID, out var itemData)) return changedSlots;
 
-        // --- LÓGICA PARA ITENS EMPILHÁVEIS ---
         if (itemData.isStackable)
         {
-            // 1. Tenta empilhar em stacks existentes do mesmo item.
-            foreach (var slot in slots)
+            for (int i = 0; i < slots.Count; i++)
             {
+                var slot = slots[i];
                 if (slot != null && slot.ItemID == stackToAdd.ItemID && slot.Quantity < itemData.maxStackSize)
                 {
                     int spaceAvailable = itemData.maxStackSize - slot.Quantity;
                     int amountToAdd = Math.Min(stackToAdd.Quantity, spaceAvailable);
 
                     slot.Quantity += amountToAdd;
-                    stackToAdd.Quantity -= amountToAdd;
+                    changedSlots[i] = slot; // Registra a mudança
 
-                    // Se empilhamos tudo, o trabalho acabou.
+                    stackToAdd.Quantity -= amountToAdd;
                     if (stackToAdd.Quantity <= 0)
                     {
-                        // Como o item original foi "consumido", podemos remover seus dados de instância.
-                        // Isso evita que dados de itens "fantasmas" fiquem na memória.
                         UDPServer.Instance?.ItemInstanceManager.UnregisterItem(stackToAdd.InstanceID);
-                        return true;
+                        return changedSlots;
                     }
                 }
             }
-
-            // 2. Se ainda restam itens no stackToAdd, ele precisa de um novo slot.
-            if (stackToAdd.Quantity > 0)
-            {
-                int? emptySlot = FindEmptySlot();
-                if (emptySlot.HasValue)
-                {
-                    slots[emptySlot.Value] = stackToAdd;
-                    return true;
-                }
-            }
-            else
-            {
-                // Isso acontece se a quantidade foi totalmente empilhada.
-                return true;
-            }
         }
-        // --- LÓGICA PARA ITENS NÃO EMPILHÁVEIS (EQUIPAMENTOS) ---
-        else
+
+        // Adiciona o resto (ou o item não empilhável) a um novo slot.
+        if (stackToAdd.Quantity > 0)
         {
-            int? emptySlot = FindEmptySlot();
-            if (emptySlot.HasValue)
+            int? emptySlotIndex = FindEmptySlot();
+            if (emptySlotIndex.HasValue)
             {
-                slots[emptySlot.Value] = stackToAdd;
-                return true;
+                slots[emptySlotIndex.Value] = stackToAdd;
+                changedSlots[emptySlotIndex.Value] = stackToAdd; // Registra a mudança
             }
         }
 
-        // Se chegamos aqui, o inventário está cheio.
-        return false;
+        return changedSlots;
     }
-
-    // --- O RESTO DA CLASSE CONTINUA IGUAL ---
 
     public void RemoveItem(int slotIndex)
     {

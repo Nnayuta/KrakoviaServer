@@ -369,7 +369,7 @@ public class CombatManager
                 string leechMessage = $"COMBAT_EVENT|{caster.SessionId}|{CombatEventType.Heal}|{(int)leechAmount}|false";
                 _server.NetworkManager.BroadcastMessageToRelevantPlayers(caster.Position, leechMessage);
 
-                Console.WriteLine($"[COMBAT] {caster.Id} curou {(int)leechAmount} via Leech ({leechPercent}%).");
+                // Console.WriteLine($"[COMBAT] {caster.Id} curou {(int)leechAmount} via Leech ({leechPercent}%).");
             }
             // --- LÓGICA DE LEECH (FIM) ---
 
@@ -397,7 +397,7 @@ public class CombatManager
         }
         else if (effectData is ServerApplyStatusEffectData applyStatusEffect)
         {
-            Console.WriteLine($"[COMBAT] Aplicando Status Effect '{applyStatusEffect.StatusEffectID}' de {caster.Id} para {target.Id}");
+            // Console.WriteLine($"[COMBAT] Aplicando Status Effect '{applyStatusEffect.StatusEffectID}' de {caster.Id} para {target.Id}");
             target.StatusEffectController.ApplyEffect(applyStatusEffect.StatusEffectID, caster);
         }
         else if (effectData is ServerSummonNpcEffectData summonEffect)

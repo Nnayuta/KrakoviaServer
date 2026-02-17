@@ -3,7 +3,7 @@ public class GiveItemCommand : ICommand
     public string Name => "item";
     public string Description => "Dá um item a um jogador online.";
     public string Usage => "item <CharacterNameOrID> <ItemID> <Quantidade>";
-    public int RequiredPermissionLevel => 50; // Apenas GMs
+    public int RequiredPermissionLevel => 50;
 
     public void Execute(Player sender, string[] args, UDPServer server)
     {
@@ -28,11 +28,21 @@ public class GiveItemCommand : ICommand
             return;
         }
 
-        if (targetPlayer.PlayerInventory.AddItem(itemId, quantity))
+        // <<< CORREÇÃO 1: Captura o resultado do método AddItem >>>
+        var changedSlots = targetPlayer.PlayerInventory.AddItem(itemId, quantity);
+
+        // <<< CORREÇÃO 2: Verifica se o dicionário tem alguma entrada. Se tiver, foi um sucesso. >>>
+        if (changedSlots.Any())
         {
             string successMsg = $"[Comando] Sucesso! {quantity}x '{itemId}' adicionado ao inventário de {targetPlayer.CharacterName}.";
             server.CommandManager.SendFeedbackToSender(sender, successMsg);
-            server.NetworkManager.SendInventoryUpdate(targetPlayer);
+
+            // <<< CORREÇÃO 3: Itera sobre os slots alterados e envia uma atualização para cada um. >>>
+            foreach (var kvp in changedSlots)
+            {
+                // kvp.Key = slotIndex, kvp.Value = ItemStack
+                server.NetworkManager.SendInventorySlotUpdate(targetPlayer, kvp.Key, kvp.Value);
+            }
         }
         else
         {
