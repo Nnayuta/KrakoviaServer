@@ -31,6 +31,7 @@ Devido à limitação de tempo:
 - As mensagens de commit podem não seguir um padrão.
 - Algumas partes do código podem estar pouco organizadas ou sem refatoração adequada.
 - Pode haver código experimental ou soluções improvisadas.
+- Foi utilizado AI para acelerar o desenvolvimento, pois o prazo era curto e era necessario desenvolver tanto o client quanto o server!
 
 O versionamento foi utilizado principalmente como ferramenta de backup e controle incremental, não como histórico técnico formal.
 
